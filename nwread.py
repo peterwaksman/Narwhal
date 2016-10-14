@@ -133,11 +133,8 @@ def ReadTextAsCausal(nar, tokens, ifound):
             imax = i
             maxab = t*v
             
-
     tokensA = tokens[:imax]
     tokensB = tokens[imax:]
-    nar.thing.clear()
-    nar.value.clear()
     
     kfound = []
     nar.clearIFound()
@@ -156,7 +153,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
 
     return t+v+c
 
-def ReadTextAsSequential(nar, tokens, ifound):  
+def ReadTextAsSequential(nar, tokens, ifound):
     if nar.action != NAR_THEN: 
         return False
     
@@ -179,8 +176,7 @@ def ReadTextAsSequential(nar, tokens, ifound):
 
     tokensA = tokens[:imax]
     tokensB = tokens[imax:]
-    nar.thing.clear()
-    nar.value.clear()
+   
     kfound = []
     nar.clearIFound()
     
@@ -329,6 +325,12 @@ class NWReader:
                 GOF = pre.GOF
 
             if trigger==NO_TRIGGER:
+                if itok==len(tokens)-1 : 
+                    if preIsComplete:
+                        g = self.V.vault()
+                        eventStr += " V("+str(GOF)+")"
+                    self.V.propose(nar, ifound,tokens, readstart)  
+                    eventStr += " V("+str(GOF)+")P"
                 eventStr += "\n"
                 continue
             
@@ -339,8 +341,7 @@ class NWReader:
                     eventStr += " V("+str(GOF)+")"
                     self.V.propose(nar, ifound,tokens, readstart)
                     eventStr += "P"
-                ifound = []
-                readstart = itok      
+                ifound = []   
                 nar.clear()    
                 forget = 0                              
 
