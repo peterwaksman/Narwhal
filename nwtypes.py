@@ -180,6 +180,34 @@ class VAR:
             self.ifound = ifound[:] # restore
             return found
 
+    ## like findInText() but simply returns true/false and corrupts contents of self
+    def scan( self, originaltokens):
+        self.clear()
+        # ensure lower case
+        tokens = []
+        for tok in originaltokens:
+            if tok==0:
+                tokens.append(0)
+            else:
+                tokens.append(tok.lower())
+            
+        # for each token 
+        for itok in range( len(tokens) ):
+            ikname = 0 
+            for kname in self.knames: # for each name in self's klist
+                
+                klist = KList.instances[ kname ]
+                
+                found = klist.findInText(tokens, itok, self.ifound) 
+                if found:
+                    return True
+  
+        for child in self.children:
+            foundC = child.scan( tokens )
+            if foundC :
+                return True
+
+
     # use Print() for recursive print, or Print(0,False) for non-recursive
     def Print(self, ntabs=0, recurs=True):
         tab = ""
@@ -462,6 +490,23 @@ class NAR:
         r = self.relation.find(tok) 
         v = self.value.find(tok)
         return t or a or r or v
+
+    # returns True if any token finds a match in self.
+    def scan( self, originaltokens):
+        if ORDER(self)==0:
+            return self.scan(originaltokens)
+        if self.thing.scan(originaltokens):
+            return True
+        elif self.thing.action.scan(originaltokens):
+            return True
+        elif self.thing.relation.scan(originaltokens):
+            return True
+        elif self.value.scan(originaltokens):
+            return True
+        return False
+    def Scan(self, text):
+        tokens = TOKS(text)
+        return scan(self, tokens)
 
     def numSlots(self):
         if isinstance(self, VAR):  

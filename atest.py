@@ -41,11 +41,11 @@ r = attribute( LOC, SOURCE, PROX )
 
 s = attribute( SOUND, INTENSITY )
 c = sequence(r,s)
-c = r
+#c = r
 
-#text = "The hotel was over a bar and that was noisy"
+text = "The hotel was over a bar and that was noisy"
 #text = "The hotel was near the border and far from downtown"
-text = NoiseText
+#text = NoiseText
 tokens = TOKS(text)
 ifound = []
 x = ReadText(c,tokens,ifound)
@@ -53,8 +53,9 @@ ifound = cleanFound(ifound)
 R = NarRecord(c, ifound, tokens)
 
 c.clear()
+
 C = NWReader(E,c)
 C.readText(text)
 #C.readText(NoiseText)
-R = NarRecord(c,ifound,tokens)
+
 x=2
