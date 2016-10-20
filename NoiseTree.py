@@ -236,5 +236,11 @@ INSULATION.sub(LETINOUT)
 # AFFECT - no children
  
   
-
+# Some NARs
+#                       sound->me :: me_/affect
+#                       sound_/intensity_/source_/timeOfDay (use implicits)
+#                       problem_/noise
+#                       (barrier_/state)-letInOut->sound
+#                       location _nearfar_/ source
+#                       X_/Y :: sound
 

@@ -41,7 +41,7 @@ r = attribute( LOC, SOURCE, PROX )
 
 s = attribute( SOUND, INTENSITY )
 c = sequence(r,s)
-#c = r
+#c = cause(r,s)
 
 text = "The hotel was over a bar and that was noisy"
 #text = "The hotel was near the border and far from downtown"
@@ -49,6 +49,7 @@ text = "The hotel was over a bar and that was noisy"
 tokens = TOKS(text)
 ifound = []
 x = ReadText(c,tokens,ifound)
+
 ifound = cleanFound(ifound)
 R = NarRecord(c, ifound, tokens)
 

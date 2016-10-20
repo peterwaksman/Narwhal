@@ -10,8 +10,8 @@ from nwcontrol import *
 # as separate count of numSlotsUsed() and ifound (the indices of found tokens) 
 # during the reading process. Here it gets scored and perhaps saved or "vaulted".
 # There is a poetic analogy with how superposition of waves is
-# additive until an event is observed. Events are not additive.  
-# "GOF" means "goodness of fit" between narrative and text
+# additive until an event is observed. Events are not additive. In any case,
+# the vaulting is an event with GOF meaning "goodness of fit" between narrative and text
 
 class NarRecord:
     def __init__(self, nar, ifound, tokens):
@@ -25,7 +25,7 @@ class NarRecord:
 
         # "goodness of fit"
     def gof(self, nar, tokens):  
-        u = self.nused;
+        u = self.nused; # a snapshot of state when the NarRecord is created
         n = nar.numSlots()
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
@@ -76,11 +76,10 @@ class NarVault:
         if len(ifound)==0:
             return;       
         ifound = cleanFound(ifound) 
-        # re-consistute the original ifound when readstart was zero
+        # use readstart to adjust relative indices back to absolute ones 
         jfound = []
         for i in range(len(ifound)):
             jfound.append( ifound[i]+readstart )      
-        #Aself.pre = NarRecord(nar, ifound,tokens)
         self.pre = NarRecord(nar, jfound,tokens)
                 
     def abandonPre(self):

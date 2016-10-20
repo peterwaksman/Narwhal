@@ -8,11 +8,11 @@ from nwvault import *
 ## a narrative is fit to an entire segment of text. This leaves it
 ## to a higher level to decide when something has been read (based
 ## on triggers such as all narrative slots being used, or the sentence
-## ending, etc...). That is the job of the NWReader ("NarReader") below.
+## ending, etc...). That is the job of the "higer level" NWReader ("NarReader").
 ##
 ## But the plain ReadText() function must be recursive, since NARs are.
 ## The difficulty is that a provisional concept of goodness of fit
-## is needed in order for the two part narratives (sequence() and cause())
+## is needed in order for the two part narratives, sequence() and cause(),
 ## to be optimally fit to a single piece of text. So I used -basically- the 
 ## the number of used slots, which is additive and can be returned from subnarratives
 ## recursively and ALSO the list of ifound[] which also can be returned
@@ -26,10 +26,10 @@ def ReadText(nar, tokens, ifound ):
     if ORDER(nar)==0:
         return ReadText0(nar, tokens, ifound)
 
-    #thing    = nar.thing # used later
+    #thing    = nar.thing # used elsewhere
     action   = nar.action
     relation = nar.relation  
-    #value    = nar.value # used later
+    #value    = nar.value # used elsewhere
 
     if relation!=NULL_VAR:
         return ReadTextAsAttribute(nar, tokens, ifound)
@@ -54,11 +54,11 @@ def ReadText0( nar, tokens, ifound ):
         return 0     
 
     found = nar.findInText(tokens) # cummulative with nar.ifound set
-   
     # Relay the ifound up the stack. Someone else is responsible
     # for calling nar.clear() - perhaps via the root of the tree
     if found :
         ifound.extend( nar.ifound )
+        nar.found = True
         return 1
     return 0  
 
@@ -236,6 +236,11 @@ def getTrigger(nar, tokens, itok, forget ):
     return NO_TRIGGER
 
 
+
+######################################################
+################# NWReader ###########################
+######################################################
+
 class NWReader:
     def __init__(self, treeroot, nar):
         
@@ -280,7 +285,7 @@ class NWReader:
             return
             
         nar    = self.nar
-        ifound =  self.ifound
+        ifound =  self.ifound 
         
         tokens = self.tokens
 
@@ -309,8 +314,10 @@ class NWReader:
             ifound = cleanFound(ifound)
             if len(ifound)>oldL:
                 forget = 0
+                eventStr += "f"
             else:
                 forget = forget + 1
+                eventStr += " "
 
             i = itok-readstart #the current index in subtoks          
             
@@ -327,7 +334,7 @@ class NWReader:
             if trigger==NO_TRIGGER:
                 if itok==len(tokens)-1 : 
                     if preIsComplete:
-                        g = self.V.vault()
+                        self.V.vault()
                         eventStr += " V("+str(GOF)+")"
                     self.V.propose(nar, ifound,tokens, readstart)  
                     eventStr += " V("+str(GOF)+")P"
@@ -337,7 +344,7 @@ class NWReader:
             elif trigger==FORGET_TRIGGER :
                 eventStr += " frgt"
                 if preIsComplete or GOF>0.5:
-                    g = self.V.vault()
+                    self.V.vault()
                     eventStr += " V("+str(GOF)+")"
                     self.V.propose(nar, ifound,tokens, readstart)
                     eventStr += "P"
@@ -348,7 +355,7 @@ class NWReader:
             elif trigger==COMPLETE_TRIGGER :
                 eventStr += " DONE"
                 if preIsComplete:
-                    g = self.V.vault()
+                    self.V.vault()
                     eventStr += " V("+str(GOF)+")"
                 # overlays nar on pre if pre is not complete               
                 self.V.propose(nar, ifound,tokens, readstart) 
@@ -364,7 +371,7 @@ class NWReader:
                 x = isLogicControl(subtoks, itok) # can assume not NULL_VAR
                 if x.isA("AND"):
                     if preIsComplete or GOF>0.5:
-                        g = self.V.vault()
+                        self.V.vault()
                         eventStr += " V("+str(GOF)+")"
                         #putting this under an "if" is different from 
                         # BUT/HEDGE and critical
@@ -378,7 +385,7 @@ class NWReader:
                         self.V.blockPre()
                    
                     if preIsComplete or GOF>0.5:
-                        g = self.V.vault()
+                        self.V.vault()
                         eventStr += " V("+str(GOF)+")"
                     ifound = []
                     readstart = itok
@@ -389,11 +396,11 @@ class NWReader:
                     if GOF<=0.5 :
                         self.V.abandonPre()
                     else:
-                        g = self.V.vault()
+                        self.V.vault()
                         eventStr += " V("+g+")"
                         V.blockPre() # in anticipation of pre being filled
                 else:
-                    print "UNHANDLED CONTROL=", x.knames[0]
+                    print "UNHANDLED CONTROL=", x.knames[0], " at itok=",itok
 
             elif trigger==PUNCTUATION_TRIGGER :
                 eventStr += " punct"
@@ -401,8 +408,8 @@ class NWReader:
                 if p.isA("COMMA") or p.isA("PERIOD") or p.isA("SEMICOLOMN"):  
                     # for now, everyone uses "AND" processing                              
                     if preIsComplete or GOF>0.5:
-                        g = self.V.vault()
-                        eventStr += " V("+g+")"
+                        self.V.vault()
+                        eventStr += " V("+str(GOF)+")"
                         # also under an "if" for now
                         ifound = []
                         readstart = itok
@@ -413,7 +420,7 @@ class NWReader:
             # last token processing. For now, borrows from COMPLETE_TRIGGER
             if itok==len(tokens)-1 : 
                 if preIsComplete:
-                    g = self.V.vault()
+                    self.V.vault()
                     eventStr += " V("+str(GOF)+")"
                 self.V.propose(nar, ifound,tokens, readstart)  
                 eventStr += " V("+str(GOF)+")P"

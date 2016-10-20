@@ -64,7 +64,8 @@ kFORWARDHEDGES = "although, even if,despite,instead of,even though,even when,"
 
 kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is "
 
-kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as "
+# inclusion of "that" may backfire ("over a bar that was noisy")
+kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as , that"
 
 # pre conjunctions
 kIF = "as $ if "
@@ -202,20 +203,20 @@ def replacePunctuation( text ):
     return newtext
     
 
-PERIOD_KLIST = KList("PERIOD" , "_dot_")
-COMMA_KLIST = KList("COMMA"     , "_comma_")
-SEMI_KLIST = KList("SEMICOLON"  , "_semi_")
-QUERY_KLIST = KList("QUERY"     , "_query_")
-EXCLM_KLIST = KList("EXCLAIM"   , "_hey_")
+kPERIOD = KList("PERIOD" , "_dot_")
+kCOMMA = KList("COMMA"     , "_comma_")
+kSEMI = KList("SEMICOLON"  , "_semi_")
+kQUERY = KList("QUERY"     , "_query_")
+kEXCLM = KList("EXCLAIM"   , "_hey_")
 
-PERIOD_OP = PERIOD_KLIST.var()
-COMMA_OP  = COMMA_KLIST.var()
-SEMI_OP   = SEMI_KLIST.var()
-QUERY_OP  = QUERY_KLIST.var()
-EXCLM_OP  = EXCLM_KLIST.var()
+PERIOD_OP = kPERIOD.var()
+COMMA_OP  = kCOMMA.var()
+SEMI_OP   = kSEMI.var()
+QUERY_OP  = kQUERY.var()
+EXCLM_OP  = kEXCLM.var()
 
-PUNCT_KLIST = KList("PUNCTUATION", "")
-PUNCTUATION_OP = PUNCT_KLIST.var()
+kPUNCT = KList("PUNCTUATION", "")
+PUNCTUATION_OP = kPUNCT.var()
 PUNCTUATION_OP.sub(PERIOD_OP )
 PUNCTUATION_OP.sub(COMMA_OP )
 PUNCTUATION_OP.sub(SEMI_OP )
