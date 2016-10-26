@@ -6,4 +6,3 @@ The concept of a narrow world is essentially the same as a “semantic frame” as d
 
 Other spellings (for the fussy GitHub search engine) trip advisor, trip-advisor, chatbot, nlp, frame net, keyword, keynarrative
 
-![alt tag](https://raw.githubusercontent.com/peterwaksman/Narwhal/NarwhalInPython.png)
