@@ -5,3 +5,5 @@ A narrow world is a collection of related topics with many short text examples. 
 The concept of a narrow world is essentially the same as a “semantic frame” as described by Fillmore [Fillmore] and archived at Berkeley's "FrameNet"; however the process for extracting what has been said is implemented using the general method of “Best Model Classification” and “The Elements of Narrative” [WAKSMAN].
 
 Other spellings (for the fussy GitHub search engine) trip advisor, trip-advisor, chatbot, nlp, frame net, keyword, keynarrative
+
+![alt tag](https://raw.githubusercontent.com/peterwaksman/Narwhal/NarwhalInPython.png)
