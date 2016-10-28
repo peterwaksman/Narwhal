@@ -1,7 +1,7 @@
 import nwfind
 import nwutils
 
-print "Hello"
+print("Hello")
 
 DEBUG_TXT = ""
   
@@ -92,10 +92,10 @@ class VAR:
 
     def copyUsing(self,tree):
         name = self.knames[0]
-        #print name, "\n"
+        #print(name+ "\n")
         if not isinstance(tree, VAR):
-            print "OOPS in copyUsing()"
-            print name
+            print("OOPS in copyUsing()")
+            print(name)
             return
         else:
             x = tree.lookup(name) # find VAR with same name, in this tree           
@@ -214,23 +214,30 @@ class VAR:
         for i in range(ntabs):
             tab += "  "
 
-        print(tab+"knames:"), 
+        endStr = tab+"knames:"
+        #print(tab+"knames:"), 
         for name in self.knames:
             if not self.exclusive:
-                print(name+" +"),
+                endStr += (name+" +")
+                #print(name+" +"),
             else:
-                print(name+" |"),
+                endStr += (name+"|")
+                #print(name+" |"),
         if self.found:
             tmp = "*"
         else:
             tmp = ""
-        print("\n" + tab+"found :"),tmp
+
+        endStr += endStr + "\n" + tab+"found :"+ tmp
+        print(endStr)
+        #print("\n" + tab+"found :"+ tmp )
+
         if self.foundInChildren:
             tmp = "*"
         else:
             tmp = ""
-        print(tab + "foundC:"),tmp
-        print(tab + "plrty :"), self.polarity
+        print(tab + "foundC:"+tmp)
+        print(tab + "plrty :"+ self.polarity)
         if len( self.children )>0 :
             print(tab + "chldrn:")
         else:
@@ -258,7 +265,6 @@ class VAR:
         if self.polarity==False:
             output += "-"
         output += '\n'        
-        #print "\n"
         for child in self.children:
             output += child.PrintSimple(ntabs+1)
         return output
@@ -318,6 +324,7 @@ class VAR:
 
     # note this does not climb up the tree of parents returning true if foundInChildren 
     # This only returns true for the self VAR's knames[0] argument
+    # nor does it climb down the tree searching for childern. (Gosh someone should do that)
     def isA(self, name):
         if name==self.knames[0]:
             return True
@@ -535,11 +542,7 @@ class NAR:
         else:
             return 0       
 
-    def showUseRatio(self):
-        s = self.numSlots()
-        u = self.numSlotsUsed()
-        print u, "/", s
-        
+          
     def getType(nar):
         thing    = nar.thing
         action   = nar.action
@@ -560,7 +563,7 @@ class NAR:
             return NULL_NARTYPE
 
     def printType(self):
-        print strNarType( self.getType())
+        print( strNarType( self.getType()) )
 
     def str(nar, ntabs=0):
         tab = ""
@@ -590,7 +593,7 @@ class NAR:
 
     def Print(nar, ntabs=0):
         s = nar.str(ntabs)
-        print s
+        print(s)
 #####################################################        
         
 #------------ZERO for NAR() type
@@ -715,4 +718,4 @@ def strNAR(nar, ntabs=0):
 
 def printNAR(nar, ntabs=0):
     s = strNAR(nar,ntabs)
-    print s
+    print(s)

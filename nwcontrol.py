@@ -42,7 +42,7 @@ kCONJUNCTIONS= " and , also , then , but also ,but more "
 
 
 
-kNEGATIONS = "isn't,wasn't,barely,hardly,unfounded, is not,"
+kNEGATIONS = "isn't,wasn't,barely,hardly,unfounded, is not,isnt,"
 kNEGATIONS += "avoid,rather than,not so,not true,false,nothing # too|being|was|but,"
 kNEGATIONS += " minimum,minimal,neither,forget it,not at all"
 kNEGATIONS += "low # volume|floor,or $ less,difficult to be,poor"
@@ -156,7 +156,7 @@ def findControl(self, tokens, itok):
         klist = KList.instances[ kname ]
         found = klist.findInText(tokens, itok, self.ifound)
         if found:
-            #print "really found at ",kname
+            #print( "really found at "+kname)
             self.found = True
             return self
     
@@ -189,7 +189,8 @@ def replacePunctuation( text ):
     newtext = ""
     for i in range(len(text)):
         if text[i]=='.' :
-            newtext += " _dot_ "
+            newtext += " _period_ "
+            noEnd = False
         elif text[i]==',' :
             newtext += " _comma_ "
         elif text[i]==';' :
@@ -203,7 +204,7 @@ def replacePunctuation( text ):
     return newtext
     
 
-kPERIOD = KList("PERIOD" , "_dot_")
+kPERIOD = KList("PERIOD" , "_period_")
 kCOMMA = KList("COMMA"     , "_comma_")
 kSEMI = KList("SEMICOLON"  , "_semi_")
 kQUERY = KList("QUERY"     , "_query_")
@@ -228,7 +229,7 @@ def findPunctuation(self, tokens, itok):
         klist = KList.instances[ kname ]
         found = klist.findInText(tokens, itok, self.ifound)
         if found:
-            #print "really found at ",kname
+            #print( "really found at "+kname)
             self.found = True
             return self
     
@@ -271,3 +272,55 @@ def discountControls(tokens, ifound):
     cleanFound(jfound)
     ifound.extend(jfound)
     return ifound
+
+
+
+#######################################################    
+#######################################################    
+### ControlData 
+#######################################################    
+#######################################################    
+
+# Control types.
+NO_CTRLTYPE          = 0       
+PUNCTUATION_CTRLTYPE = 1 
+OPERATOR_CTRLTYPE    = 2   
+END_CTRLTYPE         = 3
+
+class ControlData:
+    def __init__(self):
+        self.type = NO_CTRLTYPE
+        self.ctrl = NULL_VAR
+        self.ictrl = -1
+
+
+# return with ictrl either the index of the control or
+# L=len(tokens). Generally read up to <ictrl
+def scanNextControl(tokens, istart):
+    CD = ControlData()
+    L = len(tokens);
+    if readstart>L-1 :
+        CD.type = END_CTRLTYPE
+        CD.ctrl = NULL_VAR
+        CD.ictrl = L
+        return CD
+   
+    for itok in range(istart, L):
+        ctrl = isLogicControl(tokens,itok)
+        if ctrl!=NULL_VAR:
+            CD.type = OPERATOR_CTRLTYPE
+            CD.ctrl = ctrl
+            CD.ictrl = itok
+            return CD
+
+        ctrl = isPunctuationControl(tokens, itok)
+        if ctrl!=NULL_VAR:
+            CD.type = PUNCTUATION_CTRLTYPE
+            CD.ctrl = ctrl
+            CD.ictrl = itok
+            return CD
+
+        CD.type = END_CTRLTYPE
+        CD.ctrl = NULL_VAR
+        CD.ictrl = L
+        return CD

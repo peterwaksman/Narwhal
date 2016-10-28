@@ -15,25 +15,26 @@ from nwcontrol import *
 
 class NarRecord:
     def __init__(self, nar, ifound, tokens):
-        self.nused = nar.numSlotsUsed()   # num slots used in nar since nar.clear() erases this info.
+        self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
+        self.nslots = nar.numSlots()      # keep for convenience
         self.ifound = ifound[:]           # indices that have already been read  
         self.blocked = False
-        self.GOF = self.gof(nar,tokens)
+        self.GOF = self.gof(tokens)
 
     def block(self):
         self.blocked = True
 
         # "goodness of fit"
-    def gof(self, nar, tokens):  
+    def gof(self, tokens):  
         u = self.nused; # a snapshot of state when the NarRecord is created
-        n = nar.numSlots()
+        n = self.nslots 
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
         jfound = cleanFound(jfound)
         r = histo( jfound, L )
         f = getFoundRange(jfound,L)
         if f==0 or n==0:
-            print "error in NarRecord.gof()"
+            print("error in NarRecord.gof()")
         else:
             G = (float(u)/float(n))*(float(r)/float(f))  # one  of several possibilities.
             return G
@@ -61,8 +62,7 @@ class NarVault:
           
     def vault(self):
         #if self.pre.GOF<=0.1:
-        #    print "Aborting vault for lack of fit"
-        gofStr = ""
+        #    print( "Aborting vault for lack of fit" )
         if self.pre!=0 and self.pre.GOF>0.1:
             if self.preblock:
                 self.pre.block() #apply any pre blockage
@@ -70,18 +70,23 @@ class NarVault:
             gofStr = str(self.pre.GOF)
         self.pre = 0
         self.preblock = False
-        return gofStr
                      
     def propose(self, nar, ifound,tokens, readstart):
         if len(ifound)==0:
             return;       
         ifound = cleanFound(ifound) 
+
         # use readstart to adjust relative indices back to absolute ones 
-        jfound = []
-        for i in range(len(ifound)):
-            jfound.append( ifound[i]+readstart )      
-        self.pre = NarRecord(nar, jfound,tokens)
-                
+        jfound = shiftFoundIndices(ifound, readstart)
+ 
+        self.pre = NarRecord(nar, jfound, tokens)
+
+    def propose2(self, nar, ifound, tokens):
+        if len(ifound)==0:
+            return;       
+        ifound = cleanFound(ifound) 
+        self.pre = NarRecord(nar,ifound,tokens)
+               
     def abandonPre(self):
         self.pre = 0
         

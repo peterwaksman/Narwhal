@@ -4,6 +4,12 @@ from nwtypes import *
 from nwcontrol import *
 from nwvault import *
 
+def PlainRead( nar, tokens):
+    jfound = []
+    ReadText(nar, tokens, jfound )
+    shiftFoundIndices(jfound, istart) # also performs cleanFound()
+    return jfound   
+
 ## ReadText() and its sub routines implement "plain" reading where
 ## a narrative is fit to an entire segment of text. This leaves it
 ## to a higher level to decide when something has been read (based
@@ -400,7 +406,7 @@ class NWReader:
                         eventStr += " V("+g+")"
                         V.blockPre() # in anticipation of pre being filled
                 else:
-                    print "UNHANDLED CONTROL=", x.knames[0], " at itok=",itok
+                   print("UNHANDLED CONTROL="+x.knames[0]+ " at itok="+str(itok))
 
             elif trigger==PUNCTUATION_TRIGGER :
                 eventStr += " punct"
@@ -415,7 +421,7 @@ class NWReader:
                         readstart = itok
                         nar.clearIFound()
                 else: # p.isA("SEMICOLON") or p.isA("EXCLAIM"):
-                    print "unhandled punctuation"
+                    print("unhandled punctuation")
 
             # last token processing. For now, borrows from COMPLETE_TRIGGER
             if itok==len(tokens)-1 : 
@@ -431,9 +437,172 @@ class NWReader:
             eventStr += "\n"
 
         self.V.vault()
-        print eventStr
+        print(eventStr)
         
-        print "Vault has ", len(self.V._vault), "entries"
+        print("Vault has " +  str(len(self.V._vault)) + "entries" )
         for v in self.V._vault:
-            G = v.gof(self.nar,tokens)
-            print "GOF=",G
+            G = v.gof(tokens)
+            print("GOF=" + str(G))
+            
+######################################################
+################# ABReader ###########################
+######################################################
+class ABReader:
+    def __init__(self, treeroot, nar):
+        
+          # get our own playground
+        self.tree = treeroot.copy()
+        self.nar  = nar.copyUsing( self.tree )
+        
+        self.ifound = [] #indices found in text. A list of variable length
+                         
+        # during a readText() this keeps a fixed length 
+        self.tokens = []
+        self.V = NarVault()
+
+    ## encode punctuations, tokenize, and use lower()
+    def prepareTokens(self, text): 
+        # encode punctuations  
+        text = replacePunctuation(text)    
+            
+        self.ifound = []
+
+         # creat lower case tokens 
+        self.tokens = text.split(' ')
+       
+        for i in range( len(self.tokens)):
+            tok = self.tokens[i].lower()
+            self.tokens[i] = tok 
+ 
+    def clear(self):
+        # fixed, but clear the content
+        self.tree.clear()
+        self.nar.clear()
+        
+        # recreated during readText() 
+        self.ifound = []   
+        self.tokens = []
+        # do not clear the vault
+       
+    
+    # Implement the "moving topic" by plain reading between controls
+    def readText(self, text, freshStart=True):     
+        self.clear()
+        if freshStart:
+            self.V.clear()  
+
+        self.prepareTokens(text) 
+        if len(tokens)==0:
+            return   
+
+        # for readability 
+        nar    = self.nar
+        ifound = self.ifound  
+        tokens = self.tokens
+         
+        istart = 0  
+        # look for control data.  
+        CD  = scanNextControl(tokens, istart)
+        
+        while CD.type != END_CTRLTYPE :
+            
+            #### shift to LOCAL indexing in interval [istart, ictrl] 
+            subtoks = tokens[istart : CD.ictrl]
+            
+            #### PLAIN READ. Then shift back to global indices 
+            jfound = PlainRead(nar, subtoks)
+            ifound.append(jfound)
+
+            #### negate forward or backward, propose and vault, as needed 
+            #### and remember, when proposing, that ifound should be ignored
+            #### before istart
+            istart = applyControl(CD, nar, ifound, tokens, istart, self.V )
+
+            #### next control 
+            CD = scanNextControl(tokens, istart)
+        
+        # now CD should be of END_CTRLTYPE
+        subtoks= tokens[istart : len(tokens)]
+        jfound = PlainReadText(nar, subtoks )
+        ifound.append(jfound)
+        applyControl( CD, nar, ifound, tokens, istart, self.V )
+
+
+def rollUp( block, vault, record, Threshold ):
+    if record.GOF>Threshold:
+        V.vault()
+        V.pre = record
+        if block: # no double negatives
+            V.pre.blocked = True
+def clearStart(CD, nar, ifound):
+    nar.iclear()
+    ifound = []
+    return CD.ictrl
+
+# return an updated "istart"
+def applyControl( CD, nar, ifound, tokens, istart, V) :
+
+    block = False
+    record = NarRecord( nar, ifound, tokens )
+
+    rOK = record.GOF>0.5
+
+    if CD.type==NO_CTRLTYPE :
+        return istart
+
+    elif CD.type==END_CTRLTYPE:
+        rollUp(block, V, record, 0.1) # a more tolerant saving
+        V.vault()
+        return len(tokens)
+
+    if CD.type==OPERATOR_CTRLTYPE:       
+        op = CD.ctrl        
+        if op.isA("NEG") or op.isA("HEDGE"):
+            # block backward
+            block = True
+            rollUp(block, V, record, 0.5)
+            if rOK:
+                V.vault()
+            else:
+                V.abandonPre()
+
+            istart = clearStart(CD, nar, ifound) 
+
+        elif op.isA("FNEG") or op.isA("FHEDGE") :
+            rollUp(block, V, record, 0.5)
+            if rOK:
+                V.vault()
+            else:
+                V.abandonPre()
+
+            istart = clearStart(CD,nar,ifound)
+
+            # block forward
+            V.blockPre()
+
+        elif op.isA("AND"):
+            rollUp(block, V, record, 0.5)
+            if rOK:
+                V.vault()
+                istart = clearStart(CD,nar,ifound)
+
+    elif CD.type==PUNCTUATION_CTRLTYPE:       
+        punct = CD.ctrl
+        
+        if punct.isA("COMMA") or punct.isA("SEMICOLON"):    
+            rollUp(block, V, record, 0.5)
+            if rOK:
+                V.vault()
+                istart = clearStart(CD,nar,ifound)
+        elif punct.isA("PERIOD"):
+            rollUp(block, V, record, 0.5)
+            if rOK:
+                V.vault()
+                istart = clearStart(CD,nar,ifound)
+            if rOK and record.nused==record.nslots:
+                nar.clear()
+
+    else :
+        print( "unhandled control in applyControl()" )
+        return istart
+

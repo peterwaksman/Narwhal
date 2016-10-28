@@ -1,9 +1,14 @@
 ##from nwtypes import *
 ##from NoiseTree import *
 
-# Thanks to Gringo Suave:
+
 import sys
 
+def PythonMajorVersion():
+    return int( sys.version[0] )
+
+
+# Thanks to Gringo Suave:
 # to call a function of one variable and redirect ouput
 def sendToFileA( printFn, a):
     orig_stdout = sys.stdout
@@ -174,7 +179,7 @@ def showFound( tokens, ifound ):
         #print( t ),
         total.append(t)
     s = ''.join(total)
- #   print s
+ #   print( s )
     return s
 
 
@@ -184,17 +189,17 @@ def filterFile( filename, var ):
         outstring = ""
         sentences = line.split('.' )
         if len(line)>0:
-            print "\n\noriginal:", line
+            print("\n\noriginal:"+ line)
         for sentence in sentences:
             tokens = sentence.split(' ')
             var.clear()
             F = var.findInText(tokens)
             if F:
-                #print "FOUND", showFound(tokens, var.ifound)
+                #print("FOUND" + showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
 
         if len(outstring)>0:        
-            print "FOUND:",outstring
+            print("FOUND:"+outstring)
         
     infile.close()
 
@@ -205,19 +210,26 @@ def readFile( fineame, nar):
         outstring = ""
         sentences = line.split('.' )
         if len(line)>0:
-            print "\n\noriginal:", line
+            print("\n\noriginal:"+ line)
         for sentence in sentences:
             tokens = sentence.split(' ')
             ifound = []
             E.clear()
             F = var.findInText(tokens)
             if F:
-                #print "FOUND", showFound(tokens, var.ifound)
+                #print("FOUND"+ showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
-
         if len(outstring)>0:        
-            print "FOUND:",outstring
+            print("FOUND:" + outstring)
         
     infile.close()
     
+
+def shiftFoundIndices(ifound, shift):
+    for itok in range(len(ifound)):
+       ifound[itok] = ifound[itok] + shift
+    cleanFound(ifound)
+    return ifound
+     
+
      

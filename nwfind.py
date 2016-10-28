@@ -115,7 +115,7 @@ def matchTOK(kword, itok, ifound, tokens):
     tok = " " + tokens[itok] + " "
     if tok.find(kword)>=0 :
         ifound.append(itok)
-        #print "APPEND to ifound with itok=",itok," and kword=",kword
+        #print( "APPEND to ifound with itok="+str(itok)+" and kword="+kword")
         return True
     
     tok = "," + tokens[itok] +  " " # for token glued to a comma
@@ -190,7 +190,7 @@ def _findInText( klist, tokens, itok, ifound ):
         # and return with ifound storing itok and any  
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
-            #print "Found at itok=",itok," with kword=",kword, " in klist=",klist
+            #print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
             found = True
     if found :
         return True

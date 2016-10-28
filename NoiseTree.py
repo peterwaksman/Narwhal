@@ -81,11 +81,11 @@ kEQUIPMENTSOURCES += "tv,air shaft,drains,hvac,central heating,lift,elevator, fa
 kEQUIPMENTSOURCES += " ice ,ventilation,clanking,clattering,rumbling"
 
 kTRAFFICSOURCES="truck,traffic,busy,busy street,road noise,highway,diesel,"
-kTRAFFICSOURCES+= " city , downtown , garage , engine , tram,deliveries"
+kTRAFFICSOURCES+= " city , downtown , center, centre , garage , engine , tram,deliveries"
 
 kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering" 
 
-kOASISSOURCES="ocean,frogs"
+kOASISSOURCES="ocean"
 
 kNOISELOCSROOM="it,room # for,outside,window,balcony door,next to,door ,next door,"
 kNOISELOCSROOM+="my door,on our floor,outside my door,adjacent room,next suite,"
