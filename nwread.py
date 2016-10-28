@@ -4,10 +4,11 @@ from nwtypes import *
 from nwcontrol import *
 from nwvault import *
 
-def PlainRead( nar, tokens):
+# works with indexing relative to subtoks
+def PlainRead( nar, subtoks):
     jfound = []
-    ReadText(nar, tokens, jfound )
-    shiftFoundIndices(jfound, istart) # also performs cleanFound()
+    ReadText(nar, subtoks, jfound )
+    cleanFound(jfound)  
     return jfound   
 
 ## ReadText() and its sub routines implement "plain" reading where
@@ -511,11 +512,11 @@ class ABReader:
             
             #### PLAIN READ. Then shift back to global indices 
             jfound = PlainRead(nar, subtoks)
+            shiftFoundIndices(jound, istart )
             ifound.append(jfound)
 
             #### negate forward or backward, propose and vault, as needed 
-            #### and remember, when proposing, that ifound should be ignored
-            #### before istart
+            #### and (ifound should be ignored before istart)
             istart = applyControl(CD, nar, ifound, tokens, istart, self.V )
 
             #### next control 
@@ -523,7 +524,8 @@ class ABReader:
         
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]
-        jfound = PlainReadText(nar, subtoks )
+        jfound = PlainRead(nar, subtoks )
+        shiftFoundIndices(jound, istart )
         ifound.append(jfound)
         applyControl( CD, nar, ifound, tokens, istart, self.V )
 

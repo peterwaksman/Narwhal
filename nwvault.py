@@ -77,9 +77,10 @@ class NarVault:
         ifound = cleanFound(ifound) 
 
         # use readstart to adjust relative indices back to absolute ones 
-        jfound = shiftFoundIndices(ifound, readstart)
- 
-        self.pre = NarRecord(nar, jfound, tokens)
+ #       jfound = shiftFoundIndices(ifound, readstart)
+        shiftFoundIndices(ifound, readstart)
+        #self.pre = NarRecord(nar, jfound, tokens)
+        self.pre = NarRecord(nar, ifound, tokens)
 
     def propose2(self, nar, ifound, tokens):
         if len(ifound)==0:

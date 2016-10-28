@@ -229,7 +229,7 @@ def shiftFoundIndices(ifound, shift):
     for itok in range(len(ifound)):
        ifound[itok] = ifound[itok] + shift
     cleanFound(ifound)
-    return ifound
+    #return ifound
      
 
      
