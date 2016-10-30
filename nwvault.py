@@ -78,7 +78,7 @@ class NarVault:
 
         # use readstart to adjust relative indices back to absolute ones 
  #       jfound = shiftFoundIndices(ifound, readstart)
-        shiftFoundIndices(ifound, readstart)
+        ifound = shiftFoundIndices(ifound, readstart)
         #self.pre = NarRecord(nar, jfound, tokens)
         self.pre = NarRecord(nar, ifound, tokens)
 

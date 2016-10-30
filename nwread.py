@@ -8,7 +8,7 @@ from nwvault import *
 def PlainRead( nar, subtoks):
     jfound = []
     ReadText(nar, subtoks, jfound )
-    cleanFound(jfound)  
+    jfound = cleanFound(jfound)  
     return jfound   
 
 ## ReadText() and its sub routines implement "plain" reading where
@@ -493,7 +493,7 @@ class ABReader:
             self.V.clear()  
 
         self.prepareTokens(text) 
-        if len(tokens)==0:
+        if len(self.tokens)==0:
             return   
 
         # for readability 
@@ -512,8 +512,8 @@ class ABReader:
             
             #### PLAIN READ. Then shift back to global indices 
             jfound = PlainRead(nar, subtoks)
-            shiftFoundIndices(jound, istart )
-            ifound.append(jfound)
+            jfound = shiftFoundIndices(jound, istart )
+            ifound.extend(jfound)
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
@@ -525,17 +525,21 @@ class ABReader:
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]
         jfound = PlainRead(nar, subtoks )
-        shiftFoundIndices(jound, istart )
-        ifound.append(jfound)
+        jfound = shiftFoundIndices(jfound, istart )
+        ifound.extend(jfound)
         applyControl( CD, nar, ifound, tokens, istart, self.V )
 
 
-def rollUp( block, vault, record, Threshold ):
+def rollUp( block, V, record, Threshold ):
     if record.GOF>Threshold:
         V.vault()
         V.pre = record
         if block: # no double negatives
             V.pre.blocked = True
+        return True
+    else:
+        return False
+
 def clearStart(CD, nar, ifound):
     nar.iclear()
     ifound = []
@@ -543,11 +547,9 @@ def clearStart(CD, nar, ifound):
 
 # return an updated "istart"
 def applyControl( CD, nar, ifound, tokens, istart, V) :
+    block = False # the default
 
-    block = False
     record = NarRecord( nar, ifound, tokens )
-
-    rOK = record.GOF>0.5
 
     if CD.type==NO_CTRLTYPE :
         return istart
@@ -557,54 +559,55 @@ def applyControl( CD, nar, ifound, tokens, istart, V) :
         V.vault()
         return len(tokens)
 
-    if CD.type==OPERATOR_CTRLTYPE:       
-        op = CD.ctrl        
-        if op.isA("NEG") or op.isA("HEDGE"):
-            # block backward
-            block = True
-            rollUp(block, V, record, 0.5)
-            if rOK:
-                V.vault()
-            else:
-                V.abandonPre()
+    ########### process the control
+    CTRL = CD.ctrl
+     
+    if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
+        # block backward
+        block = True
+        rOK = rollUp(block, V, record, 0.5)
+        if rOK:
+            V.vault()
+        else:
+            V.abandonPre()
 
-            istart = clearStart(CD, nar, ifound) 
+        istart = clearStart(CD, nar, ifound) 
 
-        elif op.isA("FNEG") or op.isA("FHEDGE") :
-            rollUp(block, V, record, 0.5)
-            if rOK:
-                V.vault()
-            else:
-                V.abandonPre()
+    elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
+        rOK = rollUp(block, V, record, 0.5)
+        if rOK:
+            V.vault()
+        else:
+            V.abandonPre()
 
+        istart = clearStart(CD,nar,ifound)
+
+        # block forward
+        V.blockPre()
+
+    elif op.isA("AND"):
+        rollUp(block, V, record, 0.5)
+        if rOK:
+            V.vault()
             istart = clearStart(CD,nar,ifound)
 
-            # block forward
-            V.blockPre()
-
-        elif op.isA("AND"):
-            rollUp(block, V, record, 0.5)
-            if rOK:
-                V.vault()
-                istart = clearStart(CD,nar,ifound)
-
-    elif CD.type==PUNCTUATION_CTRLTYPE:       
-        punct = CD.ctrl
         
-        if punct.isA("COMMA") or punct.isA("SEMICOLON"):    
-            rollUp(block, V, record, 0.5)
-            if rOK:
-                V.vault()
-                istart = clearStart(CD,nar,ifound)
-        elif punct.isA("PERIOD"):
-            rollUp(block, V, record, 0.5)
-            if rOK:
-                V.vault()
-                istart = clearStart(CD,nar,ifound)
-            if rOK and record.nused==record.nslots:
+    if CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):    
+        rOK = rollUp(block, V, record, 0.5)
+        if rOK:
+            V.vault()
+            istart = clearStart(CD,nar,ifound)
+
+    elif CTRL.isA("PERIOD"):
+        rOK = rollUp(block, V, record, 0.5)
+        if rOK:
+            V.vault()
+            istart = clearStart(CD,nar,ifound)
+
+            if record.nused==record.nslots:
                 nar.clear()
 
     else :
-        print( "unhandled control in applyControl()" )
+        print( "did not apply contol: "+ CTRL.knames[0] )
         return istart
 

@@ -50,13 +50,17 @@ tokens = TOKS(text)
 ifound = []
 x = ReadText(c,tokens,ifound)
 
-ifound = cleanFound(ifound)
-R = NarRecord(c, ifound, tokens)
+#ifound = cleanFound(ifound)
+#R = NarRecord(c, ifound, tokens)
 
 c.clear()
 
-C = NWReader(E,c)
-C.readText(text)
+#C = NWReader(E,c)
+#C.readText(text)
 #C.readText(NoiseText)
 
 x=2
+
+D = ABReader(E,c)
+D.readText(text)
+x = 2

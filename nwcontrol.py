@@ -269,7 +269,7 @@ def discountControls(tokens, ifound):
             # do NOT append to jfound. So the punctuation token
             # will not be counted in the numerator of (r/f) in the gof() formula 
             asd  = 1 #remove "compiler warning" squiggles 
-    cleanFound(jfound)
+    jfound = cleanFound(jfound)
     ifound.extend(jfound)
     return ifound
 
@@ -299,7 +299,7 @@ class ControlData:
 def scanNextControl(tokens, istart):
     CD = ControlData()
     L = len(tokens);
-    if readstart>L-1 :
+    if istart>L-1 :
         CD.type = END_CTRLTYPE
         CD.ctrl = NULL_VAR
         CD.ictrl = L
