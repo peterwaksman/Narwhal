@@ -164,9 +164,9 @@ class VAR:
         # although self.found can be False
         return (self.found or self.foundInChildren)   
                 
-    ## can modify the .found  or .foundInChildren, but it protected from 
-    # chagning ifound (oops! it changes the childern. Best to 
-    # only use this for controls 
+    ## can modify the .found  or .foundInChildren, or ifound 
+    # only use this for controls, or where you do not care about
+    # corrupting the VARs in the tree 
     def find(self,tok):
             ifound = self.ifound[:] 
             tokens = []
@@ -221,7 +221,7 @@ class VAR:
                 endStr += (name+" +")
                 #print(name+" +"),
             else:
-                endStr += (name+"|")
+                endStr += (name+" |")
                 #print(name+" |"),
         if self.found:
             tmp = "*"
@@ -237,7 +237,7 @@ class VAR:
         else:
             tmp = ""
         print(tab + "foundC:"+tmp)
-        print(tab + "plrty :"+ self.polarity)
+        print(tab + "plrty :"+ str(self.polarity))
         if len( self.children )>0 :
             print(tab + "chldrn:")
         else:

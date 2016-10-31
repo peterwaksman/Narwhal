@@ -64,8 +64,11 @@ kFORWARDHEDGES = "although, even if,despite,instead of,even though,even when,"
 
 kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is "
 
-# inclusion of "that" may backfire ("over a bar that was noisy")
-kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as , that"
+# not used yet
+kDESIGNATORS = " that , it "
+
+
+kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,"
 
 # pre conjunctions
 kIF = "as $ if "
@@ -106,6 +109,8 @@ SO_OP = soD.var()
 attribD = KList( "HAS", kATTRIBUTORS )
 ATTRIB_OP = attribD.var()
 
+designatorD = KList( "IT", kDESIGNATORS )
+DESIGNATOR_OP = designatorD.var()
 
 
 gennegD = KList("NEG", kNEGATIONS)
@@ -128,6 +133,9 @@ FWDBLOCK_OP = fblockD.var()
 kLOGIC = ""
 logicD = KList("LOGIC", kLOGIC)
 LOGIC_OP = logicD.var()
+
+skipD = KList("SKIP","")
+SKIP_OP = skipD.var()
 ####################### Tree of VARs ################
 #
 BLOCK_OP.sub( GENNEGATION_OP )
@@ -141,15 +149,19 @@ PRECONJ_OP.sub( IF_OP )
 PRECONJ_OP.sub( NOTONLY_OP)
 PRECONJ_OP.sub( IFNOT_OP )
 ########################
-LOGIC_OP.sub(AND_OP)
-LOGIC_OP.sub(SO_OP)
-LOGIC_OP.sub(ATTRIB_OP)
+#LOGIC_OP.sub(AND_OP)
+#LOGIC_OP.sub(SO_OP)
+#LOGIC_OP.sub(ATTRIB_OP)
 LOGIC_OP.sub(BLOCK_OP)
 LOGIC_OP.sub(FWDBLOCK_OP)
 LOGIC_OP.sub(PRECONJ_OP)
 
 ########################## 
- 
+SKIP_OP.sub(AND_OP)
+SKIP_OP.sub(SO_OP)
+SKIP_OP.sub(ATTRIB_OP)
+SKIP_OP.sub(DESIGNATOR_OP) 
+
 
 def findControl(self, tokens, itok):
     for kname in self.knames:
@@ -256,6 +268,7 @@ def discountControls(tokens, ifound):
     imax = maxITOK(ifound)
     for i in range(imin, imax+1):
         DULL_OP.clear()
+        SKIP_OP.clear()
         LOGIC_OP.clear()
         PUNCTUATION_OP.clear()
  
@@ -263,6 +276,9 @@ def discountControls(tokens, ifound):
             jfound.append(i)
 
         elif LOGIC_OP.find(tokens[i]):
+            jfound.append(i)   
+        
+        elif SKIP_OP.find(tokens[i]):
             jfound.append(i)   
 
         elif PUNCTUATION_OP.findInText(tokens[i]):
@@ -313,6 +329,7 @@ def scanNextControl(tokens, istart):
             CD.ictrl = itok
             return CD
 
+    for itok in range(istart, L):
         ctrl = isPunctuationControl(tokens, itok)
         if ctrl!=NULL_VAR:
             CD.type = PUNCTUATION_CTRLTYPE
@@ -320,7 +337,7 @@ def scanNextControl(tokens, istart):
             CD.ictrl = itok
             return CD
 
-        CD.type = END_CTRLTYPE
-        CD.ctrl = NULL_VAR
-        CD.ictrl = L
-        return CD
+    CD.type = END_CTRLTYPE
+    CD.ctrl = NULL_VAR
+    CD.ictrl = L
+    return CD

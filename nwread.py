@@ -1,4 +1,3 @@
-
 from nwutils import *
 from nwtypes import *
 from nwcontrol import *
@@ -484,7 +483,11 @@ class ABReader:
         self.ifound = []   
         self.tokens = []
         # do not clear the vault
-       
+    
+    def clearStart(self, CD):
+        self.nar.clearIFound() 
+        self.ifound = []
+        return CD.ictrl
     
     # Implement the "moving topic" by plain reading between controls
     def readText(self, text, freshStart=True):     
@@ -501,8 +504,8 @@ class ABReader:
         ifound = self.ifound  
         tokens = self.tokens
          
-        istart = 0  
-        # look for control data.  
+         # look for control data.  
+        istart = 0       
         CD  = scanNextControl(tokens, istart)
         
         while CD.type != END_CTRLTYPE :
@@ -512,12 +515,12 @@ class ABReader:
             
             #### PLAIN READ. Then shift back to global indices 
             jfound = PlainRead(nar, subtoks)
-            jfound = shiftFoundIndices(jound, istart )
+            jfound = shiftFoundIndices(jfound, istart )
             ifound.extend(jfound)
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
-            istart = applyControl(CD, nar, ifound, tokens, istart, self.V )
+            istart = self.applyControl(CD, istart )
 
             #### next control 
             CD = scanNextControl(tokens, istart)
@@ -527,85 +530,78 @@ class ABReader:
         jfound = PlainRead(nar, subtoks )
         jfound = shiftFoundIndices(jfound, istart )
         ifound.extend(jfound)
-        applyControl( CD, nar, ifound, tokens, istart, self.V )
+        self.applyControl( CD, istart)
+
+    # return an updated "istart"
+    def applyControl( self, CD, istart) :
+        if CD.type==NO_CTRLTYPE :
+            return istart
+
+        nar = self.nar
+        ifound = self.ifound
+        tokens = self.tokens
+        V = self.V
+
+        record = NarRecord( nar, ifound, tokens )
+   
+        if CD.type==END_CTRLTYPE:
+            V.rollUp(record, 0.1) # a more tolerant saving
+            V.vault()
+            return len(tokens)
 
 
-def rollUp( V, record, Threshold, block=False):
-    if record.GOF>Threshold:
-        V.vault()
-        V.pre = record
-        if block: # no double negatives
-            V.pre.blocked = True
-        return True
-    else:
-        return False
+        ########### process the control
 
-def clearStart(CD, nar, ifound):
-    nar.iclear()
-    ifound = []
-    return CD.ictrl
-
-# return an updated "istart"
-def applyControl( CD, nar, ifound, tokens, istart, V) :
-    record = NarRecord( nar, ifound, tokens )
-
-    if CD.type==NO_CTRLTYPE :
-        return istart
-
-    elif CD.type==END_CTRLTYPE:
-        rollUp(V, record, 0.1) # a more tolerant saving
-        V.vault()
-        return len(tokens)
-
-    ########### process the control
-    CTRL = CD.ctrl
+        CTRL = CD.ctrl
      
-    if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
-        # block backward
-        BLOCK = True
-        rOK = rollUp(V, record, 0.5, BLOCK) # Iindicates pre should be blocked
-        if rOK:
-            V.vault()
-        else:
-            V.abandonPre()
+        if CTRL.isA("AND") or CTRL.isA("HAS"):
+            return istart
 
-        istart = clearStart(CD, nar, ifound) 
+        if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
+            # block backward
+            BLOCK = True
+            rOK = V.rollUp(record, 0.5, BLOCK) # Iindicates pre should be blocked
+            if rOK:
+                V.vault()
+            else:
+                V.abandonPre()
 
-    elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
-        rOK = rollUp(V, record, 0.5)
-        if rOK:
-            V.vault()
-        else:
-            V.abandonPre()
+            istart = clearStart(CD, nar, ifound) 
 
-        istart = clearStart(CD,nar,ifound)
+        elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
+            rOK = V.rollUp(record, 0.5)
+            if rOK:
+                V.vault()
+            else:
+                V.abandonPre()
 
-        # block forward
-        V.blockPre()
+            istart = self.clearStart(CD)
 
-    elif op.isA("AND"):
-        rollUp(V, record, 0.5)
-        if rOK:
-            V.vault()
-            istart = clearStart(CD,nar,ifound)
+            # block forward
+            V.blockPre()
 
+        #elif CTRL.isA("AND"):
+        #    rOK = V.rollUp(record, 0.5)
+        #    if rOK:
+        #        V.vault()
+        #        istart = self.clearStart(CD)
         
-    if CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):    
-        rOK = rollUp(V, record, 0.5)
-        if rOK:
-            V.vault()
-            istart = clearStart(CD,nar,ifound)
+        elif CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):    
+            rOK = V.rollUp( record, 0.5)
+            if rOK:
+                V.vault()
+                istart = self.clearStart(CD)
 
-    elif CTRL.isA("PERIOD"):
-        rOK = rollUp(NOBLOCK, V, record, 0.5)
-        if rOK:
-            V.vault()
-            istart = clearStart(CD,nar,ifound)
+        elif CTRL.isA("PERIOD"):
+            rOK = V.rollUp(record, 0.5)
+            if rOK:
+                V.vault()
+                istart = self.clearStart(CD)
 
-            if record.nused==record.nslots:
-                nar.clear()
+                if record.nused==record.nslots:
+                    nar.clear()
 
-    else :
-        print( "did not apply contol: "+ CTRL.knames[0] )
-        return istart
+        else :
+            print( "did not apply contol: "+ CTRL.knames[0] )
 
+        return istart         
