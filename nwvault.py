@@ -53,7 +53,7 @@ class NarVault:
 # You can block self.pre before or after you encounter the nar
 # that proposes data into it. This gives rise to awkward phrases like
 # "pre-preblocking" and "post-preblocking". The point is that
-# Pre can be blocked while still empty
+# Pre can be blocked while still empty, eg when you see "although".
 
     def clear(self):
         self._vault = []
@@ -71,22 +71,15 @@ class NarVault:
         self.pre = 0
         self.preblock = False
                      
-    def propose(self, nar, ifound,tokens, readstart):
+    def propose(self, nar, ifound,tokens, istart):
         if len(ifound)==0:
             return;       
         ifound = cleanFound(ifound) 
 
         # use readstart to adjust relative indices back to absolute ones 
- #       jfound = shiftFoundIndices(ifound, readstart)
-        ifound = shiftFoundIndices(ifound, readstart)
-        #self.pre = NarRecord(nar, jfound, tokens)
-        self.pre = NarRecord(nar, ifound, tokens)
+        ifound = shiftFoundIndices(ifound, istart)
 
-    def propose2(self, nar, ifound, tokens):
-        if len(ifound)==0:
-            return;       
-        ifound = cleanFound(ifound) 
-        self.pre = NarRecord(nar,ifound,tokens)
+        self.pre = NarRecord(nar, ifound, tokens)
                
     def abandonPre(self):
         self.pre = 0

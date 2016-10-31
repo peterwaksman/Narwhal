@@ -530,7 +530,7 @@ class ABReader:
         applyControl( CD, nar, ifound, tokens, istart, self.V )
 
 
-def rollUp( block, V, record, Threshold ):
+def rollUp( V, record, Threshold, block=False):
     if record.GOF>Threshold:
         V.vault()
         V.pre = record
@@ -547,15 +547,13 @@ def clearStart(CD, nar, ifound):
 
 # return an updated "istart"
 def applyControl( CD, nar, ifound, tokens, istart, V) :
-    block = False # the default
-
     record = NarRecord( nar, ifound, tokens )
 
     if CD.type==NO_CTRLTYPE :
         return istart
 
     elif CD.type==END_CTRLTYPE:
-        rollUp(block, V, record, 0.1) # a more tolerant saving
+        rollUp(V, record, 0.1) # a more tolerant saving
         V.vault()
         return len(tokens)
 
@@ -564,8 +562,8 @@ def applyControl( CD, nar, ifound, tokens, istart, V) :
      
     if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
         # block backward
-        block = True
-        rOK = rollUp(block, V, record, 0.5)
+        BLOCK = True
+        rOK = rollUp(V, record, 0.5, BLOCK) # Iindicates pre should be blocked
         if rOK:
             V.vault()
         else:
@@ -574,7 +572,7 @@ def applyControl( CD, nar, ifound, tokens, istart, V) :
         istart = clearStart(CD, nar, ifound) 
 
     elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
-        rOK = rollUp(block, V, record, 0.5)
+        rOK = rollUp(V, record, 0.5)
         if rOK:
             V.vault()
         else:
@@ -586,20 +584,20 @@ def applyControl( CD, nar, ifound, tokens, istart, V) :
         V.blockPre()
 
     elif op.isA("AND"):
-        rollUp(block, V, record, 0.5)
+        rollUp(V, record, 0.5)
         if rOK:
             V.vault()
             istart = clearStart(CD,nar,ifound)
 
         
     if CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):    
-        rOK = rollUp(block, V, record, 0.5)
+        rOK = rollUp(V, record, 0.5)
         if rOK:
             V.vault()
             istart = clearStart(CD,nar,ifound)
 
     elif CTRL.isA("PERIOD"):
-        rOK = rollUp(block, V, record, 0.5)
+        rOK = rollUp(NOBLOCK, V, record, 0.5)
         if rOK:
             V.vault()
             istart = clearStart(CD,nar,ifound)
