@@ -566,7 +566,7 @@ class ABReader:
             else:
                 V.abandonPre()
 
-            istart = clearStart(CD, nar, ifound) 
+            istart = clearStart(CD) 
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)
