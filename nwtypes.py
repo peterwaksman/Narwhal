@@ -80,7 +80,7 @@ class VAR:
             v.parent = 0
         
         v.found = self.found
-        v.ifound= self.ifound
+        v.ifound= self.ifound[:]
         v.foundInChildren = self.foundInChildren
         v.polarity = self.polarity
 
@@ -425,10 +425,10 @@ class NAR:
         n.order   = self.order
         n.blocked = self.blocked
         n.polarity = self.polarity
-        n.thing   = self.thing
-        n.action  = self.action
-        n.relation= self.relation
-        n.value   = self.value
+        n.thing   = self.thing.copy()
+        n.action  = self.action.copy()
+        n.relation= self.relation.copy()
+        n.value   = self.value.copy()
         return n
 
 

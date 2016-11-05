@@ -120,18 +120,19 @@ def ReadTextAsAction(nar, tokens, ifound):
 def ReadTextAsCausal(nar, tokens, ifound):
     if nar.action != NAR_SO: 
         return 0 
-
+   
+    # maximizes the score over all possible subdivisions into tokensA,tokensB
     imax = 0
     maxab=0
-    # maximizes the score over all possible subdivisions into tokensA,tokensB
+    m = nar.copy() # to preserve the orginal
     for i in range(len(tokens)):
         kfound = []
         tokensA = tokens[:i]
         tokensB = tokens[i:]
-        nar.thing.clear()
-        nar.value.clear()
-        t  = ReadText(nar.thing,  tokensA, kfound)
-        v  = ReadText(nar.value, tokensB, kfound)
+        m.thing.clear()
+        m.value.clear()
+        t  = ReadText(m.thing,  tokensA, kfound)
+        v  = ReadText(m.value, tokensB, kfound)
         c  = ReadText(SO_OP, tokens, kfound)
     
         # favors maximum balanced between the t and v
@@ -165,15 +166,16 @@ def ReadTextAsSequential(nar, tokens, ifound):
     
     imax = 0
     maxab = -1
+    m = nar.copy()
     # maximizes the score over all possible subdivisions into tokensA,tokensB
     for i in range(len(tokens)):
         kfound = []
         tokensA = tokens[:i]
         tokensB = tokens[i:]
-        nar.thing.clear()
-        nar.value.clear()
-        t  = ReadText(nar.thing, tokensA, kfound)
-        v  = ReadText(nar.value, tokensB, kfound)
+        m.thing.clear()
+        m.value.clear()
+        t  = ReadText(m.thing, tokensA, kfound)
+        v  = ReadText(m.value, tokensB, kfound)
         a  = ReadText(AND_OP, tokens, kfound)
     
         if maxab<t*v :
@@ -487,7 +489,7 @@ class ABReader:
     def clearStart(self, CD):
         self.nar.clearIFound() 
         self.ifound = []
-        return CD.ictrl
+        return CD.ictrl + 1 # to avoid re-reading the current control
     
     # Implement the "moving topic" by plain reading between controls
     def readText(self, text, freshStart=True):     
@@ -507,9 +509,9 @@ class ABReader:
          # look for control data.  
         istart = 0       
         CD  = scanNextControl(tokens, istart)
-        
+
         while CD.type != END_CTRLTYPE :
-            
+              
             #### shift to LOCAL indexing in interval [istart, ictrl] 
             subtoks = tokens[istart : CD.ictrl]
             
@@ -532,7 +534,10 @@ class ABReader:
         ifound.extend(jfound)
         self.applyControl( CD, istart)
 
-    # return an updated "istart"
+
+
+    ########### APPLY CONTROL ########
+    # return an updated istart
     def applyControl( self, CD, istart) :
         if CD.type==NO_CTRLTYPE :
             return istart
@@ -554,9 +559,14 @@ class ABReader:
 
         CTRL = CD.ctrl
      
-        if CTRL.isA("AND") or CTRL.isA("HAS"):
-            return istart
-
+        # this is current "and" processing. It is closely tied to
+        # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
+        # Take this code out if you want it to SKIP
+        if CTRL.isA("AND"):
+            if nar.numSlotsUsed()==nar.numSlots():
+                V.rollUp(record, 0.1 )
+                # but no clearing
+            istart = self.clearStart(CD)
         if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             # block backward
             BLOCK = True
@@ -566,7 +576,7 @@ class ABReader:
             else:
                 V.abandonPre()
 
-            istart = clearStart(CD) 
+            istart = self.clearStart(CD) 
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)

@@ -90,7 +90,12 @@ class NarVault:
     def unblockPre(self):  
         self.preblock = False
 
-
-
-
-
+    def rollUp( self, record, Threshold, block=False):
+        if record.GOF>Threshold:
+            self.vault()
+            self.pre = record
+            if block: # no double negatives
+                self.pre.blocked = True
+            return True
+        else:
+            return False

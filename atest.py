@@ -46,9 +46,10 @@ c = sequence(r,s)
 text = "The hotel was over a bar and that was noisy"
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
+#text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 tokens = TOKS(text)
 ifound = []
-x = ReadText(c,tokens,ifound)
+#x = ReadText(c,tokens,ifound)
 
 #ifound = cleanFound(ifound)
 #R = NarRecord(c, ifound, tokens)
