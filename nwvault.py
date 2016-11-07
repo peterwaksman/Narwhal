@@ -91,6 +91,8 @@ class NarVault:
         self.preblock = False
 
     def rollUp( self, record, Threshold, block=False):
+        if record==None:
+            return False
         if record.GOF>Threshold:
             self.vault()
             self.pre = record

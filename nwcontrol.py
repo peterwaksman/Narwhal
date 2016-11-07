@@ -66,7 +66,7 @@ kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is "
 
 # not used yet
 kDESIGNATORS = " that , it "
-
+kAMPLIFIERS  = " very "
 
 kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,"
 
@@ -149,7 +149,7 @@ PRECONJ_OP.sub( IF_OP )
 PRECONJ_OP.sub( NOTONLY_OP)
 PRECONJ_OP.sub( IFNOT_OP )
 ########################
-LOGIC_OP.sub(AND_OP)
+#LOGIC_OP.sub(AND_OP)
 #LOGIC_OP.sub(SO_OP)
 #LOGIC_OP.sub(ATTRIB_OP)
 LOGIC_OP.sub(BLOCK_OP)
@@ -157,7 +157,7 @@ LOGIC_OP.sub(FWDBLOCK_OP)
 LOGIC_OP.sub(PRECONJ_OP)
 
 ########################## 
-#SKIP_OP.sub(AND_OP)
+SKIP_OP.sub(AND_OP)
 SKIP_OP.sub(SO_OP)
 SKIP_OP.sub(ATTRIB_OP)
 SKIP_OP.sub(DESIGNATOR_OP) 
@@ -315,7 +315,7 @@ class ControlData:
 def scanNextControl(tokens, istart):
     CD = ControlData()
     L = len(tokens);
-    if istart>L-1 :
+    if istart>L-1:
         CD.type = END_CTRLTYPE
         CD.ctrl = NULL_VAR
         CD.ictrl = L

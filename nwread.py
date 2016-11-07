@@ -469,9 +469,14 @@ class ABReader:
             
         self.ifound = []
 
+         
          # creat lower case tokens 
-        self.tokens = text.split(' ')
-       
+        tokens = text.split(' ')
+        self.tokens = []
+        for tok in tokens: 
+            if len(tok)>0:
+                self.tokens.append(tok)
+
         for i in range( len(self.tokens)):
             tok = self.tokens[i].lower()
             self.tokens[i] = tok 
@@ -518,7 +523,10 @@ class ABReader:
             #### PLAIN READ. Then shift back to global indices 
             jfound = PlainRead(nar, subtoks)
             jfound = shiftFoundIndices(jfound, istart )
-            ifound.extend(jfound)
+            cleanFound(jfound)
+           # ifound.extend(jfound)
+           # self.ifound = ifound[:]
+            self.ifound.extend( jfound )
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
@@ -532,6 +540,7 @@ class ABReader:
         jfound = PlainRead(nar, subtoks )
         jfound = shiftFoundIndices(jfound, istart )
         ifound.extend(jfound)
+        self.ifound = ifound[:]
         self.applyControl( CD, istart)
 
 
@@ -547,7 +556,12 @@ class ABReader:
         tokens = self.tokens
         V = self.V
 
-        record = NarRecord( nar, ifound, tokens )
+        if len(ifound)>0:
+            record = NarRecord( nar, ifound, tokens )
+        else: 
+            record = None # I'm told this is "pythonic"
+            istart = self.clearStart(CD)
+            return istart
    
         if CD.type==END_CTRLTYPE:
             V.rollUp(record, 0.1) # a more tolerant saving
@@ -562,11 +576,12 @@ class ABReader:
         # this is current "and" processing. It is closely tied to
         # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
         # Take this code out if you want it to SKIP
-        if CTRL.isA("AND"):
-            if nar.numSlotsUsed()==nar.numSlots():
-                V.rollUp(record, 0.1 )
-                # but no clearing
-            istart = self.clearStart(CD)
+        #if CTRL.isA("AND"):
+        #    if nar.numSlotsUsed()==nar.numSlots():
+        #        V.rollUp(record, 0.1 )
+        #        # but no clearing
+        #    istart = self.clearStart(CD)
+
         if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             # block backward
             BLOCK = True
@@ -577,6 +592,7 @@ class ABReader:
                 V.abandonPre()
 
             istart = self.clearStart(CD) 
+            self.ifound = [] # fresh start
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)
@@ -601,16 +617,17 @@ class ABReader:
             if rOK:
                 V.vault()
                 istart = self.clearStart(CD)
+            else:
+                istart = CTRL.ictrl+1
 
         elif CTRL.isA("PERIOD"):
             rOK = V.rollUp(record, 0.5)
             if rOK:
                 V.vault()
-                istart = self.clearStart(CD)
 
-                if record.nused==record.nslots:
-                    nar.clear()
-
+                #if record.nused==record.nslots:
+                nar.clear()
+            istart = self.clearStart(CD)
         else :
             print( "did not apply contol: "+ CTRL.knames[0] )
 
