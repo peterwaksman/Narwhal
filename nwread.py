@@ -125,7 +125,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
     imax = 0
     maxab=0
     m = nar.copy() # to preserve the orginal
-    for i in range(len(tokens)):
+    for i in range(len(tokens)+1):
         kfound = []
         tokensA = tokens[:i]
         tokensB = tokens[i:]
@@ -136,9 +136,9 @@ def ReadTextAsCausal(nar, tokens, ifound):
         c  = ReadText(SO_OP, tokens, kfound)
     
         # favors maximum balanced between the t and v
-        if maxab<t*v :
+        if maxab<(t+1)*(v+1):
             imax = i
-            maxab = t*v
+            maxab = (t+1)*(v+1)
             
     tokensA = tokens[:imax]
     tokensB = tokens[imax:]
@@ -168,7 +168,7 @@ def ReadTextAsSequential(nar, tokens, ifound):
     maxab = -1
     m = nar.copy()
     # maximizes the score over all possible subdivisions into tokensA,tokensB
-    for i in range(len(tokens)):
+    for i in range(len(tokens)+1):
         kfound = []
         tokensA = tokens[:i]
         tokensB = tokens[i:]
@@ -178,8 +178,8 @@ def ReadTextAsSequential(nar, tokens, ifound):
         v  = ReadText(m.value, tokensB, kfound)
         a  = ReadText(AND_OP, tokens, kfound)
     
-        if maxab<t*v :
-            maxab = t*v
+        if maxab<(t+1)*(v+1) :
+            maxab = (t+1)*(v+1)
             imax = i
 
     tokensA = tokens[:imax]
@@ -576,11 +576,12 @@ class ABReader:
         # this is current "and" processing. It is closely tied to
         # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
         # Take this code out if you want it to SKIP
-        #if CTRL.isA("AND"):
-        #    if nar.numSlotsUsed()==nar.numSlots():
-        #        V.rollUp(record, 0.1 )
-        #        # but no clearing
-        #    istart = self.clearStart(CD)
+        if CTRL.isA("AND"):
+            V.rollUp(record, 0.5)
+            #if nar.numSlotsUsed()==nar.numSlots():
+               # V.rollUp(record, 0.1 )
+                 #but no clearing
+            istart = self.clearStart(CD)
 
         if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             # block backward
