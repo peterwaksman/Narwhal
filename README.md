@@ -2,7 +2,7 @@ Narwhal is a class library for Natural Language Processing. It uses client defin
 
 A narrow world is a collection of related topics with many short text examples and a underlying information model. For example TripAdvisor hotel reviews are a narrow world with roughly 30 common topics such as noise, wifi, service, nearby attractions, food, transportation, etc; and the information model is the hotel and its attributes. To read text from a narrow world, a client can focus on domain specific knowledge, while Narwhal does the text processing. For example, use Narhwal to build specialized chatbots rather than all purpose ones. 
 
-The concept of a narrow world is essentially the same as a “semantic frame” as described by Fillmore [Fillmore] and archived at Berkeley's "FrameNet"; however the process for extracting what has been said is implemented using the general method of “Best Model Classification” and “The Elements of Narrative” [WAKSMAN]. Narhwal is intended as a reference implementation for the moving topic.
+The concept of a narrow world is essentially the same as a “semantic frame” as described by Fillmore [Fillmore] and archived at Berkeley's "FrameNet"; however the process for extracting what has been said is implemented using the general method of “Best Model Classification” and “The Elements of Narrative” [WAKSMAN]. Narhwal is intended as a reference implementation for the concept of a "moving topic".
 
 Other spellings (for the fussy GitHub search engine) trip advisor, trip-advisor, chat bot, chat-bot, nlp, frame net, keyword, keynarrative
 
