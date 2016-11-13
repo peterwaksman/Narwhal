@@ -57,7 +57,9 @@ def ReadText(nar, tokens, ifound ):
 
 def ReadText0( nar, tokens, ifound ):   
     if not isinstance(nar, VAR ):
-        return 0     
+        return 0    
+    if len( tokens )==0:
+        return 0 
 
     found = nar.findInText(tokens) # cummulative with nar.ifound set
     # Relay the ifound up the stack. Someone else is responsible
@@ -158,6 +160,14 @@ def ReadTextAsCausal(nar, tokens, ifound):
     c  = ReadText(SO_OP, tokens, kfound)
     ifound.extend(kfound)
 
+    # polarity algorithm. The most ad hoc unfortunately
+    T = nar.thing.polarity
+    V = nar.value.polarity
+    if (T and V) or (not T and not V):
+        nar.polarity = True
+    else:
+        nar.polarity = False
+
     return t+v+c
 
 def ReadTextAsSequential(nar, tokens, ifound):
@@ -187,265 +197,35 @@ def ReadTextAsSequential(nar, tokens, ifound):
    
     kfound = []
     nar.clearIFound()
-    
+     
     t  = ReadText(nar.thing,  tokensA, kfound)
     ifound.extend(kfound)
+
     kfound = []
     nar.clearIFound()
 
     v  = ReadText(nar.value, tokensB, kfound) #token indices offset by imax
     for i in range(len(kfound)):
-        kfound[i] = kfound[i]+imax
-        
+        kfound[i] = kfound[i]+imax      
     ifound.extend(kfound)
    
     kfound = []
     a  = ReadText(AND_OP, tokens, kfound) #uses all token indices
     ifound.extend(kfound)
+
     ifound = cleanFound(ifound)
+
+    # polarity algorithm. The most ad hoc unfortunately
+    if t>v :
+        nar.polarity = nar.thing.polarity
+    elif v>t:
+        nar.polariy = nar.value.polarity
+        
+
     return t + v + a 
 
 
-############# TRIGGERS are events that follow from reading ONE token.
-# Typically a trigger is a "control" - a logical operator or a punctuation 
-# For example ',' and 'and' have much in common. I don't like the idea because 
-# it reminds me that code implementation is sequential but reality is more parallel
 
-
-# Define trigger types.
-NO_TRIGGER = -1      # use to check if type>=0
-FORGET_TRIGGER = 0   # means enough words have gone to cut our losses and start again
-COMPLETE_TRIGGER = 1 # when numSlotsUsed()==numSlots()
-CONTROL_TRIGGER = 2  # when a control word is encountered
-PUNCTUATION_TRIGGER = 3 # when punctuation is encountered
-
-def getTrigger(nar, tokens, itok, forget ):
-
-    x = isLogicControl(tokens,itok)
-    if x!=NULL_VAR:
-        return CONTROL_TRIGGER
-
-    p = isPunctuationControl(tokens,itok)
-    if p!=NULL_VAR:
-        return PUNCTUATION_TRIGGER
-
-    u = nar.numSlotsUsed()
-    n = nar.numSlots()
-    if u==n:
-        return COMPLETE_TRIGGER
-
-    if u<n: # is this case needed?
-        nar.find(tokens[itok])    
-        if nar.numSlotsUsed()==n: # means the findInText() found the last slot
-            return COMPLETE_TRIGGER
-
-    if forget > 3:
-        return FORGET_TRIGGER
-    return NO_TRIGGER
-
-
-
-######################################################
-################# NWReader ###########################
-######################################################
-
-class NWReader:
-    def __init__(self, treeroot, nar):
-        
-          # get our own playground
-        self.tree = treeroot.copy()
-        self.nar  = nar.copyUsing( self.tree )
-        
-        self.ifound = [] #indices found in text. A list of variable length
-                         
-        # during a readText() this keeps a fixed length 
-        self.tokens = []
-        self.V = NarVault()
-         
-    def clear(self):
-        # fixed, but clear the content
-        self.tree.clear()
-        self.nar.clear()
-        
-        # recreated during readText() 
-        self.ifound = []   
-        self.tokens = []
-       
-    def readText(self, text, restart=True):
-        
-        # prepare to read
-        self.clear()
-        if restart:
-            self.V.clear() #?? or continue from before.
-
-        text = replacePunctuation(text)     
-           
-        # lower case:
-        readstart = 0 # advances when we complete a vaulting
-
-        self.tokens = text.split(' ')
-        # go to lower case
-        for i in range( len(self.tokens)):
-            tok = self.tokens[i].lower()
-            self.tokens[i] = tok 
- 
-        if len(self.tokens)==0:
-            return
-            
-        nar    = self.nar
-        ifound =  self.ifound 
-        
-        tokens = self.tokens
-
-        eventStr = ""
-        oldpol = nar.polarity # to test for changes
-        forget = 0            # increments until you get bored and start again
-        
-        # Implements the "moving topic" by plain reading
-        # each initial segment of tokens and observing triggering events  
-        for itok in range(len(tokens)):
-
-            # prepare event report
-            eventStr += tokens[itok].rjust(10)     
-            pol = nar.polarity
-            if pol != oldpol :
-                oldpol = pol
-                eventStr += "-"
-            else:
-                eventStr += " "
-
-            subtoks = tokens[readstart:itok+1]
-     
-            # do a full, plain, read of the subtoks
-            oldL = len(ifound)
-            ReadText(nar, subtoks, ifound )
-            ifound = cleanFound(ifound)
-            if len(ifound)>oldL:
-                forget = 0
-                eventStr += "f"
-            else:
-                forget = forget + 1
-                eventStr += " "
-
-            i = itok-readstart #the current index in subtoks          
-            
-            trigger = getTrigger(nar, subtoks, i, forget)
-            
-            pre = self.V.pre
-            if pre==0:
-                preIsComplete = False
-                GOF = 0
-            else:
-                preIsComplete = (pre.nused==nar.numSlots())
-                GOF = pre.GOF
-
-            if trigger==NO_TRIGGER:
-                if itok==len(tokens)-1 : 
-                    if preIsComplete:
-                        self.V.vault()
-                        eventStr += " V("+str(GOF)+")"
-                    self.V.propose(nar, ifound,tokens, readstart)  
-                    eventStr += " V("+str(GOF)+")P"
-                eventStr += "\n"
-                continue
-            
-            elif trigger==FORGET_TRIGGER :
-                eventStr += " frgt"
-                if preIsComplete or GOF>0.5:
-                    self.V.vault()
-                    eventStr += " V("+str(GOF)+")"
-                    self.V.propose(nar, ifound,tokens, readstart)
-                    eventStr += "P"
-                ifound = []   
-                nar.clear()    
-                forget = 0                              
-
-            elif trigger==COMPLETE_TRIGGER :
-                eventStr += " DONE"
-                if preIsComplete:
-                    self.V.vault()
-                    eventStr += " V("+str(GOF)+")"
-                # overlays nar on pre if pre is not complete               
-                self.V.propose(nar, ifound,tokens, readstart) 
-                eventStr += " V("+str(GOF)+")P"
-                preIsComplete = True
-                ifound = []
-                readstart = itok
-                nar.clear()
-                forget = 0
-            
-            elif trigger==CONTROL_TRIGGER :
-                eventStr += " ctrl"
-                x = isLogicControl(subtoks, itok) # can assume not NULL_VAR
-                if x.isA("AND"):
-                    if preIsComplete or GOF>0.5:
-                        self.V.vault()
-                        eventStr += " V("+str(GOF)+")"
-                        #putting this under an "if" is different from 
-                        # BUT/HEDGE and critical
-                        ifound = []
-                        readstart = itok
-                        nar.clearIFound()
-                elif x.isA("NEG") or x.isA("HEDGE"):
-                    if GOF<=0.5 :
-                        self.V.abandonPre()
-                    else:
-                        self.V.blockPre()
-                   
-                    if preIsComplete or GOF>0.5:
-                        self.V.vault()
-                        eventStr += " V("+str(GOF)+")"
-                    ifound = []
-                    readstart = itok
-                    nar.clearIFound()
-                    forget = 0
-
-                elif x.isA("FNEG") or x.isA("FHEDGE"):      
-                    if GOF<=0.5 :
-                        self.V.abandonPre()
-                    else:
-                        self.V.vault()
-                        eventStr += " V("+g+")"
-                        V.blockPre() # in anticipation of pre being filled
-                else:
-                   print("UNHANDLED CONTROL="+x.knames[0]+ " at itok="+str(itok))
-
-            elif trigger==PUNCTUATION_TRIGGER :
-                eventStr += " punct"
-                p = isPunctuationControl(subtoks, itok)
-                if p.isA("COMMA") or p.isA("PERIOD") or p.isA("SEMICOLOMN"):  
-                    # for now, everyone uses "AND" processing                              
-                    if preIsComplete or GOF>0.5:
-                        self.V.vault()
-                        eventStr += " V("+str(GOF)+")"
-                        # also under an "if" for now
-                        ifound = []
-                        readstart = itok
-                        nar.clearIFound()
-                else: # p.isA("SEMICOLON") or p.isA("EXCLAIM"):
-                    print("unhandled punctuation")
-
-            # last token processing. For now, borrows from COMPLETE_TRIGGER
-            if itok==len(tokens)-1 : 
-                if preIsComplete:
-                    self.V.vault()
-                    eventStr += " V("+str(GOF)+")"
-                self.V.propose(nar, ifound,tokens, readstart)  
-                eventStr += " V("+str(GOF)+")P"
-                #GOF = pre.gof(nar,subtoks)      
-                #ifound = []
-                #readstart = itok
-                #nar.clear()
-            eventStr += "\n"
-
-        self.V.vault()
-        print(eventStr)
-        
-        print("Vault has " +  str(len(self.V._vault)) + "entries" )
-        for v in self.V._vault:
-            G = v.gof(tokens)
-            print("GOF=" + str(G))
-            
 ######################################################
 ################# ABReader ###########################
 ######################################################
@@ -494,8 +274,15 @@ class ABReader:
     def clearStart(self, CD):
         self.nar.clearIFound() 
         self.ifound = []
-        return CD.ictrl + 1 # to avoid re-reading the current control
-    
+        # consider appending CD.ctrl.ifound to self.ifound
+
+        # In any case if there was a keyword search it might have consumed
+        # more than one token, so use len(CD.ctrl.ifound) to figuure this out.
+        # If there was no keyword search, still the control was associated to a token
+        # like _comma_ , so you need to advance beyond it also.
+        skip =  max(1, len(CD.ctrl.ifound))
+        return CD.ictrl + skip
+
     # Implement the "moving topic" by plain reading between controls
     def readText(self, text, freshStart=True):     
         self.clear()
@@ -560,11 +347,9 @@ class ABReader:
             record = NarRecord( nar, ifound, tokens )
         else: 
             record = None # I'm told this is "pythonic"
-            istart = self.clearStart(CD)
-            return istart
    
         if CD.type==END_CTRLTYPE:
-            V.rollUp(record, 0.1) # a more tolerant saving
+            V.rollUp(record, 0.1) # a more tolerant threshold
             V.vault()
             return len(tokens)
 
@@ -576,13 +361,14 @@ class ABReader:
         # this is current "and" processing. It is closely tied to
         # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
         # Take this code out if you want it to SKIP
+        # Also consider changing the 0.5 to tune sub-vaulting
         if CTRL.isA("AND"):
             V.rollUp(record, 0.5)
-            #if nar.numSlotsUsed()==nar.numSlots():
-               # V.rollUp(record, 0.1 )
-                 #but no clearing
+            # no clearing of nar
             istart = self.clearStart(CD)
+            return istart
 
+        # other controls:
         if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             # block backward
             BLOCK = True
@@ -597,22 +383,12 @@ class ABReader:
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)
-            if rOK:
-                V.vault()
-            else:
-                V.abandonPre()
-
+            V.vault()
             istart = self.clearStart(CD)
 
             # block forward
-            V.blockPre()
-
-        #elif CTRL.isA("AND"):
-        #    rOK = V.rollUp(record, 0.5)
-        #    if rOK:
-        #        V.vault()
-        #        istart = self.clearStart(CD)
-        
+            V.addBlock()
+       
         elif CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):    
             rOK = V.rollUp( record, 0.5)
             if rOK:
@@ -621,6 +397,8 @@ class ABReader:
             else:
                 istart = CTRL.ictrl+1
 
+            V.nblocks = 0 
+
         elif CTRL.isA("PERIOD"):
             rOK = V.rollUp(record, 0.5)
             if rOK:
@@ -628,6 +406,9 @@ class ABReader:
 
                 #if record.nused==record.nslots:
                 nar.clear()
+
+            V.nblocks = 0
+
             istart = self.clearStart(CD)
         else :
             print( "did not apply contol: "+ CTRL.knames[0] )

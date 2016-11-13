@@ -8,21 +8,23 @@ from nwcontrol import *
 
 # The NarRecord reflects a collapsing of the data that has been kept 
 # as separate count of numSlotsUsed() and ifound (the indices of found tokens) 
-# during the reading process. Here it gets scored and perhaps saved or "vaulted".
+# during the reading process. These it gets scored and perhaps saved or "vaulted".
 # There is a poetic analogy with how superposition of waves is
 # additive until an event is observed. Events are not additive. In any case,
-# the vaulting is an event with GOF meaning "goodness of fit" between narrative and text
+# the vaulting is an event. GOF means "goodness of fit" between narrative 
+# and text
 
 class NarRecord:
     def __init__(self, nar, ifound, tokens):
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
         self.ifound = ifound[:]           # indices that have already been read  
-        self.blocked = False
+        self.block = False
         self.GOF = self.gof(tokens)
+        self.narpolarity = nar.polarity   # nar could change, so save its current polarity
 
     def block(self):
-        self.blocked = True
+        self.block = True
 
         # "goodness of fit"
     def gof(self, tokens):  
@@ -34,10 +36,10 @@ class NarRecord:
         r = histo( jfound, L )
         f = getFoundRange(jfound,L)
         if f==0 or n==0:
-            print("error in NarRecord.gof()")
+            G = 0
         else:
             G = (float(u)/float(n))*(float(r)/float(f))  # one  of several possibilities.
-            return G
+        return G
 
 
 # This is currently defined in terms of the above NarRecord. 
@@ -46,7 +48,7 @@ class NarVault:
     def __init__(self):
         self._vault = []         
         self.pre   = 0
-        self.preblock = False
+        self.nblocks = 0
 
 # self.pre is or will be what is proposed for vaulting. 
 # It is "previous" to vaulting.
@@ -58,46 +60,35 @@ class NarVault:
     def clear(self):
         self._vault = []
         self.pre   = 0
-        self.preblock = False 
+        self.nblocks = 0 
           
     def vault(self):
-        #if self.pre.GOF<=0.1:
-        #    print( "Aborting vault for lack of fit" )
         if self.pre!=0 and self.pre.GOF>0.1:
-            if self.preblock:
-                self.pre.block() #apply any pre blockage
+            # apply blocks
+            if 1==self.nblocks%2: 
+                self.pre.block = True 
             self._vault.append( self.pre )    
-            gofStr = str(self.pre.GOF)
         self.pre = 0
-        self.preblock = False
-                     
-    def propose(self, nar, ifound,tokens, istart):
-        if len(ifound)==0:
-            return;       
-        ifound = cleanFound(ifound) 
-
-        # use readstart to adjust relative indices back to absolute ones 
-        ifound = shiftFoundIndices(ifound, istart)
-
-        self.pre = NarRecord(nar, ifound, tokens)
-               
+        # resetting nblocks is someone else's job     
+                                   
     def abandonPre(self):
         self.pre = 0
         
-    def blockPre(self):
-        self.preblock = True 
+    def addBlock(self):
+        self.nblocks = self.nblocks+1 
          
-    def unblockPre(self):  
-        self.preblock = False
+    def removeBlock(self):  
+        self.nblocks = self.nblocks-1 
 
     def rollUp( self, record, Threshold, block=False):
-        if record==None:
-            return False
-        if record.GOF>Threshold:
-            self.vault()
+        self.vault()
+
+        if block:
+            self.addBlock()
+
+        if record!=None and record.GOF>Threshold:
+            self.vault() # saves old pre, as needed
             self.pre = record
-            if block: # no double negatives
-                self.pre.blocked = True
             return True
         else:
             return False

@@ -164,8 +164,10 @@ SKIP_OP.sub(DESIGNATOR_OP)
 
 
 def findControl(self, tokens, itok):
+    self.ifound = []
     for kname in self.knames:
         klist = KList.instances[ kname ]
+        self.ifound = []
         found = klist.findInText(tokens, itok, self.ifound)
         if found:
             #print( "really found at "+kname)
@@ -237,6 +239,7 @@ PUNCTUATION_OP.sub(QUERY_OP)
 PUNCTUATION_OP.sub(EXCLM_OP )
 
 def findPunctuation(self, tokens, itok):
+    self.ifound = []
     for kname in self.knames:
         klist = KList.instances[ kname ]
         found = klist.findInText(tokens, itok, self.ifound)

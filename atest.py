@@ -9,14 +9,15 @@ from nwread import *
 
 n = attribute( PROBLEM, SOUND )
 
-
-
 n = attribute( BARRIER, STATE)
 m = event( BARRIER, NOISE, LETINOUT )
 m2 = event( n, NOISE, LETINOUT )
 
+sext = "even though there was a wind"
+sokens = TOKS(sext)
+x = isLogicControl(sokens,0)
 
-
+j=2
 # "open windows let in the noise"
 # "the walls were thin and noise carries"
 
@@ -47,7 +48,7 @@ c = sequence(r,s)
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
 #text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
-text = "Even though my room was close to an elevator and near the lobby, it was very quiet."
+text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 tokens = TOKS(text)
 ifound = []
 #x = ReadText(r,tokens,ifound)
@@ -57,9 +58,6 @@ ifound = []
 
 c.clear()
 
-#C = NWReader(E,c)
-#C.readText(text)
-#C.readText(NoiseText)
 
 x=2
 
