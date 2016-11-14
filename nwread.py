@@ -405,7 +405,7 @@ class ABReader:
                 V.vault()
 
                 #if record.nused==record.nslots:
-                nar.clear()
+            nar.clear()
 
             V.nblocks = 0
 

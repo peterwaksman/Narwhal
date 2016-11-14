@@ -28,13 +28,17 @@ class NarRecord:
 
         # "goodness of fit"
     def gof(self, tokens):  
-        u = self.nused; # a snapshot of state when the NarRecord is created
-        n = self.nslots 
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
         jfound = cleanFound(jfound)
         r = histo( jfound, L )
         f = getFoundRange(jfound,L)
+
+        u = self.nused # a snapshot of state when the NarRecord is created
+        u = min(u, len(jfound) )
+        n = self.nslots 
+
+
         if f==0 or n==0:
             G = 0
         else:
