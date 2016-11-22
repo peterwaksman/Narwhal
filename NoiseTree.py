@@ -93,8 +93,8 @@ kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom,walls"
 
 kNOISELOCSHOTEL="hotel, high $ floor,building,area, section,location,quiet hotel,"
-kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool,external,market,street, main ,"
-kNOISELOCSHOTEL+="road,alley" #"it"????
+kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool,external,market,shopping,street, main ,"
+kNOISELOCSHOTEL+="road,alley"  
 
 
 
@@ -149,7 +149,7 @@ hotelD = KList("hotel", kNOISELOCSHOTEL)
  
 
 
-kNEAR = "nowhere $ near , near to , over , on the , right on ,overlooks, close to,next door"
+kNEAR = "nowhere $ near , near to ,in the heart of, over , on the ,being on, right on ,overlooked,overlooks, close to,next door"
 nearD = KList("near", kNEAR)
 kFAR  = " far , far from,farthest from, away from,nowhere near"
 farD = KList("far",kFAR)
@@ -160,7 +160,7 @@ insulationD = KList("insul", kINSULATION)
 
 kWINDOW = " window, balcony "
 windowD = KList("window", kWINDOW)
-kWALL = "wall,next|my|next $ door,floor"
+kWALL = "wall,my|next $ door,floor"
 wallD = KList("wall", kWALL)
 
 kOPEN = " open , thin "

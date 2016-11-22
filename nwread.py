@@ -160,7 +160,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
     c  = ReadText(SO_OP, tokens, kfound)
     ifound.extend(kfound)
 
-    # polarity algorithm. The most ad hoc unfortunately
+    # polarity algorithm. Unfortunately AD HOC  
     T = nar.thing.polarity
     V = nar.value.polarity
     if (T and V) or (not T and not V):
@@ -215,12 +215,12 @@ def ReadTextAsSequential(nar, tokens, ifound):
 
     ifound = cleanFound(ifound)
 
-    # polarity algorithm. The most ad hoc unfortunately
-    if t>v :
+    # polarity algorithm. Unfortunately AD HOC  
+    if t>0 and v==0:
         nar.polarity = nar.thing.polarity
-    elif v>t:
+    elif v>0 and t==0:
         nar.polariy = nar.value.polarity
-        
+    #else nar.polarity remains at default    
 
     return t + v + a 
 
@@ -307,12 +307,11 @@ class ABReader:
             #### shift to LOCAL indexing in interval [istart, ictrl] 
             subtoks = tokens[istart : CD.ictrl]
             
-            #### PLAIN READ. Then shift back to global indices 
+            #### PLAIN READ.  
             jfound = PlainRead(nar, subtoks)
+            # Shift back to global indices 
             jfound = shiftFoundIndices(jfound, istart )
             cleanFound(jfound)
-           # ifound.extend(jfound)
-           # self.ifound = ifound[:]
             self.ifound.extend( jfound )
 
             #### negate forward or backward, propose and vault, as needed 
@@ -331,8 +330,9 @@ class ABReader:
         self.applyControl( CD, istart)
 
 
-
-    ########### APPLY CONTROL ########
+    ############################################
+    ########### APPLY CONTROL ##################
+    ############################################
     # return an updated istart
     def applyControl( self, CD, istart) :
         if CD.type==NO_CTRLTYPE :
@@ -372,12 +372,11 @@ class ABReader:
         if CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             # block backward
             BLOCK = True
-            rOK = V.rollUp(record, 0.5, BLOCK) # Iindicates pre should be blocked
+            rOK = V.rollUp(record, 0.5, BLOCK) # Indicates pre should be blocked
             if rOK:
                 V.vault()
             else:
                 V.abandonPre()
-
             istart = self.clearStart(CD) 
             self.ifound = [] # fresh start
 
@@ -385,7 +384,6 @@ class ABReader:
             rOK = V.rollUp(record, 0.5)
             V.vault()
             istart = self.clearStart(CD)
-
             # block forward
             V.addBlock()
        
@@ -393,23 +391,18 @@ class ABReader:
             rOK = V.rollUp( record, 0.5)
             if rOK:
                 V.vault()
-                istart = self.clearStart(CD)
-            else:
-                istart = CTRL.ictrl+1
-
+                nar.clear() #AD HOC
+            istart = self.clearStart(CD)
             V.nblocks = 0 
 
         elif CTRL.isA("PERIOD"):
-            rOK = V.rollUp(record, 0.5)
+            rOK = V.rollUp(record, 0.1)
             if rOK:
                 V.vault()
-
-                #if record.nused==record.nslots:
+            istart = self.clearStart(CD)
+            V.nblocks = 0
             nar.clear()
 
-            V.nblocks = 0
-
-            istart = self.clearStart(CD)
         else :
             print( "did not apply contol: "+ CTRL.knames[0] )
 

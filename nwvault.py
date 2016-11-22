@@ -6,16 +6,26 @@ from nwcontrol import *
 # narrative, encountered in the course of reading a text. 
 # It consists of an array of NarRecords.
 
+# for convenience, the nar record includes the relevant snippet of original text
+def getSnippet(ifound, tokens):
+     if len(ifound)<1:
+         return ""
+     imin = minITOK(ifound)
+     imax = maxITOK(ifound)
+     snippet = tokens[imin:imax+1]
+     return snippet
+ 
 # The NarRecord reflects a collapsing of the data that has been kept 
 # as separate count of numSlotsUsed() and ifound (the indices of found tokens) 
-# during the reading process. These it gets scored and perhaps saved or "vaulted".
+# during the reading process. These get scored and perhaps saved or "vaulted".
 # There is a poetic analogy with how superposition of waves is
 # additive until an event is observed. Events are not additive. In any case,
-# the vaulting is an event. GOF means "goodness of fit" between narrative 
-# and text
+# the creation of a record and vaulting are an event. GOF means "goodness of fit" 
+# between narrative and text
 
 class NarRecord:
     def __init__(self, nar, ifound, tokens):
+        self.snippet = getSnippet(ifound,tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
         self.ifound = ifound[:]           # indices that have already been read  
@@ -35,9 +45,8 @@ class NarRecord:
         f = getFoundRange(jfound,L)
 
         u = self.nused # a snapshot of state when the NarRecord is created
-        u = min(u, len(jfound) )
+        u = min(u, len(jfound) ) # AD HOC
         n = self.nslots 
-
 
         if f==0 or n==0:
             G = 0
@@ -68,7 +77,9 @@ class NarVault:
           
     def vault(self):
         if self.pre!=0 and self.pre.GOF>0.1:
-            # apply blocks
+            # Apply blocks. Although polarity of a nar need
+            # not behave like a boolean, the blocks arising from 
+            # controls perhaps DO behave like booleans
             if 1==self.nblocks%2: 
                 self.pre.block = True 
             self._vault.append( self.pre )    
@@ -82,7 +93,8 @@ class NarVault:
         self.nblocks = self.nblocks+1 
          
     def removeBlock(self):  
-        self.nblocks = self.nblocks-1 
+        if self.nblocks>0:
+            self.nblocks = self.nblocks-1 
 
     def rollUp( self, record, Threshold, block=False):
         self.vault()

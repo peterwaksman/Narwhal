@@ -60,7 +60,7 @@ kFORWARDNEGATIONS+= "without # being|a|hesitation|issue|issues|problems" #????
 
 # these need to be sorted into ones that hedge the previous versus ones hedging the folling
 kHEDGES = "but # more|also,other than,except,except for,however, yet "
-kFORWARDHEDGES = "although, even if,despite,instead of,even though,even when,"
+kFORWARDHEDGES = "although, even if,despite,for being,instead of,even though,even when,"
 
 kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is "
 
@@ -85,6 +85,7 @@ kSkipThese = "should not,a little,to hear,working order,screams that,why not,"
 
 
 ##################### KList VARs ##################
+# less common controls that are not currently supported
 ifD = KList("IF", kIF )
 IF_OP = ifD.var()
 

@@ -1,13 +1,15 @@
 
 from nwtypes import *
 from NoiseTree import *
-#from nwread import *
 from nwutils import *
-#from nwreader import *
 from nwread import *
 
 
 n = attribute( PROBLEM, SOUND )
+
+q = attribute( BARRIER, INSULATION)
+
+a = cause( attribute( NOISE, TOD ), AFFECT )
 
 n = attribute( BARRIER, STATE)
 m = event( BARRIER, NOISE, LETINOUT )
@@ -42,8 +44,8 @@ r = attribute( LOC, SOURCE, PROX )
 
 s = attribute( SOUND, INTENSITY )
 #c = sequence(r,s)
-#c = cause(r,s)
-c=r
+c = cause(r,s)
+#c=r
 
 #text = "The hotel was over a bar and that was noisy"
 #text = "The hotel was near the border and far from downtown"

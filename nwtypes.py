@@ -313,7 +313,7 @@ class VAR:
     def nar(self):
         p = NAR()
         p.order = 1
-        p.blocked  = False
+        #p.blocked  = 0
         p.polarity = True
         
         p.thing = self         # so isinstance(p.thing,VAR) is True
@@ -378,7 +378,7 @@ class NAR:
 
         # between these two, we can consider the "whole" value of the narrative to be 
         # their product, specifically: if blocked then return polarity, else return !polarity
-        self.blocked = 0
+        #self.blocked = 0 # deprecated, blocking is handled at a higher level
         self.polarity = True
         
         self.thing = NULL_VAR 
@@ -392,7 +392,7 @@ class NAR:
 
     # If x is a var, this calls .clear(), otherwise it calls into the sub narratives.
     def clear(self):
-        self.blocked = 0
+        #self.blocked = 0
         self.polarity = True
 
         if self.thing != NULL_VAR: # and self.thing !=0:
@@ -423,7 +423,7 @@ class NAR:
     def copy(self):
         n = NAR()
         n.order   = self.order
-        n.blocked = self.blocked
+        #n.blocked = self.blocked
         n.polarity = self.polarity
         n.thing   = self.thing.copy()
         n.action  = self.action.copy()
@@ -450,7 +450,7 @@ class NAR:
 
         n = NAR()
         n.order   = self.order
-        n.blocked = self.blocked
+        #n.blocked = self.blocked
         n.polarity = self.polarity
         
         # for the sub NARs
@@ -471,22 +471,23 @@ class NAR:
         n.value   = self.value.copyUsing(tree)
         return n   
 
+    ## (For now, this is implemented as a control, not a narrative)
     # Implements OPERATOR X* (i.e. negation/contrast to X)
     # in general block() is not idempotent. A double block() is not always 
     # an un-block(). For example: "she was not ready to swim"
     # Also, unlike other operators, it seems simpler for this one to modify 
     # an original NAR and does not produce a fresh copy, that is blocked.
     # (TODO: revisit this decision)
-    def block(self):
-        self.blocked += 1
+    #def block(self):
+    #    self.blocked += 1
         
-    def unblock(self):
-        if self.blocked>0 :
-           self.blocked -= 1        
+    #def unblock(self):
+    #    if self.blocked>0 :
+    #       self.blocked -= 1        
              
 
-           # means the token is part of the narrative. This changes the state of underlying VARs 
-           # but note it is prevented from changing the ifound
+            # means the token is part of the narrative. This changes the state of 
+            # underlying VARs but note it is prevented from changing the ifound
     def find(self,tok):
         if ORDER(self)==0 :
             tokens = []
