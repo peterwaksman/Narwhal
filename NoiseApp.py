@@ -47,4 +47,11 @@ class N_NoiseSummary:
     def finalPolarity():
         return True
 
-     
+class NoiseReader:
+    def __init__(self ):
+        self.reader = NWReader(EXPERIENCE, nars)
+    
+    def readText(self, text ):
+        self.reader.clearAll()
+        self.reader.readText( text)
+                

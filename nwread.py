@@ -407,3 +407,232 @@ class ABReader:
             print( "did not apply contol: "+ CTRL.knames[0] )
 
         return istart         
+
+
+#########################################################
+#########################################################
+#########################################################    
+# The following code, although not identical with the ABReader,
+# is supposed to be the same, but with looping over an array
+# of nars, each with its own ifound, and vault - rather than having
+# one nar and managing the ifound and vault in the reader. To manage
+# the array of nars, we have
+class NarReadData:
+    def __init__(self, treeroot, nar ):
+        self.tree = treeroot.copy()
+        self.nar = nar.copyUsing( self.tree )
+
+        self.ifound = []
+        self.V = NarVault()
+
+    def clearIFound(self):
+        self.nar.clearIFound()
+        self.ifound = []
+
+    def clear(self):
+        self.clearIFound()
+        self.nar.clear()
+
+######################################################
+# The syntax is R = NWReader( tree, nars[] )
+#               R.readText( text )
+# (don't know yet how the vaults are un-packed into a data structuure)
+class NWReader:
+    def __init__(self, tree, nars):
+        self.tokens = []                              
+        self.narD =[]
+        for nar in nars:
+            self.narD.append( NarReadData(tree, nar) )
+    
+    ##### PRIVATELY USED ########### 
+    def prepareTokens(self, text): 
+            # encode punctuations  
+        text = replacePunctuation(text)    
+            
+             # lower case tokens 
+        tokens = text.split(' ')
+        self.tokens = []
+        for tok in tokens: 
+            if len(tok)>0:
+                self.tokens.append(tok)
+
+        for i in range( len(self.tokens)):
+            tok = self.tokens[i].lower()
+            self.tokens[i] = tok 
+                               
+    def newStart(self, CD):
+        # If there was a keyword search it might have consumed
+        # more than one token, so use len(CD.ctrl.ifound) to figuure this out.
+        # If there was no keyword search, still the control was associated to
+        # a token like _comma_ , so you need to advance beyond it also.
+        skip =  max(1, len(CD.ctrl.ifound))
+        return CD.ictrl + skip
+
+    def clearMany( self ):
+        for i in range( len(self.narD) ):
+            self.narD[i].clear()
+
+    def clearIFoundMany( self ):
+        for i in range( len(self.narD) ):
+            self.narD[i].clearIFound()
+            
+    def clearVaults( self ):
+        for i in range( len(self.narD) ):
+            self.narD[i].V.clear()
+                    
+    def clearAll(self):
+        self.clearMany()
+        self.clearIFoundMany()
+        self.clearVaults()
+
+    def readMany(self, subtoks, istart):
+        for i in range( len(self.narD) ):
+            nar = self.narD[i].nar
+            ifound = self.narD[i].ifound
+                                
+            jfound = PlainRead(nar, subtoks)
+            jfound = shiftFoundIndices(jfound, istart )
+            cleanFound(jfound)
+            ifound.extend( jfound )
+            
+    def recordMany( self, tokens):
+        records = []
+        for i in range( len(self.narD) ):
+            nard = self.narD[i]
+            if len(nard.ifound)>0:
+                record = NarRecord( nard.nar, nard.ifound, tokens)
+            else:
+                record = None
+            records.append( record )
+            return records
+
+    def rollUpMany( self, records, Threshold, block=False):
+        for i in range( len(self.narD) ):
+            nard = self.narD[i]
+            nard.V.rollUp( records[i], Threshold, block)
+
+    def rollUpAndVaultMany( self, records, Threshold, block=False):
+        for i in range( len(self.narD) ):
+            nard = self.narD[i]
+            nard.V.rollUp( records[i], Threshold, block)
+            self.narD[i].V.vault()
+            
+    def rollUpCanVaultMany(self, records, Threshold, block):
+        for i in range( len(self.narD) ):
+            nard = self.narD[i]
+            rOK = nard.V.rollUp( records[i], Threshold, block)
+            if rOK:
+                nard.V.vault()
+            
+    def rollUpCanVaultOrAbandonMany( self, records, Threshold, block):
+        for i in range( len(self.narD) ):
+            nard = self.narD[i]
+            rOK = nard.V.rollUp( records[i], Threshold, block)
+            if rOK:
+                nard.V.vault()
+            else:
+                nard.V.abandonPre()
+            
+    def addBlockMany(self):
+        for i in range( len(self.narD) ):
+            self.narD[i].V.addBlock()            
+
+    def removeAllBlocksMany(self):
+        for i in range( len(self.narD) ):
+            self.narD[i].V.nblocks = 0
+
+
+        ################################################
+        ################## READ  #######################
+        ################################################
+        # Implement the "moving topic" by plain reading between controls
+    def readText(self, text, freshStart=True):     
+        if freshStart:
+            self.clearVaults()
+
+        self.prepareTokens(text) 
+        if len(self.tokens)==0:
+            return   
+
+        tokens = self.tokens 
+         
+         # look for control data.  
+        istart = 0       
+        CD  = scanNextControl(tokens, istart)
+
+        while CD.type != END_CTRLTYPE :
+              
+            #### shift to LOCAL indexing in interval [istart, ictrl] 
+            subtoks = tokens[istart : CD.ictrl]
+            
+            #### PLAIN READ. Then shift back to global indices
+            self.readMany( subtoks, istart )
+
+            #### negate forward or backward, propose and vault, as needed 
+            #### and (ifound should be ignored before istart)
+            istart = self.applyControl(CD, istart )
+
+            #### next control 
+            CD = scanNextControl(tokens, istart)
+        
+        # now CD should be of END_CTRLTYPE
+        subtoks= tokens[istart : len(tokens)]
+        self.readMany(subtoks, istart )
+        self.applyControl( CD, istart)
+
+
+        ################################################# 
+        ########### APPLY CONTROL ####################### 
+        ################################################# 
+        # return an updated istart
+    def applyControl( self, CD, istart) :
+        if CD.type==NO_CTRLTYPE :
+            return istart
+
+        tokens = self.tokens
+
+            # prepare records for all nars
+        records = self.recordMany(tokens)
+   
+        if CD.type==END_CTRLTYPE:
+            self.rollUpAndVaultMany(records, 0.1)
+            return len(tokens)
+
+
+        CTRL = CD.ctrl
+    
+            # this is current "and" processing. It is closely tied to
+            # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
+            # Take this code out if you want it to SKIP
+            # Also consider changing the 0.5 to tune sub-vaulting
+        if CTRL.isA("AND"):
+            self.rollUpMany( records, 0.5)
+
+        elif CTRL.isA("NEG") or CTRL.isA("HEDGE"):                   
+            BLOCK = True  # block backward
+            self.rollUpCanVaultOrAbandonMany(records, 0.5, BLOCK)
+
+        elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
+            self.rollUpAndVaultMany( records, 0.5)
+            self.addBlockMany()# block forward
+       
+        elif CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):
+            self.rollUpCanVaultMany( records, 0.5)
+            self.removeAllBlocksMany()
+
+        elif CTRL.isA("PERIOD"):
+            self.rollUpCanVault(records, 0.5)
+            self.removeAllBlocksMany()         
+            self.clearMany() # a clean start
+
+        else :
+            print( "did not apply contol: "+ CTRL.knames[0] )
+
+
+        self.clearIFoundMany()
+            
+        istart = self.newStart(CD)
+            
+        return istart         
+
+
