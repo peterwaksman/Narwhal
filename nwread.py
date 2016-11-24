@@ -504,7 +504,7 @@ class NWReader:
             else:
                 record = None
             records.append( record )
-            return records
+        return records
 
     def rollUpMany( self, records, Threshold, block=False):
         for i in range( len(self.narD) ):
@@ -517,14 +517,14 @@ class NWReader:
             nard.V.rollUp( records[i], Threshold, block)
             self.narD[i].V.vault()
             
-    def rollUpCanVaultMany(self, records, Threshold, block):
+    def rollUpCanVaultMany(self, records, Threshold, block=False):
         for i in range( len(self.narD) ):
             nard = self.narD[i]
             rOK = nard.V.rollUp( records[i], Threshold, block)
             if rOK:
                 nard.V.vault()
             
-    def rollUpCanVaultOrAbandonMany( self, records, Threshold, block):
+    def rollUpCanVaultOrAbandonMany( self, records, Threshold, block=False):
         for i in range( len(self.narD) ):
             nard = self.narD[i]
             rOK = nard.V.rollUp( records[i], Threshold, block)
@@ -593,6 +593,8 @@ class NWReader:
 
             # prepare records for all nars
         records = self.recordMany(tokens)
+        if len(records)==0:
+            return istart
    
         if CD.type==END_CTRLTYPE:
             self.rollUpAndVaultMany(records, 0.1)
@@ -621,7 +623,7 @@ class NWReader:
             self.removeAllBlocksMany()
 
         elif CTRL.isA("PERIOD"):
-            self.rollUpCanVault(records, 0.5)
+            self.rollUpCanVaultMany(records, 0.1)
             self.removeAllBlocksMany()         
             self.clearMany() # a clean start
 

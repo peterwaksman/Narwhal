@@ -66,5 +66,11 @@ x=2
 
 D = ABReader(E,c)
 
-D.readText(text)
+#D.readText(text)
+x = 2
+
+R = [ r , c]
+
+K = NWReader(E, R)
+K.readText(text)
 x = 2

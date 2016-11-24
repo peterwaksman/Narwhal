@@ -32,7 +32,7 @@ class N_Affect:
         self.tod = tod
 
 #location _nearfar_/ source
-sourceNAR = attribute( LOC, SOURCE, PROX)        
+nearsourceNAR = attribute( LOC, SOURCE, PROX)        
 class N_Source:
     def __init(self, pol, loc, src, prox ):
         self.polarity = pol
@@ -59,7 +59,7 @@ class N_NoiseSummary:
         return True
 
 class NoiseReader:
-    nars = [ problemNAR, soundNAR, affectNAR, sourceNAR, keepOutNAR ] 
+    nars = [ problemNAR, soundNAR, affectNAR, nearsourceNAR, keepOutNAR ] 
    
     def __init__(self ):
         self.reader = NWReader(EXPERIENCE, nars)
