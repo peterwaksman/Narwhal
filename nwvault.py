@@ -24,7 +24,7 @@ def getSnippet(ifound, tokens):
 # between narrative and text
 
 class NarRecord:
-    def __init__(self, nar, ifound, tokens):
+    def __init__(self, nar, ifound, tokens, ictrl):
         self.snippet = getSnippet(ifound,tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
@@ -32,6 +32,7 @@ class NarRecord:
         self.block = False
         self.GOF = self.gof(tokens)
         self.narpolarity = nar.polarity   # nar could change, so save its current polarity
+        self.ictrl = ictrl
 
     def block(self):
         self.block = True

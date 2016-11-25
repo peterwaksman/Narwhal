@@ -344,7 +344,7 @@ class ABReader:
         V = self.V
 
         if len(ifound)>0:
-            record = NarRecord( nar, ifound, tokens )
+            record = NarRecord( nar, ifound, tokens, CD.ictrl )
         else: 
             record = None # I'm told this is "pythonic"
    
@@ -495,12 +495,12 @@ class NWReader:
             cleanFound(jfound)
             ifound.extend( jfound )
             
-    def recordMany( self, tokens):
+    def recordMany( self, tokens, ictrl):
         records = []
         for i in range( len(self.narD) ):
             nard = self.narD[i]
             if len(nard.ifound)>0:
-                record = NarRecord( nard.nar, nard.ifound, tokens)
+                record = NarRecord( nard.nar, nard.ifound, tokens, ictrl)
             else:
                 record = None
             records.append( record )
@@ -592,7 +592,7 @@ class NWReader:
         tokens = self.tokens
 
             # prepare records for all nars
-        records = self.recordMany(tokens)
+        records = self.recordMany(tokens, CD.ictrl)
         if len(records)==0:
             return istart
    
