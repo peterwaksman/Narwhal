@@ -371,8 +371,7 @@ def strNarType(type):
 # But the implementation is TREE-like because "operators" of the form
 #               self.thing = (some other self)
 # can get recursive
-class NAR:
-    
+class NAR:   
     def __init__(self):
         self.order = 0 # the level of pattern-inside-pattern depth
 

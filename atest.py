@@ -52,6 +52,7 @@ c = cause(r,s)
 #text = NoiseText
 #text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+#text = "My room was far from the elevator and far from the lobby, so it was very quiet."
 tokens = TOKS(text)
 ifound = []
 #x = ReadText(r,tokens,ifound)
@@ -69,8 +70,13 @@ D = ABReader(E,c)
 #D.readText(text)
 x = 2
 
-R = [ r , c]
-
+ 
+R      = [ r , s , cause(r,s)]
+calibs = [True, True, False]
 K = NWReader(E, R)
 K.readText(text)
+
+K.setCalibration(calibs)
+out = K.test()
+print( out )
 x = 2

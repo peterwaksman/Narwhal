@@ -109,3 +109,11 @@ class NarVault:
             return True
         else:
             return False
+
+        # Retrieve a record with specified ictrl.
+        # Given way vault is created, at most one is possible 
+    def getRecordByCtrl( self, ictrl):
+        for r in self._vault:
+            if r.ictrl==ictrl:
+                return r
+        return None

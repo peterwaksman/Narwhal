@@ -9,7 +9,7 @@ from NoiseTree import *
 # Each NAR corresponds with an intermediate sub-structure of the final data
 
 # problem_/noise
-problemNAR = attribute( PROBLEM, NOISE )
+problem = attribute( PROBLEM, NOISE )
 class N_Problem:
    def __init__(self, true_false):
        self.polarity = true_false
@@ -17,14 +17,14 @@ class N_Problem:
 
 
 # sound_/intensity_/source_/timeOfDay ::[me_/affect]
-soundNAR = attribute( attribute( attribute(SOUND, INTENSITY), SOURCE), TOD)
+sound = attribute( attribute( attribute(SOUND, INTENSITY), SOURCE), TOD)
 class N_Sound:
     def __init__(self, pol, sound, source, intensity, tod):
         asd
 
 
 #[sound->me] :: me_/affect
-affectNAR = cause( attrib(NPOSE,TOD), AFFECT )
+affect  = cause( attribute(NOISE,TOD), AFFECT )
 class N_Affect:
     def __init__(self, pol, affect, tod):
         self.polarity = pol
@@ -32,7 +32,7 @@ class N_Affect:
         self.tod = tod
 
 #location _nearfar_/ source
-nearsourceNAR = attribute( LOC, SOURCE, PROX)        
+proximity = attribute( LOC, SOURCE, PROX)        
 class N_Source:
     def __init(self, pol, loc, src, prox ):
         self.polarity = pol
@@ -42,7 +42,7 @@ class N_Source:
 
 
 # (barrier_/state)-letInOut->sound
-keepOutNAR = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
+letin = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
 class N_Barrier:
     def __init__(self,pol):
         self.polarity = pol
@@ -53,16 +53,19 @@ class N_NoiseSummary:
        self.problem = None
        self.sound = None
        self.affect = None
-       self.source = None
-       self.barrier = None
+       self.proximity = None
+       self.letin = None
     def finalPolarity():
         return True
 
 class NoiseReader:
-    nars = [ problemNAR, soundNAR, affectNAR, nearsourceNAR, keepOutNAR ] 
+    nars = [ problem, sound, affect, proximity, keepout ] 
+    # all have negative interpetations
+    calibs=[ True,    True,  True,   True,   True ]     
    
     def __init__(self ):
         self.reader = NWReader(EXPERIENCE, nars)
+        self.reader.setCalibration(calibs)
     
     def readText(self, text ):
         self.reader.clearAll()

@@ -116,7 +116,11 @@ def ReadTextAsAction(nar, tokens, ifound):
         
     ifound.extend(jfound) 
     
-    return t + a + v
+    # require that action be found??? AD HOC
+    if a==0:
+        return 0 
+    else:
+        return t + a + v
       
     
 def ReadTextAsCausal(nar, tokens, ifound):
@@ -413,14 +417,15 @@ class ABReader:
 #########################################################
 #########################################################    
 # The following code, although not identical with the ABReader,
-# is supposed to be the same, but with looping over an array
+# is supposed to be the same, together with looping over an array
 # of nars, each with its own ifound, and vault - rather than having
 # one nar and managing the ifound and vault in the reader. To manage
 # the array of nars, we have
-class NarReadData:
+class NarFoundData:
     def __init__(self, treeroot, nar ):
         self.tree = treeroot.copy()
         self.nar = nar.copyUsing( self.tree )
+        self.calib = False
 
         self.ifound = []
         self.V = NarVault()
@@ -442,7 +447,11 @@ class NWReader:
         self.tokens = []                              
         self.narD =[]
         for nar in nars:
-            self.narD.append( NarReadData(tree, nar) )
+            self.narD.append( NarFoundData(tree, nar) )
+
+    def setCalibration(self, calibs):
+        for i in range( min( len(self.narD), len(calibs) ) ):
+            self.narD[i].calib = calibs[i]
     
     ##### PRIVATELY USED ########### 
     def prepareTokens(self, text): 
@@ -636,5 +645,31 @@ class NWReader:
         istart = self.newStart(CD)
             
         return istart         
+
+    def test(self):
+        out = ""
+        for i in range(len(self.tokens)):
+            out += self.tokens[i].rjust(10) + " "
+            for nard in self.narD:
+                r = nard.V.getRecordByCtrl(i)
+                if r==None:
+                    out += " "
+                else:
+                    p = r.narpolarity
+                    if nard.calib: # flip interpretation
+                        p = not p
+                    b = r.block
+                    if (b and p) or (not b and not p):
+                        val = "-"
+                    else:
+                        val = "+"                      
+                    out += val
+                if r==None:
+                    out += ".      " 
+                else:
+                    out += ("{0:.4g}".format(r.GOF)).ljust(6) + " "
+            out += "\n" 
+        out += "\n"
+        return out
 
 
