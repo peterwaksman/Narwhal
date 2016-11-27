@@ -55,6 +55,16 @@ class NarRecord:
             G = (float(u)/float(n))*(float(r)/float(f))  # one  of several possibilities.
         return G
 
+    def finalPolarity( self, calib):
+        p = self.narpolarity
+        if calib: # flip interpretation
+            p = not p
+
+        b = self.block
+        if b==p:  # it works out as this
+            return False
+        else:
+            return True             
 
 # This is currently defined in terms of the above NarRecord. 
 # Probably it could be more general.
@@ -117,3 +127,33 @@ class NarVault:
             if r.ictrl==ictrl:
                 return r
         return None
+
+### This is a class that lives only to relieve some of the complexity 
+### of the NarReader. 
+class NarFoundData:
+    def __init__(self, treeroot, nar ):
+        self.tree = treeroot.copy()
+        self.nar = nar.copyUsing( self.tree )
+        self.calib = False
+
+        self.ifound = []
+        self.V = NarVault()
+
+    def clearIFound(self):
+        self.nar.clearIFound()
+        self.ifound = []
+
+    def clear(self):
+        self.clearIFound()
+        self.nar.clear()
+
+    def finalPolarity(self, r):
+        p = r.narpolarity
+        if self.calib: # flip interpretation
+            p = not p
+
+        b = r.block
+        if b==p:  # it works out as this
+            return False
+        else:
+            return True             

@@ -71,12 +71,18 @@ D = ABReader(E,c)
 x = 2
 
  
-R      = [ r , s , cause(r,s)]
-calibs = [True, True, False]
-K = NWReader(E, R)
-K.readText(text)
+R          = [ r , s , cause(r,s)]
+calibs     = [True, True, False]
+thresholds = [0.6 , 0.6, 0.6 ]
 
+
+
+K = NWReader(E, R)
 K.setCalibration(calibs)
-out = K.test()
+
+K.readText(text)
+out = K.report()
 print( out )
 x = 2
+
+

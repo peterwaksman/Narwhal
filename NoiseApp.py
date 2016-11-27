@@ -10,22 +10,39 @@ from NoiseTree import *
 
 # problem_/noise
 problem = attribute( PROBLEM, NOISE )
-class N_Problem:
-   def __init__(self, true_false):
-       self.polarity = true_false
+class ProblemInfo:
+   def __init__(self):
+       self.str = "PROBLEM"
+       self.polarity = True
+       self.found = False
+
+   def transferRecord(self, nard, irecord):
+        problemT = 0.6
+        if irecord< len(nard.V) :
+            record = nard.V[irecord]
+        else:
+            return
+
+        if record==None:
+            return
+
+        if record.GOF>problemT :
+            self.found = True
+            self.polarity = finalPolarity()
+            
 
 
 
 # sound_/intensity_/source_/timeOfDay ::[me_/affect]
 sound = attribute( attribute( attribute(SOUND, INTENSITY), SOURCE), TOD)
-class N_Sound:
+class SoundInfo:
     def __init__(self, pol, sound, source, intensity, tod):
         asd
 
 
 #[sound->me] :: me_/affect
 affect  = cause( attribute(NOISE,TOD), AFFECT )
-class N_Affect:
+class AffectInfo:
     def __init__(self, pol, affect, tod):
         self.polarity = pol
         self.affect = affect
@@ -33,7 +50,7 @@ class N_Affect:
 
 #location _nearfar_/ source
 proximity = attribute( LOC, SOURCE, PROX)        
-class N_Source:
+class SourceInfo:
     def __init(self, pol, loc, src, prox ):
         self.polarity = pol
         self.loc = loc
@@ -43,12 +60,12 @@ class N_Source:
 
 # (barrier_/state)-letInOut->sound
 letin = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
-class N_Barrier:
+class BarrierInfo:
     def __init__(self,pol):
         self.polarity = pol
 
 # this is the whole package of a noise statement
-class N_NoiseSummary:
+class NoiseInfoSummary:
     def __init__(self):
        self.problem = None
        self.sound = None
@@ -58,16 +75,10 @@ class N_NoiseSummary:
     def finalPolarity():
         return True
 
-class NoiseReader:
-    nars = [ problem, sound, affect, proximity, keepout ] 
-    # all have negative interpetations
-    calibs=[ True,    True,  True,   True,   True ]     
-   
-    def __init__(self ):
-        self.reader = NWReader(EXPERIENCE, nars)
-        self.reader.setCalibration(calibs)
-    
-    def readText(self, text ):
-        self.reader.clearAll()
-        self.reader.readText( text)
-                
+class NoiseApp:
+    nars      = [ problem, sound, affect, proximity, keepout ]
+    calibs    = [ True,    True,  True,   True,      True ]     
+    thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
+
+    object = NWObject(EXPERIENCE, nars, calibs, thresholds) 
+

@@ -412,36 +412,20 @@ class ABReader:
 
         return istart         
 
-
 #########################################################
-#########################################################
+##################### NWReader ##########################
 #########################################################    
 # The following code, although not identical with the ABReader,
 # is supposed to be the same, together with looping over an array
-# of nars, each with its own ifound, and vault - rather than having
-# one nar and managing the ifound and vault in the reader. To manage
-# the array of nars, we have
-class NarFoundData:
-    def __init__(self, treeroot, nar ):
-        self.tree = treeroot.copy()
-        self.nar = nar.copyUsing( self.tree )
-        self.calib = False
-
-        self.ifound = []
-        self.V = NarVault()
-
-    def clearIFound(self):
-        self.nar.clearIFound()
-        self.ifound = []
-
-    def clear(self):
-        self.clearIFound()
-        self.nar.clear()
-
+# of nars, each with its own ifound, and vault (here called
+# NarFoundData) - rather than having one nar and managing 
+# the ifound and vault in the reader.  
+        
 ######################################################
 # The syntax is R = NWReader( tree, nars[] )
 #               R.readText( text )
-# (don't know yet how the vaults are un-packed into a data structuure)
+# (don't know yet how the vaults are un-packed into a data structure)
+
 class NWReader:
     def __init__(self, tree, nars):
         self.tokens = []                              
@@ -646,7 +630,7 @@ class NWReader:
             
         return istart         
 
-    def test(self):
+    def report(self):
         out = ""
         for i in range(len(self.tokens)):
             out += self.tokens[i].rjust(10) + " "
@@ -655,14 +639,11 @@ class NWReader:
                 if r==None:
                     out += " "
                 else:
-                    p = r.narpolarity
-                    if nard.calib: # flip interpretation
-                        p = not p
-                    b = r.block
-                    if (b and p) or (not b and not p):
-                        val = "-"
+                    P = r.finalPolarity(nard.calib)
+                    if P:
+                        val = "+"
                     else:
-                        val = "+"                      
+                        val = "-"                  
                     out += val
                 if r==None:
                     out += ".      " 
@@ -671,5 +652,4 @@ class NWReader:
             out += "\n" 
         out += "\n"
         return out
-
 
