@@ -418,7 +418,7 @@ class ABReader:
 # The following code, although not identical with the ABReader,
 # is supposed to be the same, together with looping over an array
 # of nars, each with its own ifound, and vault (here called
-# NarFoundData) - rather than having one nar and managing 
+# NarReadData) - rather than having one nar and managing 
 # the ifound and vault in the reader.  
         
 ######################################################
@@ -431,7 +431,7 @@ class NWReader:
         self.tokens = []                              
         self.narD =[]
         for nar in nars:
-            self.narD.append( NarFoundData(tree, nar) )
+            self.narD.append( NarReadData(tree, nar) )
 
     def setCalibration(self, calibs):
         for i in range( min( len(self.narD), len(calibs) ) ):
@@ -462,16 +462,16 @@ class NWReader:
         return CD.ictrl + skip
 
     def clearMany( self ):
-        for i in range( len(self.narD) ):
-            self.narD[i].clear()
+        for nard in self.narD :
+            nard.clear()
 
     def clearIFoundMany( self ):
-        for i in range( len(self.narD) ):
-            self.narD[i].clearIFound()
+        for nard in self.narD :
+            nard.clearIFound()
             
     def clearVaults( self ):
-        for i in range( len(self.narD) ):
-            self.narD[i].V.clear()
+         for nard in self.narD :
+            nard.V.clear()
                     
     def clearAll(self):
         self.clearMany()

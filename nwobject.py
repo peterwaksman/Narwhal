@@ -3,21 +3,11 @@ from nwtypes import *
 from nwcontrol import *
 from nwvault import *
 
-##########################################################
-#  The official narwhal "object" is an NWObject
-#  It is built as a wrapper for NWReader, that manages
-#  final polarity interpretation, final "was said" thresholds
-#  and structures the "found" data. Currently, few details 
-#  are retained from the filled nar: polarity, GOF, and snippet
-#  but not which particular nar slots were filled. 
-#  Anyway...the NarInfo is a "most final" version of things
+# NarInfo: a structured version of  the NarRecord 
+# The NarInfo is a "most final" version of things
 # So we have a partially filled nar converted to a NarRecord 
-# Which is stored in a vault inside a NarFoundData. Could be
-# better organized. Now here, a NarFoundData is converted into 
-# final structured form as NarInfo.
-
-
-# A structured version of  the NarRecord
+# Which is stored in a vault inside a NarReadData (could be
+# better organized).  
 class NarInfo:
     def __init__(self, threshold):
         self.threshold = threshold
@@ -45,8 +35,14 @@ class NarInfo:
         self.polarity = record.finalPolarity( calib )
         return self.polarity
 
- 
 
+ ##########################################################
+#  The official narwhal "object" is an NWObject
+#  It is built as a wrapper for NWReader, that manages
+#  final polarity interpretation, final "was said" thresholds
+#  and structures the "found" data. Currently, few details 
+#  are retained from the filled nar: polarity, GOF, and snippet
+#  but not which particular nar slots were filled.
 class NWObject:
     def __init__(self, treeroot, nars, calibs, thresholds):
         self.numNars = len(nars)
