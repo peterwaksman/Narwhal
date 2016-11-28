@@ -2,6 +2,7 @@ from nwutils import *
 from nwtypes import *
 from nwcontrol import *
 from nwvault import *
+from nwread import *
 
 # NarInfo: a structured version of  the NarRecord 
 # The NarInfo is a "most final" version of things
@@ -57,9 +58,9 @@ class NWObject:
             self.infos.append( NarInfo(thresh) )
 
     def report(self):
-        self.reader.report()
+        return self.reader.report()
                
-    def readText( text ):
+    def readText( self, text ):
                 # clear the mutable fields
         self.reader.clearAll()
         for info in self.infos:
@@ -83,16 +84,21 @@ class NWObject:
                 info = NarInfo(self.thresholds[n])
                 info.fillFromRecord(record, nard.calib)
 
-                if gofMAX<info.GOF:
+                if gofMAX<=info.GOF: #want the terminal state, not the initial one
                     gofMAX = info.GOF
-                    self.info[n] = info
+                    self.infos[n] = info
 
         # The last and only sanity check
-        p = self.info[0].polarity  
-        for n in range( self.numNars ):
-            if self.info[n].polarity != p:
-                print("MIXED n="+str(n))
-            else:
-                print("OK") 
+        p = self.infos[0].polarity 
 
+        mixed = False
+        for n in range( self.numNars ):
+            if self.infos[n].polarity != p:
+                mixed = True
+        if mixed:
+            print("INCOHERENT")
+        elif self.infos[0].GOF>0:
+            print("COHERENT")
+        else:
+            print("NOTHING SAID")
  

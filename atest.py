@@ -3,6 +3,7 @@ from nwtypes import *
 from NoiseTree import *
 from nwutils import *
 from nwread import *
+from nwobject import *
 
 
 n = attribute( PROBLEM, SOUND )
@@ -77,12 +78,18 @@ thresholds = [0.6 , 0.6, 0.6 ]
 
 
 
-K = NWReader(E, R)
-K.setCalibration(calibs)
+#K = NWReader(E, R)
+#K.setCalibration(calibs)
 
-K.readText(text)
-out = K.report()
-print( out )
+#K.readText(text)
+#out = K.report()
+#print( out )
+#x = 2
+
+O = NWObject(E, R, calibs, thresholds)
+O.readText(text)
+x = O.report()
+print(x)
 x = 2
 
 
