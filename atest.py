@@ -52,8 +52,10 @@ c = cause(r,s)
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
 #text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
-text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+#text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "My room was far from the elevator and far from the lobby, so it was very quiet."
+text = "the noise outside the hotel was bad late at night"
+
 tokens = TOKS(text)
 ifound = []
 #x = ReadText(r,tokens,ifound)
@@ -74,7 +76,7 @@ x = 2
  
 R          = [ r , s , cause(r,s)]
 calibs     = [True, True, False]
-thresholds = [0.6 , 0.6, 0.6 ]
+thresholds = [0.3 , 0.3, 0.3 ]
 
 
 

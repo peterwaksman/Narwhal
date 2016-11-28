@@ -76,7 +76,7 @@ class NWObject:
         for n in range( self.numNars ):
             nard = self.reader.narD[n]      # nth narrative read data
             gofMAX = 0.0
-            for i in range( numToks ):       
+            for i in range( numToks +1):       
                 record = nard.V.getRecordByCtrl(i)  
                 if record==None: # if ith token is not a control
                     continue
@@ -89,16 +89,22 @@ class NWObject:
                     self.infos[n] = info
 
         # The last and only sanity check
-        p = self.infos[0].polarity 
+        p = None
+        for info in self.infos:
+            if info.found:
+                p = info.polarity
+                break
+        # no polarity 
+        if p==None:
+            print("NOTHING SAID")
+            return
 
         mixed = False
-        for n in range( self.numNars ):
-            if self.infos[n].polarity != p:
+        for info in self.infos:
+            if info.found and info.polarity != p:
                 mixed = True
         if mixed:
             print("INCOHERENT")
-        elif self.infos[0].GOF>0:
-            print("COHERENT")
         else:
-            print("NOTHING SAID")
- 
+            print("COHERENT")
+     

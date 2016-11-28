@@ -629,8 +629,11 @@ class NWReader:
 
     def report(self):
         out = ""
-        for i in range(len(self.tokens)):
-            out += self.tokens[i].rjust(10) + " "
+        for i in range(len(self.tokens)+1):
+            if i< len(self.tokens):
+                out += self.tokens[i].rjust(10) + " "
+            else: 
+                out += "END".rjust(10) + " "
             for nard in self.narD:
                 r = nard.V.getRecordByCtrl(i)
                 if r==None:
