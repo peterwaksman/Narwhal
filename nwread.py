@@ -479,19 +479,16 @@ class NWReader:
         self.clearVaults()
 
     def readMany(self, subtoks, istart):
-        for i in range( len(self.narD) ):
-            nar = self.narD[i].nar
-            ifound = self.narD[i].ifound
-                                
+        for nard in self.narD :
+            nar = nard.nar                         
             jfound = PlainRead(nar, subtoks)
             jfound = shiftFoundIndices(jfound, istart )
             cleanFound(jfound)
-            ifound.extend( jfound )
+            nard.ifound.extend( jfound )
             
     def recordMany( self, tokens, ictrl):
         records = []
-        for i in range( len(self.narD) ):
-            nard = self.narD[i]
+        for nard in self.narD:
             if len(nard.ifound)>0:
                 record = NarRecord( nard.nar, nard.ifound, tokens, ictrl)
             else:
@@ -527,12 +524,12 @@ class NWReader:
                 nard.V.abandonPre()
             
     def addBlockMany(self):
-        for i in range( len(self.narD) ):
-            self.narD[i].V.addBlock()            
+       for nard in self.narD:
+            nard.V.addBlock()            
 
     def removeAllBlocksMany(self):
-        for i in range( len(self.narD) ):
-            self.narD[i].V.nblocks = 0
+        for nard in self.narD:
+            nard.V.nblocks = 0
 
 
         ################################################

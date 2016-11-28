@@ -54,8 +54,7 @@ class NWObject:
         self.thresholds = thresholds
         self.infos = []         
         for thresh in thresholds:
-            info = NarInfo(thresh)
-            self.infos.append( info )
+            self.infos.append( NarInfo(thresh) )
 
     def report(self):
         self.reader.report()
@@ -72,26 +71,27 @@ class NWObject:
 
         numToks = len( self.reader.tokens )
        
-        for n in range(self.numNars):
-            nard = self.narD[n]      # nth narrative found data
+        ######## TRANSFER WHAT WAS SAID #######
+        for n in range( self.numNars ):
+            nard = self.reader.narD[n]      # nth narrative read data
             gofMAX = 0.0
-            for i in range(numToks):       
+            for i in range( numToks ):       
                 record = nard.V.getRecordByCtrl(i)  
                 if record==None: # if ith token is not a control
                     continue
              
                 info = NarInfo(self.thresholds[n])
-                info.fillFromRecord(record, calibs[n])
+                info.fillFromRecord(record, nard.calib)
 
                 if gofMAX<info.GOF:
                     gofMAX = info.GOF
                     self.info[n] = info
 
-        # The last and almost only sanity check
+        # The last and only sanity check
         p = self.info[0].polarity  
         for n in range( self.numNars ):
             if self.info[n].polarity != p:
-                print("MIXED n="+str(self.info[n].polarity))
+                print("MIXED n="+str(n))
             else:
                 print("OK") 
 
