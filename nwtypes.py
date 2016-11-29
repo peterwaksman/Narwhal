@@ -134,6 +134,7 @@ class VAR:
                 tokens.append(tok.lower())
             
         # for each token 
+        wasFound = False # used to test newly found, nor re found
         for itok in range( len(tokens) ):
             ikname = 0 
             for kname in self.knames: # for each name in self's klist
@@ -142,15 +143,14 @@ class VAR:
                 
                 found = klist.findInText(tokens, itok, self.ifound) 
                 if found:
-                        self.found = True
-
-                        # can switch frequently and reflects the last found token
-                        if self.exclusive and ikname>0:
-                            self.polarity = False
-                        else:
-                            self.polarity = True                          
+                    self.found = True # could have been true already
+                    wasFound = True 
+                    # can switch frequently and reflects the last found token
+                    if self.exclusive and ikname>0:
+                        self.polarity = False
+                    else:
+                        self.polarity = True                          
                 ikname += 1               
-            
                     # all the way through the call stack, self.ifound updates
                     # a list of indices of tokens found. This will be
                     # confusing, as they may not sync with itok exactly,
@@ -165,7 +165,7 @@ class VAR:
         
         # tell the caller that something below it was found
         # although self.found can be False
-        return (self.found or self.foundInChildren)   
+        return (wasFound or self.foundInChildren)   
                 
     ## can modify the .found  or .foundInChildren, or ifound 
     # only use this for controls, or where you do not care about

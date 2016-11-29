@@ -73,7 +73,7 @@ x=2
 #x = 2
 
  
-R          = [ r , s , cause(r,s)]
+R          = [ r , s , cause(r,s)] 
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
  
@@ -83,7 +83,7 @@ K.setCalibration(calibs)
 
 K.readText(text)
 out = K.report()
-print( out )
+print( out ) 
 x = 2
 
 #O = NWObject(E, R, calibs, thresholds)
