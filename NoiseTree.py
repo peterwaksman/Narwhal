@@ -131,7 +131,7 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "loud,very loud, a bit of, a bit" #people hate to criticize and use understatement
+kLOUD = "loud,very loud, a bit of, a bit,bad" #people hate to criticize and use understatement
 loudD = KList("loud", kLOUD)
 kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
 softD = KList("soft", kSOFT)

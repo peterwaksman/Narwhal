@@ -48,7 +48,8 @@ class NWObject:
     def __init__(self, treeroot, nars, calibs, thresholds):
         self.numNars = len(nars)
         if not( self.numNars==len(calibs) and self.numNars==len(thresholds)):
-           return
+            print("Mismatched arguments in NWObject")
+            return # no soup for you!
 
         self.reader = NWReader(treeroot,nars)
         self.reader.setCalibration(calibs)

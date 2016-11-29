@@ -6,7 +6,7 @@ from nwvault import *
 # works with indexing relative to subtoks
 def PlainRead( nar, subtoks):
     jfound = []
-    ReadText(nar, subtoks, jfound )
+    x = ReadText(nar, subtoks, jfound )
     jfound = cleanFound(jfound)  
     return jfound   
 
@@ -320,7 +320,7 @@ class ABReader:
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
-            istart = self.applyControl(CD, istart )
+            istart = self.applyControl(CD, istart, len(subtoks) )
 
             #### next control 
             CD = scanNextControl(tokens, istart)
@@ -331,14 +331,14 @@ class ABReader:
         jfound = shiftFoundIndices(jfound, istart )
         ifound.extend(jfound)
         self.ifound = ifound[:]
-        self.applyControl( CD, istart)
+        self.applyControl( CD, istart, len(subtoks))
 
 
     ############################################
     ########### APPLY CONTROL ##################
     ############################################
     # return an updated istart
-    def applyControl( self, CD, istart) :
+    def applyControl( self, CD, istart, subrange) :
         if CD.type==NO_CTRLTYPE :
             return istart
 
@@ -348,7 +348,7 @@ class ABReader:
         V = self.V
 
         if len(ifound)>0:
-            record = NarRecord( nar, ifound, tokens, CD.ictrl )
+            record = NarRecord( nar, ifound, tokens, CD.ictrl, subrange )
         else: 
             record = None # I'm told this is "pythonic"
    
@@ -395,9 +395,10 @@ class ABReader:
             rOK = V.rollUp( record, 0.5)
             if rOK:
                 V.vault()
-                nar.clear() #AD HOC
+                #nar.clear() #AD HOC (AND WRONG)
             istart = self.clearStart(CD)
             V.nblocks = 0 
+            nar.clearPolarity()
 
         elif CTRL.isA("PERIOD"):
             rOK = V.rollUp(record, 0.1)
@@ -486,11 +487,11 @@ class NWReader:
             cleanFound(jfound)
             nard.ifound.extend( jfound )
             
-    def recordMany( self, tokens, ictrl):
+    def recordMany( self, tokens, ictrl, subrange):
         records = []
         for nard in self.narD:
             if len(nard.ifound)>0:
-                record = NarRecord( nard.nar, nard.ifound, tokens, ictrl)
+                record = NarRecord( nard.nar, nard.ifound, tokens, ictrl, subrange)
             else:
                 record = None
             records.append( record )
@@ -530,7 +531,9 @@ class NWReader:
     def removeAllBlocksMany(self):
         for nard in self.narD:
             nard.V.nblocks = 0
+            nard.nar.clearPolarity()
 
+     
 
         ################################################
         ################## READ  #######################
@@ -554,13 +557,13 @@ class NWReader:
               
             #### shift to LOCAL indexing in interval [istart, ictrl] 
             subtoks = tokens[istart : CD.ictrl]
-            
+
             #### PLAIN READ. Then shift back to global indices
             self.readMany( subtoks, istart )
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
-            istart = self.applyControl(CD, istart )
+            istart = self.applyControl(CD, istart, len(subtoks) )
 
             #### next control 
             CD = scanNextControl(tokens, istart)
@@ -568,21 +571,21 @@ class NWReader:
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]
         self.readMany(subtoks, istart )
-        self.applyControl( CD, istart)
+        self.applyControl( CD, istart, len(subtoks))
 
 
         ################################################# 
         ########### APPLY CONTROL ####################### 
         ################################################# 
         # return an updated istart
-    def applyControl( self, CD, istart) :
+    def applyControl( self, CD, istart, subrange) :
         if CD.type==NO_CTRLTYPE :
             return istart
 
         tokens = self.tokens
 
             # prepare records for all nars
-        records = self.recordMany(tokens, CD.ictrl)
+        records = self.recordMany(tokens, CD.ictrl, subrange)
         if len(records)==0:
             return istart
    

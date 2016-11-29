@@ -1,5 +1,7 @@
 from nwtypes import *
 from nwread import *
+from nwobject import *
+
 # app specific
 from NoiseTree import *
 
@@ -26,9 +28,16 @@ letin = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
 
 
 class NoiseApp:
-    nars      = [ problem, sound, affect, proximity, letin ]
-    calibs    = [ True,    True,  True,   True,      True ]     
-    thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
+    def __init__(self):
+        nars      = [ problem, sound, affect, proximity, letin ]
+        calibs    = [ True,    True,  True,   True,      True ]     
+        thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
+ 
+        self.object = NWObject(EXPERIENCE, nars, calibs, thresholds) 
 
-    object = NWObject(EXPERIENCE, nars, calibs, thresholds) 
-
+    def run(self):
+        text = ""
+        while 1:
+            text = input('Enter text: ')
+            self.object.readText(text)
+            self.object.report()

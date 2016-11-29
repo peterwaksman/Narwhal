@@ -71,6 +71,9 @@ class VAR:
         for child in self.children:
             child.clearIFound()
 
+    def clearPolarity(self):
+        self.polarity = True
+
     # call this once, usually on the root node of the tree
     def copy(self):
         v = VAR()
@@ -402,7 +405,18 @@ class NAR:
             self.relation.clear()
         if self.value != NULL_VAR: # self.value !=0:
             self.value.clear()
-        
+    
+    def clearPolarity(self):
+        self.polarity = True
+        if self.thing != NULL_VAR: # and self.thing !=0:
+            self.thing.clearPolarity()
+        if self.action != NULL_VAR:  # self.action !=0:
+            self.action.clearPolarity()
+        if self.relation !=NULL_VAR: # self.relation !=0:
+            self.relation.clearPolarity()
+        if self.value != NULL_VAR: # self.value !=0:
+            self.value.clearPolarity()    
+
     def clearIFound(self):
         if ORDER(self)==0:
             self.clearIFound()

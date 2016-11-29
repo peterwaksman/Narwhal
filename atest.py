@@ -52,9 +52,9 @@ c = cause(r,s)
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
 #text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
-#text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "My room was far from the elevator and far from the lobby, so it was very quiet."
-text = "the noise outside the hotel was bad late at night"
+#text = "the noise outside the hotel was bad late at night"
 
 tokens = TOKS(text)
 ifound = []
@@ -68,30 +68,28 @@ c.clear()
 
 x=2
 
-D = ABReader(E,c)
-
+#D = ABReader(E,c)
 #D.readText(text)
-x = 2
+#x = 2
 
  
 R          = [ r , s , cause(r,s)]
-calibs     = [True, True, False]
+calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
+ 
 
+K = NWReader(E, R)
+K.setCalibration(calibs)
 
-
-#K = NWReader(E, R)
-#K.setCalibration(calibs)
-
-#K.readText(text)
-#out = K.report()
-#print( out )
-#x = 2
-
-O = NWObject(E, R, calibs, thresholds)
-O.readText(text)
-x = O.report()
-print(x)
+K.readText(text)
+out = K.report()
+print( out )
 x = 2
+
+#O = NWObject(E, R, calibs, thresholds)
+#O.readText(text)
+#x = O.report()
+#print(x)
+#x = 2
 
 

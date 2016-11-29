@@ -24,13 +24,13 @@ def getSnippet(ifound, tokens):
 # between narrative and text
 
 class NarRecord:
-    def __init__(self, nar, ifound, tokens, ictrl):
+    def __init__(self, nar, ifound, tokens, ictrl, subrange):
         self.snippet = getSnippet(ifound,tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
         self.ifound = ifound[:]           # indices that have already been read  
         self.block = False
-        self.GOF = self.gof(tokens)
+        self.GOF = self.gof(tokens, subrange)
         self.narpolarity = nar.polarity   # nar could change, so save its current polarity
         self.ictrl = ictrl
 
@@ -38,7 +38,9 @@ class NarRecord:
         self.block = True
 
         # "goodness of fit"
-    def gof(self, tokens):  
+        # the subrange is the length of the subtokens used for this ifound
+        # Not same as tokens
+    def gof(self, tokens, subrange):  
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
         jfound = cleanFound(jfound)
@@ -46,13 +48,14 @@ class NarRecord:
         f = getFoundRange(jfound,L)
 
         u = self.nused # a snapshot of state when the NarRecord is created
-        u = min(u, len(jfound) ) # AD HOC
         n = self.nslots 
 
         if f==0 or n==0:
             G = 0
         else:
             G = (float(u)/float(n))*(float(r)/float(f))  # one  of several possibilities.
+            G *= float(f)/float( subrange ) # penalty for ignored text
+            # so (u/n)*(r/subrange)
         return G
 
     def finalPolarity( self, calib):
