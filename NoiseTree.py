@@ -87,7 +87,7 @@ kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maint
 
 kOASISSOURCES="ocean"
 
-kNOISELOCSROOM="room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
+kNOISELOCSROOM="it, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
 kNOISELOCSROOM+="my door,on our floor,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom,walls"
@@ -119,7 +119,7 @@ UNPROFFESIONAL += "not experienced,inexperienced,over enthusiastic,failed,refuse
 # add to this list
 # note: expericence shoule be made as the | of two KList VARs
 # For example "was bad" belongs in a negative KList
-kEXPERIENCE = "experience,we found,I found,we did find, it was"
+kEXPERIENCE = "experience,we found,I found,we did find"
 experienceD = KList("experience", kEXPERIENCE)  
 
 kPROBLEM = "problem,issue,drawback,not for you"
