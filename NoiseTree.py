@@ -87,7 +87,7 @@ kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maint
 
 kOASISSOURCES="ocean"
 
-kNOISELOCSROOM="it, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
+kNOISELOCSROOM="that,it, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
 kNOISELOCSROOM+="my door,on our floor,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom,walls"
@@ -131,7 +131,7 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "loud,very loud, a bit of, a bit,bad" #people hate to criticize and use understatement
+kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad" #people hate to criticize and use understatement
 loudD = KList("loud", kLOUD)
 kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
 softD = KList("soft", kSOFT)

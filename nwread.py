@@ -541,7 +541,7 @@ class NWReader:
         # Implement the "moving topic" by plain reading between controls
     def readText(self, text, freshStart=True):     
         if freshStart:
-            self.clearVaults()
+            self.clearAll()
 
         self.prepareTokens(text) 
         if len(self.tokens)==0:
