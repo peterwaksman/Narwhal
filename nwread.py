@@ -85,13 +85,16 @@ def ReadTextAsAttribute(nar, tokens, ifound ):
         ATTRIB_OP.clearIFound()
         r = ReadText0( ATTRIB_OP, tokens, jfound)
 
-    # a little algorithm to determine polarity of nar. It ignores nar.thing
+    # a little algorithm to determine polarity of nar. [HAD: It ignores nar.thing]
     # and prioritizes the polarity of nar.value 
     V = nar.value.polarity
     R = nar.relation.polarity
-    if V==False: # a "Bad" value is passed to the nar, regardless of R
+    T = nar.thing.polarity
+    if v>0 and V==False: # a "Bad" value is passed to the nar, regardless of R
         nar.polarity = False
     elif R==False: # a "Bad" relation is passed to nar, if that has a meaning
+        nar.polarity = False
+    elif v==0 and T==False: #handling for partial matches
         nar.polarity = False
 
     ifound.extend(jfound) 
@@ -563,6 +566,7 @@ class NWReader:
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
+            nar = self.narD[0].nar
             istart = self.applyControl(CD, istart, len(subtoks) )
 
             #### next control 
@@ -586,7 +590,7 @@ class NWReader:
 
             # prepare records for all nars
         records = self.recordMany(tokens, CD.ictrl, subrange)
-        if len(records)==0:
+        if records==None or len(records)==0:
             return istart
    
         if CD.type==END_CTRLTYPE:

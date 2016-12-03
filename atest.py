@@ -44,6 +44,7 @@ r = attribute( LOC, SOURCE, PROX )
  
 
 s = attribute( SOUND, INTENSITY )
+
 #c = sequence(r,s)
 c = cause(r,s)
 #c=r
@@ -52,11 +53,13 @@ c = cause(r,s)
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
 #text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
-#text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "My room was far from the elevator and far from the lobby, so it was very quiet."
 #text = "the noise outside the hotel was bad late at night"
-text = "it was very noisy late at night"
+#text = "it was very noisy late at night"
+#text= "window open at night and found the ventilation equipment a bit noisy."
 
+text="was very quiet"
 tokens = TOKS(text)
 ifound = []
 x = ReadText(s,tokens,ifound)
@@ -67,24 +70,24 @@ x=2
 
 x=2
 
-D = ABReader(E,s)
-D.readText(text)
-x = 2
-
-
- 
-#R          = [s] #[ r , s , cause(r,s)] 
-#calibs     = [True, True, True]
-#thresholds = [0.3 , 0.3, 0.3 ]
- 
-
-#K = NWReader(E, R)
-#K.setCalibration(calibs)
-
-#K.readText(text)
-#out = K.report()
-#print( out ) 
+#D = ABReader(E,s)
+#D.readText(text)
 #x = 2
+
+
+ 
+R          = [c]#[ r , s , cause(r,s)] 
+calibs     = [True, True, True]
+thresholds = [0.3 , 0.3, 0.3 ]
+ 
+
+K = NWReader(E, R)
+K.setCalibration(calibs)
+
+K.readText(text)
+out = K.report()
+print( out ) 
+x = 2
 
 
 

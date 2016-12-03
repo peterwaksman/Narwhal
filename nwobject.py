@@ -105,7 +105,10 @@ class NWObject:
             if info.found and info.polarity != p:
                 mixed = True
         if mixed:
-            print("INCOHERENT")
+            print("incoherent")
         else:
-            print("COHERENT")
+            if p:
+                print("coherent + ")
+            else:
+                print("coherent - ")
      
