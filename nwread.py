@@ -421,15 +421,14 @@ class ABReader:
 #########################################################    
 # The following code, although not identical with the ABReader,
 # is supposed to be the same, together with looping over an array
-# of nars, each with its own ifound, and vault (here called
-# NarReadData) - rather than having one nar and managing 
-# the ifound and vault in the reader.  
+# of nars, each with their own ifound, and vault (i.e. "NarReadData")
+# rather than having one nar and managing the ifound and vault in 
+# the reader.  
         
 ######################################################
 # The syntax is R = NWReader( tree, nars[] )
 #               R.readText( text )
-# (don't know yet how the vaults are un-packed into a data structure)
-
+# If you want to reverse polarity of a nar use R.setCalibration()
 class NWReader:
     def __init__(self, tree, nars):
         self.tokens = []                              
@@ -456,7 +455,8 @@ class NWReader:
         for i in range( len(self.tokens)):
             tok = self.tokens[i].lower()
             self.tokens[i] = tok 
-                               
+             
+    # how far to skip to restart reading                  
     def newStart(self, CD):
         # If there was a keyword search it might have consumed
         # more than one token, so use len(CD.ctrl.ifound) to figuure this out.
@@ -500,6 +500,8 @@ class NWReader:
             records.append( record )
         return records
 
+    # each "rollUp" method works slightly differently. I did not see
+    # a better way to generalize ABReader, although maybe...
     def rollUpMany( self, records, Threshold, block=False):
         for i in range( len(self.narD) ):
             nard = self.narD[i]
@@ -556,19 +558,13 @@ class NWReader:
         istart = 0       
         CD  = scanNextControl(tokens, istart)
 
-        while CD.type != END_CTRLTYPE :
-              
-            #### shift to LOCAL indexing in interval [istart, ictrl] 
-            subtoks = tokens[istart : CD.ictrl]
+        while CD.type != END_CTRLTYPE :              
+            subtoks = tokens[istart : CD.ictrl]  
 
-            #### PLAIN READ. Then shift back to global indices
             self.readMany( subtoks, istart )
 
-            #### negate forward or backward, propose and vault, as needed 
-            #### and (ifound should be ignored before istart)
             istart = self.applyControl(CD, istart, len(subtoks) )
 
-            #### next control 
             CD = scanNextControl(tokens, istart)
         
         # now CD should be of END_CTRLTYPE
@@ -620,7 +616,8 @@ class NWReader:
 
         elif CTRL.isA("PERIOD"):
             self.rollUpCanVaultMany(records, 0.1)
-            self.removeAllBlocksMany()         
+            self.removeAllBlocksMany()      
+               
             self.clearMany() # a clean start
 
         else :

@@ -80,22 +80,28 @@ R          = [ r , s , cause(r,s)]
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
  
+##
+##K = NWReader(E, R)
+##K.setCalibration(calibs)
+##
+##K.readText(text)
+##out = K.report()
+##print( out ) 
+##x = 2
 
-K = NWReader(E, R)
-K.setCalibration(calibs)
 
-K.readText(text)
-out = K.report()
-print( out ) 
+
+
+O = NWObject(E, R, calibs, thresholds)
+O.readText(text)
+x = O.report()
+y = O.printFinal()
+print(x + "\n" + y)
+x=2
+
+  
+
+
 x = 2
-
-
-
-
-#O = NWObject(E, R, calibs, thresholds)
-#O.readText(text)
-#x = O.report()
-#print(x)
-#x = 2
 
 

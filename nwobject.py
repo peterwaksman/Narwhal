@@ -4,113 +4,133 @@ from nwcontrol import *
 from nwvault import *
 from nwread import *
 
-# NarInfo: a structured version of  the NarRecord 
-# The NarInfo is a "most final" version of things
-# So we have a partially filled nar converted to a NarRecord 
-# Which is stored in a vault inside a NarReadData (could be
-# better organized).  Finally the NarInfo's filled from the records
-# from the vaults.
-class NarInfo:
-    def __init__(self, threshold):
-        self.threshold = threshold
-        self.found = False
-        self.GOF = 0.0
-        self.snippet = ""
-        self.polarity   = True
- 
-    def clear(self):
-        self.found = False
-        self.GOF = 0.0
-        self.snippet = ""
-        self.polarity   = True
- 
-    def fillFromRecord(self, record, calib):
-        if record==None:
-            return
-        G = record.GOF
-        if G<self.threshold:
-            return
-        # finally! fill it in
-        self.found = True
-        self.GOF = G
-        self.snippet = record.snippet
-        self.polarity = record.finalPolarity( calib )
-        return self.polarity
 
+MIXED_POLARITY=0
+UNDEFINED_POLARITY=10
+POSITIVE_POLARITY=1
+NEGATIVE_POLARITY=-1
 
  ##########################################################
 #  The official narwhal "object" is an NWObject
 #  It is built as a wrapper for NWReader, that manages
 #  final polarity interpretation, final "was said" thresholds
 #  and structures the "found" data. Currently, few details 
-#  are retained from the filled nar: polarity, GOF, and snippet
-#  but not which particular nar slots were filled.
+#  are summarized, mainly max GOF and polarity per nar
 class NWObject:
     def __init__(self, treeroot, nars, calibs, thresholds):
         self.numNars = len(nars)
         if not( self.numNars==len(calibs) and self.numNars==len(thresholds)):
             print("Mismatched arguments in NWObject")
             return # no soup for you!
-
+        
+        ## fixed
         self.reader = NWReader(treeroot,nars)
         self.reader.setCalibration(calibs)
         self.thresholds = thresholds
-        self.infos = []         
-        for thresh in thresholds:
-            self.infos.append( NarInfo(thresh) )
+        ## output
+        self.gofMax = []
+        self.finalPolarity = []
+        self.clearSummary()
+        # scratchpads
+        self.totalPolarity = UNDEFINED_POLARITY
+        self.numToks = 0
 
+    
+    def clearSummary(self):
+        self.totalPolarity = UNDEFINED_POLARITY
+        self.numToks = 0
+        
+        for n in range( self.numNars ):
+            self.gofMax.append( 0.0 )
+            self.finalPolarity.append(UNDEFINED_POLARITY)
+            
+    def printFinal(self):
+        #out = ""
+        #for n in range( self.numNars ):
+        #    out += str(self.gofMax[n]) + "," + str( self.finalPolarity[n]) + " "
+        #print(out + "\n")
+ 
+        out = ""
+        polarity = self.totalPolarity
+        if polarity==POSITIVE_POLARITY:
+            out = "coherent +"
+        elif polarity==NEGATIVE_POLARITY:
+            out = "coherent -"
+        elif polarity==MIXED_POLARITY:
+            out = "incoherent"
+        else:
+            out = "nothing was said"         
+        return out       
+                   
     def report(self):
-        return self.reader.report()
+         return self.reader.report()
+
+     # run through the vaults, find maxGOF/polarity for each
+    def summarize(self):
+        numToks = self.numToks
+        for n in range( self.numNars ):
+            nard = self.reader.narD[n]      # nth narrative read data
+            cal = self.reader.narD[n].calib
+            thresh = self.thresholds[n]
+
+            lastPolarity = UNDEFINED_POLARITY
+            maxGOF = 0.0
+            
+            # find max GOF and final polarity for each nar
+            for i in range( numToks +1):       
+                record = nard.V.getRecordByCtrl(i)  
+                if record==None: # if ith token is not a control
+                    continue
+
+                G = record.GOF
+                if G<thresh:
+                    continue
+                
+                if G>=maxGOF:
+                    maxGOF = G;
+                    lastPolarity = record.finalPolarity( cal )
+
+            if maxGOF>0: # if one gof above threshold
+                self.gofMax[n] = maxGOF
+                self.finalPolarity[n] = lastPolarity
+            else:
+                self.gofMax[n] = 0.0
+                self.finalPolarty[n] = UNDEFINED_POLARITY
+                # The last and only sanity check
+
+        polarity = UNDEFINED_POLARITY
+        for n in range( self.numNars ):
+            if self.finalPolarity[n]==UNDEFINED_POLARITY:
+                continue
+            
+            if polarity==UNDEFINED_POLARITY:
+                polarity = self.finalPolarity[n] # first "defined" polarity
+        
+            if polarity != self.finalPolarity[n]:# look for conflicts
+                self.totalPolarity = MIXED_POLARITY
+                break
+            
+        if polarity==UNDEFINED_POLARITY:
+            self.totalPolarity = UNDEFINED_POLARITY          
+        elif polarity==True:
+            self.totalPolarity = POSITIVE_POLARITY
+        elif polarity==False:
+            self.totalPolarity = NEGATIVE_POLAIRTY    
+        else:
+            self.totalPolarity =  MIXED_POLARITY            
+
+        return self.totalPolarity
                
     def readText( self, text ):
-                # clear the mutable fields
+        self.clearSummary()
         self.reader.clearAll()
-
-        for info in self.infos:
-            info.clear()
 
         ############# READ ###############
         self.reader.readText( text)
         ##################################
 
-        numToks = len( self.reader.tokens )
-       
-        ######## TRANSFER WHAT WAS SAID #######
-        for n in range( self.numNars ):
-            nard = self.reader.narD[n]      # nth narrative read data
-            gofMAX = 0.0
-            for i in range( numToks +1):       
-                record = nard.V.getRecordByCtrl(i)  
-                if record==None: # if ith token is not a control
-                    continue
-             
-                info = NarInfo(self.thresholds[n])
-                info.fillFromRecord(record, nard.calib)
+        self.numToks = len( self.reader.tokens )
+        polarity = self.summarize(  )
 
-                if gofMAX<=info.GOF: #want the terminal state, not the initial one
-                    gofMAX = info.GOF
-                    self.infos[n] = info
-
-        # The last and only sanity check
-        p = None
-        for info in self.infos:
-            if info.found:
-                p = info.polarity
-                break
-        # no polarity 
-        if p==None:
-            print("NOTHING SAID")
-            return
-
-        mixed = False
-        for info in self.infos:
-            if info.found and info.polarity != p:
-                mixed = True
-        if mixed:
-            print("incoherent")
-        else:
-            if p:
-                print("coherent + ")
-            else:
-                print("coherent - ")
-     
+        return polarity
+        

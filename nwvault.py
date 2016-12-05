@@ -133,10 +133,9 @@ class NarVault:
                 return r
         return None
 
-### This is a class manages the nar and related "found" information
-### after a read
+### This is a class manages nar and related "found" information after a read
+### It is a nar plus ifound plus Vault
 ### It relieves some of the complexity of the NarReader. 
-### It is a nar plus ifound and Vault
 class NarReadData:
     def __init__(self, treeroot, nar ):
         self.tree = treeroot.copy()
