@@ -566,7 +566,6 @@ class NWReader:
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
-            nar = self.narD[0].nar
             istart = self.applyControl(CD, istart, len(subtoks) )
 
             #### next control 

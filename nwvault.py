@@ -53,13 +53,11 @@ class NarRecord:
         if f==0 or n==0:
             G = 0
         else:
-            a = (float(u)/float(n))
-            b = (float(r)/float(f))
-            c =  float(r)/float( subrange )
+            a = float(u)/float(n)
+            b = float(r)/float(f)
+            c = float(r)/float( subrange )
             G = a*b*c
-            #G = (float(u)/float(n))*(float(r)/float(f))  # one  of several possibilities.
-            #G *= float(f)/float( subrange ) # penalty for ignored text
-            # or simply: (u/n)*(r/subrange)
+             
         return G
 
     def finalPolarity( self, calib):

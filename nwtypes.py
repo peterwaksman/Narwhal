@@ -164,7 +164,6 @@ class VAR:
                 self.ifound.extend( child.ifound )
                 if not wasFound:
                     self.polarity = child.polarity
-                    x=2
         
         # tell the caller that something below it was found
         # although self.found can be False

@@ -8,7 +8,8 @@ from nwread import *
 # The NarInfo is a "most final" version of things
 # So we have a partially filled nar converted to a NarRecord 
 # Which is stored in a vault inside a NarReadData (could be
-# better organized).  
+# better organized).  Finally the NarInfo's filled from the records
+# from the vaults.
 class NarInfo:
     def __init__(self, threshold):
         self.threshold = threshold
@@ -64,6 +65,7 @@ class NWObject:
     def readText( self, text ):
                 # clear the mutable fields
         self.reader.clearAll()
+
         for info in self.infos:
             info.clear()
 

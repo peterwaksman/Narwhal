@@ -43,7 +43,7 @@ r = attribute( LOC, SOURCE, PROX )
 #A.readText("The hotel was near the border and far from downtown")
  
 
-s = attribute( SOUND, INTENSITY )
+s = attribute( SOUND, INTENSITY)
 
 #c = sequence(r,s)
 c = cause(r,s)
@@ -59,16 +59,16 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 #text = "it was very noisy late at night"
 #text= "window open at night and found the ventilation equipment a bit noisy."
 
-text="was very quiet"
-tokens = TOKS(text)
-ifound = []
-x = ReadText(s,tokens,ifound)
+#text="was very quiet"
+#tokens = TOKS(text)
+#ifound = []
+#x = ReadText(s,tokens,ifound)
 
-ifound = cleanFound(ifound)
+#ifound = cleanFound(ifound)
  
-x=2
+#x=2
 
-x=2
+#x=2
 
 #D = ABReader(E,s)
 #D.readText(text)
@@ -76,7 +76,7 @@ x=2
 
 
  
-R          = [c]#[ r , s , cause(r,s)] 
+R          = [ r , s , cause(r,s)] 
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
  

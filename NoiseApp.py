@@ -29,7 +29,7 @@ letin = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
 
 class NoiseApp:
     def __init__(self):
-        nars      = [ problem, sound, affect, proximity, letin ]
+        nars      = [ problem, sound, affect, proximity, letin]
         calibs    = [ True,    True,  True,   True,      True ]     
         thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
  
