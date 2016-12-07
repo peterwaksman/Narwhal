@@ -43,8 +43,9 @@ r = attribute( LOC, SOURCE, PROX )
 #A = NWReader(E,r)
 #A.readText("The hotel was near the border and far from downtown")
  
-
-s = attribute( SOUND, INTENSITY)
+I = INTENSITY
+I.makeImplicit()
+s = attribute( SOUND, I)
 
 
 #c = sequence(r,s)
@@ -104,8 +105,9 @@ x = 2
 #O.readText(text)
 #x = O.report()
 #y = O.printFinal()
-#print(x + "\n" + y)
-#x=2
+#print(x)
+#print(y)
+
 
   
 

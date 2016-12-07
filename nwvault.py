@@ -28,6 +28,7 @@ class NarRecord:
         self.snippet = getSnippet(ifound,tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
+        self.nactive = nar.numSlotsActive()
         self.ifound = ifound[:]           # indices that have already been read  
         self.block = False
         self.GOF = self.gof(tokens, subrange)
@@ -49,6 +50,8 @@ class NarRecord:
 
         u = self.nused # a snapshot of state when the NarRecord is created
         n = self.nslots 
+        a = self.nactive
+        n = a # deploy the 'implicits'
 
         if f==0 or n==0:
             G = 0

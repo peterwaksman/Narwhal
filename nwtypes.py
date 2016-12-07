@@ -43,9 +43,13 @@ class VAR:
         self.exclusive = False
         self.parent = 0 # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
+        self.explicit = True # When False, this allows nars to be multi purpose. Slots that 
+                             # are neither filled nor explicirt are "inactive" and do not enter 
+                             # into the GOF formula. Non-explicit VARs are called 'implicit'
+                             # If an implicit is not 'found' then, functionally, the nar just 
+                             # becomes shorter 
 
-        # ---these are associated with reading text: startings at ground state then changed
-            # a normal "detected" signal
+        # FOR READING:
         self.found = False 
             # to storeindices of tokens in text, with matches words of self's KLists.
         self.ifound= []   
@@ -53,8 +57,15 @@ class VAR:
         self.foundInChildren = False
             # becomes false if kname after 1st is used
         self.polarity = True
-             
 
+    # All children become implicit when their parent does
+    def makeImplicit(self):
+        if self==NULL_VAR:
+            return
+        self.explicit = False
+        for child in self.children:
+            child.makeImplicit()
+        
     def clear(self):
         self.found = False
         self.ifound = []
@@ -90,7 +101,9 @@ class VAR:
         for child in self.children:
             newchild = child.copy()
             v.children.append(newchild)
-                      
+         
+        v.explicit = self.explicit
+                     
         return v
 
     def copyUsing(self,tree):
@@ -293,7 +306,7 @@ class VAR:
         return Z
 
     ## connect with your children as in "addChild()"
-    def sub(self, other): #to make other into a child of self
+    def sub(self, other): 
         other.parent = self
         self.children.append(other) 
 
@@ -302,8 +315,20 @@ class VAR:
             return 0
         else:
             return 1
+
     def numSlotsUsed(self):
+        if self==NULL_VAR:
+            return 0
         if self.found or self.foundInChildren:
+            return 1
+        else:
+            return 0
+
+    # "Active" means explicit or currently used.
+    def numSlotsActive(self):
+        if self==NULL_VAR:
+            return 0      
+        if self.found or self.foundInChildren or self.explicit:
             return 1
         else:
             return 0
@@ -318,8 +343,8 @@ class VAR:
     def nar(self):
         p = NAR()
         p.order = 1
-        #p.blocked  = 0
         p.polarity = True
+        p.implicit = False
         
         p.thing = self         # so isinstance(p.thing,VAR) is True
         p.action   = NULL_VAR
@@ -379,6 +404,7 @@ def strNarType(type):
 class NAR:   
     def __init__(self):
         self.order = 0 # the level of pattern-inside-pattern depth
+        self.explicit = True # don't know if I want this
 
         self.polarity = True
         
@@ -390,6 +416,13 @@ class NAR:
         # by a lack of programming ability. "value" works as an adjective,
         # or as an object, or as whatever
 
+    # don't know if I want this
+    def makeImplicit(self):
+        self.explicit = False
+        self.thing.makeExplicit() 
+        self.action.makeExplicit() 
+        self.relation.makeExplicit() 
+        self.value.makeExplicit() 
 
     # If x is a var, this calls .clear(), otherwise it calls into the sub narratives.
     def clear(self):
@@ -539,20 +572,24 @@ class NAR:
     def numSlotsUsed(self):
         if isinstance(self,VAR) and self.found:
             return 1
-        elif isinstance(self,NAR):
-            n = 0
-            if self.thing  != 0:
-                n += self.thing.numSlotsUsed()
-            if self.action != 0:
-                n += self.action.numSlotsUsed()
-            if self.relation !=0:
-                n += self.relation.numSlotsUsed()
-            if self.value != 0:
-                n += self.value.numSlotsUsed()
-            return n
         else:
-            return 0       
+            n = 0
+            n += self.thing.numSlotsUsed()
+            n += self.action.numSlotsUsed()
+            n += self.relation.numSlotsUsed()
+            n += self.value.numSlotsUsed()
+            return n
 
+    def numSlotsActive(self):
+        if isinstance(self,VAR):
+            return self.numSlotsActive()
+        else:
+            n = 0
+            n += self.thing.numSlotsActive()
+            n += self.action.numSlotsActive()
+            n += self.relation.numSlotsActive()
+            n += self.value.numSlotsActive()
+            return n
           
     def getType(nar):
         thing    = nar.thing
