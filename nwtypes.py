@@ -380,9 +380,6 @@ class NAR:
     def __init__(self):
         self.order = 0 # the level of pattern-inside-pattern depth
 
-        # between these two, we can consider the "whole" value of the narrative to be 
-        # their product, specifically: if blocked then return polarity, else return !polarity
-        #self.blocked = 0 # deprecated, blocking is handled at a higher level
         self.polarity = True
         
         self.thing = NULL_VAR 
@@ -396,45 +393,44 @@ class NAR:
 
     # If x is a var, this calls .clear(), otherwise it calls into the sub narratives.
     def clear(self):
-        #self.blocked = 0
         self.polarity = True
 
-        if self.thing != NULL_VAR: # and self.thing !=0:
+        if self.thing != NULL_VAR:  
             self.thing.clear()
-        if self.action != NULL_VAR:  # self.action !=0:
+        if self.action != NULL_VAR:   
             self.action.clear()
-        if self.relation !=NULL_VAR: # self.relation !=0:
+        if self.relation !=NULL_VAR:  
             self.relation.clear()
-        if self.value != NULL_VAR: # self.value !=0:
+        if self.value != NULL_VAR:  
             self.value.clear()
     
     def clearPolarity(self):
         self.polarity = True
-        if self.thing != NULL_VAR: # and self.thing !=0:
+        if self.thing != NULL_VAR:  
             self.thing.clearPolarity()
-        if self.action != NULL_VAR:  # self.action !=0:
+        if self.action != NULL_VAR:   
             self.action.clearPolarity()
-        if self.relation !=NULL_VAR: # self.relation !=0:
+        if self.relation !=NULL_VAR:  
             self.relation.clearPolarity()
-        if self.value != NULL_VAR: # self.value !=0:
+        if self.value != NULL_VAR:  
             self.value.clearPolarity()    
 
     def clearIFound(self):
         if ORDER(self)==0:
             self.clearIFound()
             return
-        if self.thing != NULL_VAR: # and self.thing !=0:
+        if self.thing != NULL_VAR:  
             self.thing.clearIFound()
-        if self.action != NULL_VAR:  # self.action !=0:
+        if self.action != NULL_VAR:   
             self.action.clearIFound()
-        if self.relation !=NULL_VAR: # self.relation !=0:
+        if self.relation !=NULL_VAR:  
             self.relation.clearIFound()
-        if self.value != NULL_VAR: # self.value !=0:
+        if self.value != NULL_VAR:  
             self.value.clearIFound()
 
 
 
-    # this copy uses the same VARs as the original
+    # this copy uses the same VARs in the same tree as the original
     def copy(self):
         n = NAR()
         n.order   = self.order
@@ -465,7 +461,6 @@ class NAR:
 
         n = NAR()
         n.order   = self.order
-        #n.blocked = self.blocked
         n.polarity = self.polarity
         
         # for the sub NARs

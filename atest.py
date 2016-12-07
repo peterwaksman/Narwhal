@@ -5,6 +5,7 @@ from nwutils import *
 from nwread import *
 from nwobject import *
 
+from NoiseApp import *
 
 n = attribute( PROBLEM, SOUND )
 
@@ -45,27 +46,34 @@ r = attribute( LOC, SOURCE, PROX )
 
 s = attribute( SOUND, INTENSITY)
 
+
 #c = sequence(r,s)
 c = cause(r,s)
 #c=r
+ 
+
+
 
 #text = "The hotel was over a bar and it was very noisy late at night"
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
-#text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "My room was far from the elevator and far from the lobby, so it was very quiet."
 #text = "the noise outside the hotel was bad late at night"
 #text = "it was very noisy late at night"
 #text= "window open at night and found the ventilation equipment a bit noisy."
 
-#text="was very quiet"
+#a = AFFECT
+
+#text="noise from the bar"
 #tokens = TOKS(text)
+
+
+
 #ifound = []
 #x = ReadText(s,tokens,ifound)
-
 #ifound = cleanFound(ifound)
- 
+#a.findInText(tokens) 
 #x=2
 
 #x=2
@@ -80,26 +88,29 @@ R          = [ r , s , cause(r,s)]
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
  
-##
-##K = NWReader(E, R)
-##K.setCalibration(calibs)
-##
-##K.readText(text)
-##out = K.report()
-##print( out ) 
-##x = 2
+
+K = NWReader(E, R  )
+
+K.setCalibration(calibs)
+
+K.readText(text)
+out = K.report()
+print( out ) 
+x = 2
 
 
 
-
-O = NWObject(E, R, calibs, thresholds)
-O.readText(text)
-x = O.report()
-y = O.printFinal()
-print(x + "\n" + y)
-x=2
+#O = NWObject(E, R, calibs, thresholds)
+#O.readText(text)
+#x = O.report()
+#y = O.printFinal()
+#print(x + "\n" + y)
+#x=2
 
   
+
+#N = NoiseApp()
+#N.run()
 
 
 x = 2

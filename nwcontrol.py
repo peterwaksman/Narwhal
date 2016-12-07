@@ -62,7 +62,7 @@ kFORWARDNEGATIONS+= "without # being|a|hesitation|issue|issues|problems" #????
 kHEDGES = "but # more|also,other than,except,except for,however, yet "
 kFORWARDHEDGES = "although, even if,despite,for being,instead of,even though,even when,"
 
-kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is "
+kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is , from "
 
 # not used yet
 kDESIGNATORS = " that , it "
@@ -313,6 +313,11 @@ class ControlData:
         self.ctrl = NULL_VAR
         self.ictrl = -1
 
+    def set(self, type, ctrl, ictrl):
+        self.type = type
+        self.ctrl = ctrl
+        self.ictrl = ictrl
+  
 
 # return with ictrl either the index of the control or
 # L=len(tokens). Generally read up to <ictrl
@@ -320,28 +325,19 @@ def scanNextControl(tokens, istart):
     CD = ControlData()
     L = len(tokens);
     if istart>L-1:
-        CD.type = END_CTRLTYPE
-        CD.ctrl = NULL_VAR
-        CD.ictrl = L
+        CD.set(END_CTRLTYPE, NULL_VAR, L)
         return CD
    
     for itok in range(istart, L):
         ctrl = isLogicControl(tokens,itok)
         if ctrl!=NULL_VAR:
-            CD.type = OPERATOR_CTRLTYPE
-            CD.ctrl = ctrl
-            CD.ictrl = itok
+            CD.set(OPERATOR_CTRLTYPE, ctrl, itok)
             return CD
 
     for itok in range(istart, L):
         ctrl = isPunctuationControl(tokens, itok)
         if ctrl!=NULL_VAR:
-            CD.type = PUNCTUATION_CTRLTYPE
-            CD.ctrl = ctrl
-            CD.ictrl = itok
+            CD.set(PUNCTUATION_CTRLTYPE, ctrl, itok)
             return CD
-
-    CD.type = END_CTRLTYPE
-    CD.ctrl = NULL_VAR
-    CD.ictrl = L
+    CD.set(END_CTRLTYPE, NULL_VAR, L)
     return CD

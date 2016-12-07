@@ -23,24 +23,27 @@ class NWObject:
             print("Mismatched arguments in NWObject")
             return # no soup for you!
         
-        ## fixed
+        ## fixed at construction time
         self.reader = NWReader(treeroot,nars)
         self.reader.setCalibration(calibs)
         self.thresholds = thresholds
-        ## output
+
+        ## output after reading
         self.gofMax = []
         self.finalPolarity = []
-        self.clearSummary()
-        # scratchpads
         self.totalPolarity = UNDEFINED_POLARITY
         self.numToks = 0
 
-    
-    def clearSummary(self):
+        self.clear()
+
+    def clear(self):
         self.totalPolarity = UNDEFINED_POLARITY
         self.numToks = 0
-        
+        self.gofMax = []
+        self.finalPolarity = []
+
         for n in range( self.numNars ):
+
             self.gofMax.append( 0.0 )
             self.finalPolarity.append(UNDEFINED_POLARITY)
             
@@ -95,7 +98,7 @@ class NWObject:
                 self.finalPolarity[n] = lastPolarity
             else:
                 self.gofMax[n] = 0.0
-                self.finalPolarty[n] = UNDEFINED_POLARITY
+                self.finalPolarity[n] = UNDEFINED_POLARITY
                 # The last and only sanity check
 
         polarity = UNDEFINED_POLARITY
@@ -115,14 +118,14 @@ class NWObject:
         elif polarity==True:
             self.totalPolarity = POSITIVE_POLARITY
         elif polarity==False:
-            self.totalPolarity = NEGATIVE_POLAIRTY    
+            self.totalPolarity = NEGATIVE_POLARITY    
         else:
             self.totalPolarity =  MIXED_POLARITY            
 
         return self.totalPolarity
                
     def readText( self, text ):
-        self.clearSummary()
+        self.clear()
         self.reader.clearAll()
 
         ############# READ ###############

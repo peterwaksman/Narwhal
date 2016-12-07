@@ -40,4 +40,6 @@ class NoiseApp:
         while 1:
             text = input('Enter text: ')
             self.object.readText(text)
-            self.object.report()
+            h = self.object.report()
+            print(h)
+            print( self.object.printFinal())
