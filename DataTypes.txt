@@ -1,0 +1,38 @@
+Basic data types:
+
+KList - a list of keywords with special symbols for dis-ambiguation
+
+
+VAR - wraps a KList and keeps a 'found' and an ifound[] array of tokens found to match during on read operation. The VARs can be connected using the sub() method. So A.sub(B) means B is a child of A. Sometimes the 'found' remains True, while the ifound[] is emptied and re-used. 
+
+A VAR also implements a polarity 'value' which can represent True/False or Good/Bad or whatever. When two KLists represent mutually exclusive possibilities and are exclusive 'or'd into to the same VAR the first one listed is automatically considered as positive polarity. If the second is found, that automatically becomes a negative polarity. You can ignore this here and fix it later with 'calibration'.
+
+
+NAR - is a formula with VARs for variables. Special operators for combinations and nesting are used.
+
+
+NarRecord - A temporary snapshot of a NAR. Has a goodness of fit gof() formula
+
+
+calibration - means switching the polarity of a nar at the last moment. This is mainly so you
+do not have to be too consistent when setting up exclusive VARs.
+
+Readers
+-------
+The recursive ReadText(nar, tokens, ifound) sits at the base of the reading concepts. It is applied between control words (like 'AND' and 'NOT').
+
+ABReader implements a single NAR and its use in ReadText(). Results are converted to NarRecords and stored in a single NarVault.
+
+NWReader implements the same logic as the ABReader but with an array of NARs. To keep the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'. This comes at the cost of combining ingredients and refactoring. So the NWReader implements an array of NarReadData instances: 
+
+NarReadData - a combination of NAR, ifound, calibration, and NarVault. 
+Managing the data, this makes the NWReader simpler and only responsible for calling ReadText( ) bewteen controls - once for each of its array of nar containing NarReadData's.
+
+NWObject - wraps the NWReader, applies final thresholds and summarizes a reading event. The NWObject is a single point of entry to Narwhal
+
+----------- 
+
+
+Application
+-----------
+The NoiseApp.py example is an application that consists of an tree, a collection of several narratives and arrays, of the same length, of calibrations and thresholds. These initializers create one NWObject,
