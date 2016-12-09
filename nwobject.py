@@ -72,8 +72,8 @@ class NWObject:
     def summarize(self):
         numToks = self.numToks
         for n in range( self.numNars ):
-            nard = self.reader.narD[n]      # nth narrative read data
-            cal = self.reader.narD[n].calib
+            rd = self.reader.RD[n]      # nth narrative read data
+            cal = self.reader.RD[n].calib
             thresh = self.thresholds[n]
 
             lastPolarity = UNDEFINED_POLARITY
@@ -81,7 +81,7 @@ class NWObject:
             
             # find max GOF and final polarity for each nar
             for i in range( numToks +1):       
-                record = nard.V.getRecordByCtrl(i)  
+                record = rd.V.getRecordByCtrl(i)  
                 if record==None: # if ith token is not a control
                     continue
 

@@ -7,6 +7,16 @@ from nwobject import *
 
 from NoiseApp import *
 
+
+def fnt(x):
+    if type(x) is list:
+        f = "OK"
+    else:
+        f = "NOT OK"
+
+
+
+
 n = attribute( PROBLEM, SOUND )
 
 q = attribute( BARRIER, INSULATION)

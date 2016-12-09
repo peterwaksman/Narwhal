@@ -23,10 +23,10 @@ The recursive ReadText(nar, tokens, ifound) sits at the base of the reading conc
 
 ABReader implements a single NAR and its use in ReadText(). Results are converted to NarRecords and stored in a single NarVault.
 
-NWReader implements the same logic as the ABReader but with an array of NARs. To keep the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'. This comes at the cost of combining ingredients and refactoring. So the NWReader implements an array of NarReadData instances: 
+NarReadData - a NAR plus a vault with calibration and scratchpads for ifound. This factors out some of the ABReader, leaving the control logic to the following: 
 
-NarReadData - a combination of NAR, ifound, calibration, and NarVault. 
-Managing the data, this makes the NWReader simpler and only responsible for calling ReadText( ) bewteen controls - once for each of its array of nar containing NarReadData's.
+NWReader implements the same logic as the ABReader but with an array of NarReadData's. To keep the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'.  
+
 
 NWObject - wraps the NWReader, applies final thresholds and summarizes a reading event. The NWObject is a single point of entry to Narwhal
 

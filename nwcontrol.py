@@ -68,7 +68,7 @@ kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is ,
 kDESIGNATORS = " that , it "
 kAMPLIFIERS  = " very "
 
-kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,keep the,"
+kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,keep the, kept us"
 
 # pre conjunctions
 kIF = "as $ if "

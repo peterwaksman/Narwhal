@@ -432,13 +432,13 @@ class ABReader:
 class NWReader:
     def __init__(self, tree, nars):
         self.tokens = []                              
-        self.narD =[]
+        self.RD =[] #(R)ead (D)ata
         for nar in nars:
-            self.narD.append( NarReadData(tree, nar) )
+            self.RD.append( NarReadData(tree, nar) )
 
     def setCalibration(self, calibs):
-        for i in range( min( len(self.narD), len(calibs) ) ):
-            self.narD[i].calib = calibs[i]
+        for i in range( min( len(self.RD), len(calibs) ) ):
+            self.RD[i].calib = calibs[i]
     
     ##### PRIVATELY USED ########### 
     def prepareTokens(self, text): 
@@ -466,16 +466,16 @@ class NWReader:
         return CD.ictrl + skip
 
     def clearMany( self ):
-        for nard in self.narD :
-            nard.clear()
+        for rd in self.RD :
+            rd.clear()
 
     def clearIFoundMany( self ):
-        for nard in self.narD :
-            nard.clearIFound()
+        for rd in self.RD :
+            rd.clearIFound()
             
     def clearVaults( self ):
-         for nard in self.narD :
-            nard.V.clear()
+         for rd in self.RD :
+            rd.V.clear()
                     
     def clearAll(self):
         self.clearMany()
@@ -483,18 +483,18 @@ class NWReader:
         self.clearVaults()
 
     def readMany(self, subtoks, istart):
-        for nard in self.narD :
-            nar = nard.nar                         
+        for rd in self.RD :
+            nar = rd.nar                         
             jfound = PlainRead(nar, subtoks)
             jfound = shiftFoundIndices(jfound, istart )
             cleanFound(jfound)
-            nard.ifound.extend( jfound )
+            rd.ifound.extend( jfound )
             
     def recordMany( self, tokens, ictrl, subrange):
         records = []
-        for nard in self.narD:
-            if len(nard.ifound)>0:
-                record = NarRecord( nard.nar, nard.ifound, tokens, ictrl, subrange)
+        for rd in self.RD:
+            if len(rd.ifound)>0:
+                record = NarRecord( rd.nar, rd.ifound, tokens, ictrl, subrange)
             else:
                 record = None
             records.append( record )
@@ -503,40 +503,40 @@ class NWReader:
     # each "rollUp" method works slightly differently. I did not see
     # a better way to generalize ABReader, although maybe...
     def rollUpMany( self, records, Threshold, block=False):
-        for i in range( len(self.narD) ):
-            nard = self.narD[i]
-            nard.V.rollUp( records[i], Threshold, block)
+        for i in range( len(self.RD) ):
+            RD = self.RD[i]
+            RD.V.rollUp( records[i], Threshold, block)
 
     def rollUpAndVaultMany( self, records, Threshold, block=False):
-        for i in range( len(self.narD) ):
-            nard = self.narD[i]
-            nard.V.rollUp( records[i], Threshold, block)
-            self.narD[i].V.vault()
+        for i in range( len(self.RD) ):
+            RD = self.RD[i]
+            RD.V.rollUp( records[i], Threshold, block)
+            self.RD[i].V.vault()
             
     def rollUpCanVaultMany(self, records, Threshold, block=False):
-        for i in range( len(self.narD) ):
-            nard = self.narD[i]
-            rOK = nard.V.rollUp( records[i], Threshold, block)
+        for i in range( len(self.RD) ):
+            rd = self.RD[i]
+            rOK = rd.V.rollUp( records[i], Threshold, block)
             if rOK:
-                nard.V.vault()
+                rd.V.vault()
             
     def rollUpCanVaultOrAbandonMany( self, records, Threshold, block=False):
-        for i in range( len(self.narD) ):
-            nard = self.narD[i]
-            rOK = nard.V.rollUp( records[i], Threshold, block)
+        for i in range( len(self.RD) ):
+            rd = self.RD[i]
+            rOK = rd.V.rollUp( records[i], Threshold, block)
             if rOK:
-                nard.V.vault()
+                rd.V.vault()
             else:
-                nard.V.abandonPre()
+                rd.V.abandonPre()
             
     def addBlockMany(self):
-       for nard in self.narD:
-            nard.V.addBlock()            
+       for rd in self.RD:
+            rd.V.addBlock()            
 
     def removeAllBlocksMany(self):
-        for nard in self.narD:
-            nard.V.nblocks = 0
-            nard.nar.clearPolarity()
+        for rd in self.RD:
+            rd.V.nblocks = 0
+            rd.nar.clearPolarity()
 
      
 
@@ -637,12 +637,12 @@ class NWReader:
                 out += self.tokens[i].rjust(10) + " "
             else: 
                 out += "END".rjust(10) + " "
-            for nard in self.narD:
-                r = nard.V.getRecordByCtrl(i)
+            for rd in self.RD:
+                r = rd.V.getRecordByCtrl(i)
                 if r==None:
                     out += " "
                 else:
-                    P = r.finalPolarity(nard.calib)
+                    P = r.finalPolarity(rd.calib)
                     if P:
                         val = "+"
                     else:

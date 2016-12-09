@@ -44,7 +44,7 @@ class VAR:
         self.parent = 0 # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
         self.explicit = True # When False, this allows nars to be multi purpose. Slots that 
-                             # are neither filled nor explicirt are "inactive" and do not enter 
+                             # are neither filled nor explicit are "inactive" and do not enter 
                              # into the GOF formula. Non-explicit VARs are called 'implicit'
                              # If an implicit is not 'found' then, functionally, the nar just 
                              # becomes shorter 
@@ -65,6 +65,14 @@ class VAR:
         self.explicit = False
         for child in self.children:
             child.makeImplicit()
+    
+    def makeExplicit(self):
+        if self==NULL_VAR:
+            return
+        self.explicit = True
+        for child in self.children:
+            child.makeExplicit()
+
         
     def clear(self):
         self.found = False
@@ -406,7 +414,7 @@ class NAR:
         self.order = 0 # the level of pattern-inside-pattern depth
         self.explicit = True # don't know if I want this
 
-        self.polarity = True
+        self.polarity = True 
         
         self.thing = NULL_VAR 
         self.action = NULL_VAR
@@ -419,47 +427,42 @@ class NAR:
     # don't know if I want this
     def makeImplicit(self):
         self.explicit = False
+        self.thing.makeImplicit() 
+        self.action.makeImplicit() 
+        self.relation.makeImplicit() 
+        self.value.makeImplicit() 
+
+    def makeExplicit(self):
+        self.explicit = True
         self.thing.makeExplicit() 
         self.action.makeExplicit() 
         self.relation.makeExplicit() 
         self.value.makeExplicit() 
 
+
     # If x is a var, this calls .clear(), otherwise it calls into the sub narratives.
     def clear(self):
         self.polarity = True
-
-        if self.thing != NULL_VAR:  
-            self.thing.clear()
-        if self.action != NULL_VAR:   
-            self.action.clear()
-        if self.relation !=NULL_VAR:  
-            self.relation.clear()
-        if self.value != NULL_VAR:  
-            self.value.clear()
+        self.thing.clear()
+        self.action.clear()
+        self.relation.clear()
+        self.value.clear()
     
     def clearPolarity(self):
-        self.polarity = True
-        if self.thing != NULL_VAR:  
-            self.thing.clearPolarity()
-        if self.action != NULL_VAR:   
-            self.action.clearPolarity()
-        if self.relation !=NULL_VAR:  
-            self.relation.clearPolarity()
-        if self.value != NULL_VAR:  
-            self.value.clearPolarity()    
+        self.polarity = True       
+        self.thing.clearPolarity()
+        self.action.clearPolarity()
+        self.relation.clearPolarity()
+        self.value.clearPolarity()    
 
     def clearIFound(self):
         if ORDER(self)==0:
             self.clearIFound()
             return
-        if self.thing != NULL_VAR:  
-            self.thing.clearIFound()
-        if self.action != NULL_VAR:   
-            self.action.clearIFound()
-        if self.relation !=NULL_VAR:  
-            self.relation.clearIFound()
-        if self.value != NULL_VAR:  
-            self.value.clearIFound()
+        self.thing.clearIFound()
+        self.action.clearIFound()
+        self.relation.clearIFound()
+        self.value.clearIFound()
 
 
 
@@ -467,8 +470,9 @@ class NAR:
     def copy(self):
         n = NAR()
         n.order   = self.order
-        #n.blocked = self.blocked
         n.polarity = self.polarity
+        n.explicit = self.explicit
+
         n.thing   = self.thing.copy()
         n.action  = self.action.copy()
         n.relation= self.relation.copy()
@@ -495,6 +499,7 @@ class NAR:
         n = NAR()
         n.order   = self.order
         n.polarity = self.polarity
+        n.explicit = self.explicit
         
         # for the sub NARs
         n.thing   = self.thing.copyUsing(tree)

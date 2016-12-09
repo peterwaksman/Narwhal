@@ -14,7 +14,7 @@ from NoiseTree import *
 problem = attribute( PROBLEM, NOISE )
 
 # sound_/intensity_/source_/timeOfDay ::[me_/affect]
-sound = attribute( attribute( attribute(SOUND, INTENSITY), SOURCE), TOD)
+sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
 
 #[sound->me] :: me_/affect
 affect  = cause( attribute(NOISE,TOD), AFFECT )
