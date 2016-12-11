@@ -8,16 +8,11 @@ from nwobject import *
 from NoiseApp import *
 
 
-def fnt(x):
-    if type(x) is list:
-        f = "OK"
-    else:
-        f = "NOT OK"
-
-
 
 
 n = attribute( PROBLEM, SOUND )
+ 
+
 
 q = attribute( BARRIER, INSULATION)
 
@@ -54,7 +49,6 @@ r = attribute( LOC, SOURCE, PROX )
 #A.readText("The hotel was near the border and far from downtown")
  
 I = INTENSITY
-I.makeImplicit()
 s = attribute( SOUND, I)
 
 
@@ -68,13 +62,12 @@ c = cause(r,s)
 #text = "The hotel was over a bar and it was very noisy late at night"
 #text = "The hotel was near the border and far from downtown"
 #text = NoiseText
-text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "My room was far from the elevator and far from the lobby, so it was very quiet."
 #text = "the noise outside the hotel was bad late at night"
 #text = "it was very noisy late at night"
 #text= "window open at night and found the ventilation equipment a bit noisy."
-
-#a = AFFECT
+text = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+#text = "it was very quiet"
 
 #text="noise from the bar"
 #tokens = TOKS(text)
@@ -93,9 +86,10 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 #D.readText(text)
 #x = 2
 
-
+I.makeImplicit()
  
 R          = [ r , s , cause(r,s)] 
+
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
  

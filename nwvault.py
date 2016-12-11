@@ -50,8 +50,8 @@ class NarRecord:
 
         u = self.nused # a snapshot of state when the NarRecord is created
         n = self.nslots 
-        a = self.nactive
-        n = a # deploy the 'implicits'
+        av = self.nactive
+        n = av # deploy the 'implicits'
 
         if f==0 or n==0:
             G = 0
@@ -142,7 +142,9 @@ class NarVault:
 class NarReadData:
     def __init__(self, treeroot, nar ):
         self.tree = treeroot.copy()
+        self.tree.clear()
         self.nar = nar.copyUsing( self.tree )
+        self.nar.refreshImplicits(False)
         self.calib = False
 
         self.ifound = []

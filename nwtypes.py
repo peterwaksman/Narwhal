@@ -1,5 +1,5 @@
-import nwfind
-import nwutils
+import nwfind  
+from nwutils import *
 
 print("Hello")
 
@@ -24,7 +24,7 @@ class KList:
                 # it is the responsibility to the client to pass in ifound
                 # This method returns True or False
     def findInText(self, tokens, itok, ifound):
-        return nwfind._findInText(self, tokens, itok, ifound)
+         return nwfind._findInText(self, tokens, itok, ifound)
     
 NULL_KLIST = KList("nullK","")
 
@@ -73,7 +73,12 @@ class VAR:
         for child in self.children:
             child.makeExplicit()
 
-        
+    def refreshImplicits(self, parentWasImplicit):
+        if parentWasImplicit or self.explicit==False:
+            self.makeImplicit()
+        #else:
+           # self.makeExplicit()
+       
     def clear(self):
         self.found = False
         self.ifound = []
@@ -143,7 +148,6 @@ class VAR:
                 return x
         return NULL_VAR          
     
-
                     # loops through text for every kname.
     def findInText( self, originaltokens):
         # ensure lower case
@@ -519,21 +523,19 @@ class NAR:
         n.value   = self.value.copyUsing(tree)
         return n   
 
-    ## (For now, this is implemented as a control, not a narrative)
-    # Implements OPERATOR X* (i.e. negation/contrast to X)
-    # in general block() is not idempotent. A double block() is not always 
-    # an un-block(). For example: "she was not ready to swim"
-    # Also, unlike other operators, it seems simpler for this one to modify 
-    # an original NAR and does not produce a fresh copy, that is blocked.
-    # (TODO: revisit this decision)
-    #def block(self):
-    #    self.blocked += 1
-        
-    #def unblock(self):
-    #    if self.blocked>0 :
-    #       self.blocked -= 1        
-             
+    def refreshImplicits(self, parentWasImplicit):
+        if not self.explicit: # as soon as you hit an implicit...so also its sub narratives
+            parentWasImplicit =True
 
+        if self.thing!=NULL_VAR:
+            self.thing.refreshImplicits(parentWasImplicit)
+        if self.action!=NULL_VAR:
+            self.action.refreshImplicits(parentWasImplicit)
+        if self.relation!=NULL_VAR:
+            self.relation.refreshImplicits(parentWasImplicit)
+        if self.value!=NULL_VAR:
+            self.value.refreshImplicits(parentWasImplicit)
+              
             # means the token is part of the narrative. This changes the state of 
             # underlying VARs but note it is prevented from changing the ifound
     def find(self,tok):
@@ -733,7 +735,7 @@ def cause(X,Y):
 ## for now requires using both X,Y and Y,X and you can design code making them equivalent
 NAR_THEN = KList("then","").var().nar() # used to identify the "and"/"then" type of statement
 
-def sequence(X,Y):   
+def sequence(X,Y): 
     n = NAR()
     n.thing = X         #"we ate cookies"
     n.action = NAR_THEN #(encode a "then" operation)
