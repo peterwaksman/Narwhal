@@ -78,7 +78,13 @@ class VAR:
             self.makeImplicit()
             for child in self.children:
                 child.refreshImplicit(True)    
-       
+    
+    def clearImplicits(self):
+        self.explicit = True
+        for child in self.children:
+            child.clearImplicits()
+
+                    
     def clear(self):
         self.found = False
         self.ifound = []
@@ -129,6 +135,7 @@ class VAR:
         else:
             x = tree.lookup(name) # find VAR with same name, in this tree           
         if x != NULL_VAR:
+            x.explicit = self.explicit
             return x # x.copy().
         else:
             return NULL_VAR
@@ -286,6 +293,8 @@ class VAR:
         output += tab
         #print(tab),      
         for name in self.knames:
+            if not self.explicit:
+                name = "["+name+"]"
             if not self.exclusive:
                 output += name + " "
             else:

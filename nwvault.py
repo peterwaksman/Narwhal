@@ -143,8 +143,9 @@ class NarReadData:
     def __init__(self, treeroot, nar ):
         self.tree = treeroot.copy()
         self.tree.clear()
+        self.tree.clearImplicits()
         self.nar = nar.copyUsing( self.tree )
-        self.nar.refreshImplicits(False)
+        #self.nar.refreshImplicits(False) they are refreshed inadvertenly while copyUsing()
         self.calib = False
 
         self.ifound = []

@@ -88,7 +88,7 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 
 I.makeImplicit()
  
-R          = [ r , s , cause(r,s)] 
+R          = [s]#[ r , s , cause(r,s)] 
 
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
