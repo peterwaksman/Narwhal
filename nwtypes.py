@@ -76,8 +76,8 @@ class VAR:
     def refreshImplicits(self, parentWasImplicit):
         if parentWasImplicit or self.explicit==False:
             self.makeImplicit()
-        #else:
-           # self.makeExplicit()
+            for child in self.children:
+                child.refreshImplicit(True)    
        
     def clear(self):
         self.found = False

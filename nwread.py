@@ -243,7 +243,7 @@ class ABReader:
         self.tree = treeroot.copy()
         self.tree.clear()
         self.nar  = nar.copyUsing( self.tree )
-        self.nar.refreshImplicts( False )
+        self.nar.refreshImplicits( False )
         
         self.ifound = [] #indices found in text. A list of variable length
                          

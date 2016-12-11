@@ -1,21 +1,28 @@
 Basic data types:
 
 KList - a list of keywords with special symbols for dis-ambiguation
+KLists manage finding tokens in keyword lists. Note that ALL tokens are scanned each time a single token index is examined for matching. [Allows matching to invove multiple consecutive tokens].
 
 
-VAR - wraps a KList and keeps a 'found' and an ifound[] array of tokens found to match during on read operation. The VARs can be connected using the sub() method. So A.sub(B) means B is a child of A. Sometimes the 'found' remains True, while the ifound[] is emptied and re-used. 
+VAR - wraps a KList and manages finding tokens with it. The VAR keeps a 'found' and an ifound[] array of tokens found to match during on read operation. The VARs can be connected using the sub() method. So A.sub(B) means B is a child of A. Sometimes the 'found' remains True, while the ifound[] is emptied and re-used. 
 
-A VAR also implements a polarity 'value' which can represent True/False or Good/Bad or whatever. When two KLists represent mutually exclusive possibilities and are exclusive 'or'd into to the same VAR the first one listed is automatically considered as positive polarity. If the second is found, that automatically becomes a negative polarity. You can ignore this here and fix it later with 'calibration'.
+VAR also implements a polarity 'value' which can represent True/False or Good/Bad or whatever. When two KLists represent mutually exclusive possibilities and are exclusive 'or'd into to the same VAR the first one listed is automatically considered as positive polarity. If the second is found, that automatically becomes a negative polarity. You can ignore this here and fix it later with 'calibration'.
 
+VAR supports '|' as exclusive OR - to create a VAR from two others regarded as mutually exclusive. It can be used mutliply, like this:  A|(B|C), but this behaves as A|B|C with anything found other than A producing a negative polarity.
 
 NAR - is a formula with VARs for variables. Special operators for combinations and nesting are used.
+In Particular a NAR has four sub narratives: thing, relation, action, value. If un-used they are set to NULL_VAR, otherwise they can be complete sub NARs.
 
 
 NarRecord - A temporary snapshot of a NAR. Has a goodness of fit gof() formula
 
 
+NarReadData - a NAR, a vault of NarRecors, and scratchpads for reading. [THis has suspect ontology. It exists in order to simplfy certain implementations.]
+
+
 calibration - means switching the polarity of a nar at the last moment. This is mainly so you
-do not have to be too consistent when setting up exclusive VARs.
+do not have to be too consistent when defining exclusive VARs.
+
 
 Readers
 -------
@@ -23,9 +30,7 @@ The recursive ReadText(nar, tokens, ifound) sits at the base of the reading conc
 
 ABReader implements a single NAR and its use in ReadText(). Results are converted to NarRecords and stored in a single NarVault.
 
-NarReadData - a NAR plus a vault with calibration and scratchpads for ifound. This factors out some of the ABReader, leaving the control logic to the following: 
-
-NWReader implements the same logic as the ABReader but with an array of NarReadData's. To keep the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'.  
+NWReader implements the same logic as the ABReader but with an array of NarReadData's. This keeps the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'.  
 
 
 NWObject - wraps the NWReader, applies final thresholds and summarizes a reading event. The NWObject is a single point of entry to Narwhal

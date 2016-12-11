@@ -1,0 +1,32 @@
+Design Choices
+
+There are plenty of things I had to puzzle over to get into their current form. Especially the gof usage, return values from reading sub narratives, and the whole vaulting business. This file is to record examples of difficult design details.
+
+-----------------------------------------------------------------------------------------
+Trees are part of the definition of a NAR but they are also used dynamically as scratchpads during reading. This would get messy if multiple NARs used the same tree. So the general scheme is that the client sees one tree and makes definitions in terms of it but behind the scenes, different copies of the tree are deployed, one per NAR. 
+
+The tree, even as a scratchpad for one NAR is still confusing. A VAR node stores a 'found' variable which is relatively stable and can remain set after the ifound[] list of token indices is cleared and re-used. When a more permanent moment arrives (eg END_CTRLTYPE) the 'found' can get cleared.
+
+
+--------------------------------------------------------------------------------------------
+About 'implicit' sub narratives:
+
+
+
+There were two constraints in the design: that the client not be bothered by implementation details (like tree duplications versus conflicting users of the same tree); and that the syntax not get anymore complicated than it already is.
+
+I finally settled on wrapping the low level NAR constructors (attribute(),event(),cause(),sequence()) with higher level ones that would better manage the necessary copying of interenal entities so they would not step on each other - using wrappers (Attribute(), Event(), Cause(), and Sequence(). These guys do two things (1) they examine arguments and any that are in the form of a list are interpreted as containing a single sub nar that should be made implicit; (2) they make fresh copies of the input nars and sub nars.
+
+On the face of it, the problem with this is that all the NARs are using the same tree when the definitions are made by the client so, sharing the same underlying tree, the implicit/explicit settings of the lowest level VARs, the nodes of that tree, may get set to implicit then back to explicit - back and forth depending only on what NAR most recently used that VAR. 
+
+So here is a trickiness: during the definition phase of the NARs each return from Attribute(), Event(), Cause(), or Sequence() will be an independent copy of the input NAR (and its sub nars) and we IGNORE how this affects the underlying tree because later, a copy of that NAR will work with a fresh copy of the tree, which is cleared so all its VARs are explicit - and that copied NAR wil contain the original implicits of the original NAR and can repopulate the implict vallues in its copy of the tree. Another little subtlety is that repopulating the underlying VARs of the new tree means settinig all 
+
+
+
+
+What this means is that the application level user of NWObject will not be able to use an implicit VAR directly in its input list of NARs, bacause THAT list does not suuport the '[]' notation to indicate implicitness. If you wanted it to, you need to unpack the notation and copy the VAR. If a client wants to do that the recommended way is to copy the VAR and make it implicit, then pass it as an element of the list initializing the NWObject.
+
+
+
+
+-------------------------------------------------------------------------------------------
