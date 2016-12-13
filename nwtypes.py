@@ -73,11 +73,11 @@ class VAR:
         for child in self.children:
             child.makeExplicit()
 
-    def refreshImplicits(self, parentWasImplicit):
-        if parentWasImplicit or self.explicit==False:
-            self.makeImplicit()
-            for child in self.children:
-                child.refreshImplicit(True)    
+    #def refreshImplicits(self, parentWasImplicit):
+    #    if parentWasImplicit or self.explicit==False:
+    #        self.makeImplicit()
+    #        for child in self.children:
+    #            child.refreshImplicit(True)    
     
     def clearImplicits(self):
         self.explicit = True
@@ -244,6 +244,19 @@ class VAR:
             if foundC :
                 return True
 
+    def str(self, ntabs):
+        tab = ""
+        for i in range(ntabs):
+            tab += "  "
+
+        x = ""
+        if self.found:                 
+            x += "*"
+        if self.explicit:
+            x += self.knames[0]   
+        else:
+            x += "["+ self.knames[0] + "]"
+        return tab + x
 
     # use Print() for recursive print, or Print(0,False) for non-recursive
     def Print(self, ntabs=0, recurs=True):
@@ -532,18 +545,18 @@ class NAR:
         n.value   = self.value.copyUsing(tree)
         return n   
 
-    def refreshImplicits(self, parentWasImplicit):
-        if not self.explicit: # as soon as you hit an implicit...so also its sub narratives
-            parentWasImplicit =True
+    #def refreshImplicits(self, parentWasImplicit):
+    #    if not self.explicit: # as soon as you hit an implicit...so also its sub narratives
+    #        parentWasImplicit =True
 
-        if self.thing!=NULL_VAR:
-            self.thing.refreshImplicits(parentWasImplicit)
-        if self.action!=NULL_VAR:
-            self.action.refreshImplicits(parentWasImplicit)
-        if self.relation!=NULL_VAR:
-            self.relation.refreshImplicits(parentWasImplicit)
-        if self.value!=NULL_VAR:
-            self.value.refreshImplicits(parentWasImplicit)
+    #    if self.thing!=NULL_VAR:
+    #        self.thing.refreshImplicits(parentWasImplicit)
+    #    if self.action!=NULL_VAR:
+    #        self.action.refreshImplicits(parentWasImplicit)
+    #    if self.relation!=NULL_VAR:
+    #        self.relation.refreshImplicits(parentWasImplicit)
+    #    if self.value!=NULL_VAR:
+    #        self.value.refreshImplicits(parentWasImplicit)
               
             # means the token is part of the narrative. This changes the state of 
             # underlying VARs but note it is prevented from changing the ifound
@@ -639,15 +652,18 @@ class NAR:
 
         x = ""
         if isinstance(nar,VAR):
-            if nar.found:
+            if nar.found:                 
                 x += "*"
-            x += nar.knames[0]       
+            if nar.explicit:
+                x += nar.knames[0]   
+            else:
+                x += "["+ nar.knames[0] + "]"   
         elif isinstance(nar,NAR):
             x += "\n"
-            t = strNAR(nar.thing,    ntabs+1)
-            r = strNAR(nar.relation, ntabs+1)
-            a = strNAR(nar.action,   ntabs+1)
-            v = strNAR(nar.value,    ntabs+1)
+            t = nar.thing.str(ntabs+1)
+            r = nar.relation.str(ntabs+1)
+            a = nar.action.str(ntabs+1)
+            v = nar.value.str(ntabs+1)
 
             x += tab+"T:" +t + "\n"
             x += tab+"R:" +r + "\n"
@@ -675,31 +691,59 @@ def ORDER( X ):
         return X.order
 
 
+
+
+
+
 #----------- OPERATORS that should have been methods of NAR() but I could not
 # figure out how to program them. Their default args need to be globals that are
 # not acceptable to the VAR() class.
 #
-# These are narratives of higher order than their members. Eg order 1 for KList NARs
+# These are narratives of higher order than their members. Eg order 1 for NARs that wrap VARs
 #
 # The proccessing priority is: attribute, event, cause, sequence - implemented in the read methods
+
+# NOTE: all these operators allow args to be a NAR or a list containing one
+# NAR. The list brackets "[]" indicates the contained NAR should be
+# set to 'implicit'. The next  methods change values in the underlying tree
+# So a client cannot use the same VAR as implicit in one place and explicit
+# in another. A VAR copy is needed for that.
+
+# This co-ops the list syntax of Python, to indicate implicit arguments
+# It returns (possibly modified) input  
+def a2n(arg):   
+    if type(arg) is list:
+        n = arg[0] 
+        n.explicit = False
+    else:         
+        n = arg
+    return n    
 
 
 #-------implements:  "X_REL_/A" - the adjective relation. X,A, and REL are NARs
 #  ATTN! only use the REL variable if it is defined with A  
 ## TODO: put in a check for this
 
-def attribute( X, A, REL=NULL_NAR):
+def attribute( x, y, rel=NULL_NAR):
+    X = a2n(x)       #interpret args
+    Y = a2n(y)
+    REL = a2n(rel)
+    
     n = NAR()
     n.thing    = X   #"noise"   
     n.relation = REL #"outside"
     n.action   = NULL_VAR
-    n.value    = A   #"loud"
+    n.value    = Y   #"loud"
 
-    n.order = max( ORDER(X), ORDER(REL), ORDER(A) ) + 1
+    n.order = max( ORDER(X), ORDER(REL), ORDER(Y) ) + 1
     return n
 
 #-------implements:  "X-ACT->Y" - the verb relation
-def event( X, Y, ACT):
+def event( x, y, act):
+    X = a2n(x)       #interpret args
+    Y = a2n(y)
+    ACT = a2n(act)
+    
     n = NAR()
     n.thing  = X     #"I"
     n.relation = NULL_VAR
@@ -725,7 +769,10 @@ def event( X, Y, ACT):
 NAR_SO  = KList("so","").var().nar() # a dummy to identify the "cause" type of statement
                                      # the correct word searching is handled by internal lists
 
-def cause(X,Y):
+def cause(x,y):
+    X = a2n(x)       #interpret args
+    Y = a2n(y)
+    
     n = NAR()
     n.thing = X      #"we were happy"
 
@@ -744,7 +791,10 @@ def cause(X,Y):
 ## for now requires using both X,Y and Y,X and you can design code making them equivalent
 NAR_THEN = KList("then","").var().nar() # used to identify the "and"/"then" type of statement
 
-def sequence(X,Y): 
+def sequence(x,y):
+    X = a2n(x)         #interpret args
+    Y = a2n(y)
+    
     n = NAR()
     n.thing = X         #"we ate cookies"
     n.action = NAR_THEN #(encode a "then" operation)
@@ -753,33 +803,3 @@ def sequence(X,Y):
     return n
 
 ##########################################
-
-def strNAR(nar, ntabs=0):
-    tab = ""
-    for i in range(ntabs):
-        tab += "  "
-
-    if nar==NULL_NAR:
-        return "nullN"
-
-    x = ""
-    if isinstance(nar,VAR):
-        if nar.found:
-            x += "*"
-        x += nar.knames[0]       
-    elif isinstance(nar,NAR):
-        x += "\n"
-        t = strNAR(nar.thing,    ntabs+1)
-        r = strNAR(nar.relation, ntabs+1)
-        a = strNAR(nar.action,   ntabs+1)
-        v = strNAR(nar.value,    ntabs+1)
-
-        x += tab+"T:" +t + "\n"
-        x += tab+"R:" +r + "\n"
-        x += tab+"A:" +a + "\n"
-        x += tab+"V:" +v + "\n"
-    return x
-
-def printNAR(nar, ntabs=0):
-    s = strNAR(nar,ntabs)
-    print(s)

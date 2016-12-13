@@ -52,6 +52,9 @@ I = INTENSITY
 s = attribute( SOUND, I)
 
 
+s = attribute( SOUND, [attribute(SOURCE, [attribute(INTENSITY,[TOD])] )] )
+
+
 #c = sequence(r,s)
 c = cause(r,s)
 #c=r
@@ -86,9 +89,9 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 #D.readText(text)
 #x = 2
 
-I.makeImplicit()
+#I.makeImplicit()
  
-R          = [s]#[ r , s , cause(r,s)] 
+R          = [ r , s , cause(r,s)] 
 
 calibs     = [True, True, True]
 thresholds = [0.3 , 0.3, 0.3 ]
