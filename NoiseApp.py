@@ -17,14 +17,14 @@ problem = attribute( PROBLEM, NOISE )
 sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
 
 #[sound->me] :: me_/affect
-affect  = cause( attribute(NOISE,TOD), AFFECT )
+affect  = cause( attribute(SOUND,[TOD]), AFFECT )
 
 #location _nearfar_/ source
 proximity = attribute( LOC, SOURCE, PROX)        
 
 
 # (barrier_/state)-letInOut->sound
-letin = event( attribute(BARRIER,STATE), NOISE, LETINOUT )
+letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
 
 
 class NoiseApp:

@@ -293,8 +293,33 @@ def discountControls(tokens, ifound):
     ifound.extend(jfound)
     return ifound
 
+# counts in [outerMin,imin) and (imax,outerMax]
+def countControlsBetween(tokens, ifound, ictrl, istart):
+    count = 0
+    imin = minITOK(ifound)
+    imax = maxITOK(ifound)
+    for i in range(len(tokens)): 
+        if imin<= i and i<=imax:
+            continue
+        DULL_OP.clear()
+        SKIP_OP.clear()
+        LOGIC_OP.clear()
+        PUNCTUATION_OP.clear()
+ 
+        if DULL_OP.find(tokens[i]):
+            count += 1
 
+        elif LOGIC_OP.find(tokens[i]):
+            count += 1
+        
+        elif SKIP_OP.find(tokens[i]):
+            count += 1  
 
+        elif PUNCTUATION_OP.findInText(tokens[i]):
+            count += 1
+
+    return count
+ 
 #######################################################    
 #######################################################    
 ### ControlData 

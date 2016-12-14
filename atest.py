@@ -77,6 +77,7 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 
 
 
+
 #ifound = []
 #x = ReadText(s,tokens,ifound)
 #ifound = cleanFound(ifound)
@@ -85,26 +86,28 @@ text = "Even though my room was close to an elevator and not far from the lobby,
 
 #x=2
 
-#D = ABReader(E,s)
-#D.readText(text)
-#x = 2
+text="the room was over a noisy bar"
+prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
+D = ABReader(E,prox)
+D.readText(text)
+x = 2
 
 #I.makeImplicit()
  
-R          = [ r , s , cause(r,s)] 
+R = [prox] #          = [ r , s , cause(r,s)] 
 
-calibs     = [True, True, True]
-thresholds = [0.3 , 0.3, 0.3 ]
+#calibs     = [True, True, True]
+#thresholds = [0.3 , 0.3, 0.3 ]
  
 
 K = NWReader(E, R  )
 
-K.setCalibration(calibs)
+#K.setCalibration(calibs)
 
 K.readText(text)
 out = K.report()
 print( out ) 
-x = 2
+#x = 2
 
 
 
@@ -122,6 +125,6 @@ x = 2
 #N.run()
 
 
-x = 2
+#x = 2
 
 

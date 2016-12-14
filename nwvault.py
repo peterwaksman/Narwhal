@@ -24,16 +24,16 @@ def getSnippet(ifound, tokens):
 # between narrative and text
 
 class NarRecord:
-    def __init__(self, nar, ifound, tokens, ictrl, subrange):
+    def __init__(self, nar, ifound, tokens, ictrl, istart):
         self.snippet = getSnippet(ifound,tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
         self.nactive = nar.numSlotsActive()
         self.ifound = ifound[:]           # indices that have already been read  
         self.block = False
-        self.GOF = self.gof(tokens, subrange)
-        self.narpolarity = nar.polarity   # nar could change, so save its current polarity
         self.ictrl = ictrl
+        self.GOF = self.gof(tokens, istart)
+        self.narpolarity = nar.polarity   # nar could change, so save its current polarity
 
     def block(self):
         self.block = True
@@ -41,12 +41,19 @@ class NarRecord:
         # "goodness of fit"
         # the subrange is the length of the subtokens used for this ifound
         # Not same as tokens
-    def gof(self, tokens, subrange):  
+    def gof(self, tokens, istart): 
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
         jfound = cleanFound(jfound)
         r = histo( jfound, L )
-        f = getFoundRange(jfound,L)
+        f = getFoundRange(jfound,L) # same as len(snippet)
+
+        # count controls in ALL subtok from istart to ictrl
+        # these should be less
+        c = countControlsBetween(tokens, self.ifound, self.ictrl, istart)
+        subrange = self.ictrl - istart 
+        if subrange>c:
+            subrange = subrange-c
 
         u = self.nused # a snapshot of state when the NarRecord is created
         n = self.nslots 
