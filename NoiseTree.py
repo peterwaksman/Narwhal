@@ -142,6 +142,11 @@ equipmentD = KList("equip", kEQUIPMENTSOURCES)
 trafficD = KList("traffic", kTRAFFICSOURCES)
 constructionD = KList("constr", kCONSTRUCTIONSOURCES)
 oasisD = KList("oasis", kOASISSOURCES)
+## unfotunately, to work around a bug:
+nsourceD = KList("nsource", kPEOPLESOURCES + kPARTYSOURCES + kEQUIPMENTSOURCES + kTRAFFICSOURCES + kCONSTRUCTIONSOURCES)
+qsourceD = KList("oasis",kOASISSOURCES)
+
+
 
 
 roomD = KList("room", kNOISELOCSROOM)
@@ -193,8 +198,11 @@ SOUND = soundD.var()
 NOISE = noiseD.var()|quietD.var()
 
 INTENSITY = loudD.var()|softD.var()
-#SOURCE = peopleD.var() + partyD.var() + equipmentD.var()+ trafficD.var() + constructionD.var() + oasisD.var()
-SOURCE = (peopleD.var() + partyD.var() + equipmentD.var()+ trafficD.var() + constructionD.var()) | oasisD.var()
+
+
+SOURCE = nsourceD.var() | qsourceD.var()
+ 
+#SOURCE = (peopleD.var() + partyD.var() + equipmentD.var()+ trafficD.var() + constructionD.var()) | oasisD.var()
 
 
 LOC = KList("loc","").var() #VAR()  

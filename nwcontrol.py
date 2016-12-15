@@ -293,8 +293,8 @@ def discountControls(tokens, ifound):
     ifound.extend(jfound)
     return ifound
 
-# counts in [outerMin,imin) and (imax,outerMax]
-def countControlsBetween(tokens, ifound, ictrl, istart):
+# counts in full range of subtoks not just between words that have been read.
+def countUnreadControls(tokens, ifound, ictrl, istart):
     count = 0
     imin = minITOK(ifound)
     imax = maxITOK(ifound)

@@ -85,13 +85,15 @@ def ReadTextAsAttribute(nar, tokens, ifound ):
         ATTRIB_OP.clearIFound()
         r = ReadText0( ATTRIB_OP, tokens, jfound)
 
-    # a little algorithm to determine polarity of nar. [HAD: It ignores nar.thing]
-    # and prioritizes the polarity of nar.value 
+    # a little algorithm to determine polarity of nar. 
+    T = nar.thing.polarity
     V = nar.value.polarity
     R = nar.relation.polarity
-    T = nar.thing.polarity
     if v>0 and V==False: # a "Bad" value is passed to the nar, regardless of R
-        nar.polarity = False
+        if R:
+            nar.polarity = False
+        else:
+            nar.polarity = True
     elif R==False: # a "Bad" relation is passed to nar, if that has a meaning
         nar.polarity = False
     elif v==0 and T==False: #handling for partial matches
