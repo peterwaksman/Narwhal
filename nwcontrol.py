@@ -299,7 +299,7 @@ def countUnreadControls(tokens, ifound, ictrl, istart):
     imin = minITOK(ifound)
     imax = maxITOK(ifound)
 #    for i in range(len(tokens)): 
-    for i in range(istart, len(tokens)): 
+    for i in range(istart, ictrl): 
         if imin<= i and i<=imax:
             continue
         DULL_OP.clear()

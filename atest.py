@@ -93,12 +93,12 @@ prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)
 #D.readText(text)
 #x = 2
  
-R = [prox] #[ r , s , cause(r,s)] 
+R = [ r , s , cause(r,s)] 
 K = NWReader(E, R  )
 calibs     = [True, True, True]
 #K.setCalibration(calibs)
 
-K.readText(text)
+K.readText(text0)
 out = K.report()
 print( out ) 
 #x = 2
