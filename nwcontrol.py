@@ -62,7 +62,7 @@ kFORWARDNEGATIONS+= "without # being|a|hesitation|issue|issues|problems" #????
 kHEDGES = "but # more|also,other than,except,except for,however, yet "
 kFORWARDHEDGES = "although, even if,despite,for being,instead of,even though,even when,"
 
-kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is , from "
+kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is , from the "
 
 # not used yet
 kDESIGNATORS = " that , it "
@@ -298,7 +298,8 @@ def countUnreadControls(tokens, ifound, ictrl, istart):
     count = 0
     imin = minITOK(ifound)
     imax = maxITOK(ifound)
-    for i in range(len(tokens)): 
+#    for i in range(len(tokens)): 
+    for i in range(istart, len(tokens)): 
         if imin<= i and i<=imax:
             continue
         DULL_OP.clear()

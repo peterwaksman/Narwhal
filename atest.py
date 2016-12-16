@@ -69,41 +69,40 @@ c = cause(r,s)
 #text = "the noise outside the hotel was bad late at night"
 #text = "it was very noisy late at night"
 #text= "window open at night and found the ventilation equipment a bit noisy."
-text1 = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
+text0 = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "it was very quiet"
 
-text="bar"
-tokens = TOKS(text)
-noi = attribute(SOURCE,NOISE)
+#text="bar"
+#tokens = TOKS(text)
+#noi = attribute(SOURCE,NOISE)
 
 
-ifound = []
-x = ReadText(noi,tokens,ifound)
-ifound = cleanFound(ifound)
+#ifound = []
+#x = ReadText(noi,tokens,ifound)
+#ifound = cleanFound(ifound)
  
-x=2
+#x=2
 
-#text="the room was over a noisy bar"
-#prox = attribute( LOC, attribute(SOURCE, NOISE), PROX)  
+text="the room was over a noisy bar"
+prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
 #prox = attribute( LOC, SOURCE, PROX)  
 #prox = attribute(LOC, SOURCE,PROX)
-text = "bar"
-noi = attribute(SOURCE,NOISE)
-D = ABReader(E,noi)
-D.readText(text)
-x = 2
-
-
+#text = "bar"
+#noi = attribute(SOURCE,NOISE)
+#D = ABReader(E,noi)
+#D.readText(text)
+#x = 2
  
-R = [prox] #          = [ r , s , cause(r,s)] 
+R = [prox] #[ r , s , cause(r,s)] 
 K = NWReader(E, R  )
+calibs     = [True, True, True]
+#K.setCalibration(calibs)
+
 K.readText(text)
 out = K.report()
 print( out ) 
 #x = 2
 
-#calibs     = [True, True, True]
-#K.setCalibration(calibs)
 #thresholds = [0.3 , 0.3, 0.3 ]
 #O = NWObject(E, R, calibs, thresholds)
 #O.readText(text)

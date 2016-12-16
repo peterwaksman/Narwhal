@@ -50,12 +50,13 @@ class NarRecord:
 
         # count controls in ALL subtok from istart to ictrl
         # these should be less
-        c = countUnreadControls(tokens, self.ifound, self.ictrl, istart)
+        ur = countUnreadControls(tokens, self.ifound, self.ictrl, istart)
         subrange = self.ictrl - istart 
-        if subrange>c:
-            subrange = subrange-c
-        else:
-            print("Weirdness after countUnreadControls()")
+        H = min(r+ur, subrange)
+        #if subrange>ur:
+        #    subrange = subrange-ur
+        #else:
+        #    print("Weirdness after countUnreadControls()")
 
         u = self.nused # a snapshot of state when the NarRecord is created
         n = self.nslots 
@@ -67,7 +68,7 @@ class NarRecord:
         else:
             a = float(u)/float(n)
             b = float(r)/float(f)
-            c = float(r)/float( subrange )
+            c = float(H)/float( subrange )
             G = a*b*c
              
         return G
