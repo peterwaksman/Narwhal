@@ -214,6 +214,10 @@ def replacePunctuation( text ):
             newtext += " _query_ "
         elif text[i]=="!" :
             newtext += " _hey_ "
+        elif text[i]=="(":
+            newtext += " _(_ "
+        elif text[i]==")":
+            newtext += " _)_ "
         else:
             newtext += text[i]
     return newtext
@@ -224,12 +228,16 @@ kCOMMA = KList("COMMA"     , "_comma_")
 kSEMI = KList("SEMICOLON"  , "_semi_")
 kQUERY = KList("QUERY"     , "_query_")
 kEXCLM = KList("EXCLAIM"   , "_hey_")
+kOPENPAREN = KList("OPENPAREN", "_(_")
+kCLOSEPAREN = KList("CLOSEPAREN", "_)_")
 
 PERIOD_OP = kPERIOD.var()
 COMMA_OP  = kCOMMA.var()
 SEMI_OP   = kSEMI.var()
 QUERY_OP  = kQUERY.var()
 EXCLM_OP  = kEXCLM.var()
+OPAREN_OP = kOPENPAREN.var()
+CPAREN_OP =  kCLOSEPAREN.var()
 
 kPUNCT = KList("PUNCTUATION", "")
 PUNCTUATION_OP = kPUNCT.var()
@@ -238,6 +246,9 @@ PUNCTUATION_OP.sub(COMMA_OP )
 PUNCTUATION_OP.sub(SEMI_OP )
 PUNCTUATION_OP.sub(QUERY_OP)
 PUNCTUATION_OP.sub(EXCLM_OP )
+PUNCTUATION_OP.sub(OPAREN_OP )
+PUNCTUATION_OP.sub(CPAREN_OP )
+
 
 def findPunctuation(self, tokens, itok):
     self.ifound = []
@@ -293,12 +304,12 @@ def discountControls(tokens, ifound):
     ifound.extend(jfound)
     return ifound
 
-# counts in full range of subtoks not just between words that have been read.
+# Counts controls in the full range of subtoks, excluding ones  
+# in the range where words have been found, which are already discounted.
 def countUnreadControls(tokens, ifound, ictrl, istart):
     count = 0
     imin = minITOK(ifound)
     imax = maxITOK(ifound)
-#    for i in range(len(tokens)): 
     for i in range(istart, ictrl): 
         if imin<= i and i<=imax:
             continue
@@ -359,11 +370,10 @@ def scanNextControl(tokens, istart):
         if ctrl!=NULL_VAR:
             CD.set(OPERATOR_CTRLTYPE, ctrl, itok)
             return CD
-
-    for itok in range(istart, L):
         ctrl = isPunctuationControl(tokens, itok)
         if ctrl!=NULL_VAR:
             CD.set(PUNCTUATION_CTRLTYPE, ctrl, itok)
             return CD
+
     CD.set(END_CTRLTYPE, NULL_VAR, L)
     return CD

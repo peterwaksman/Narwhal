@@ -49,7 +49,7 @@ class NarRecord:
         f = getFoundRange(jfound,L) # same as len(snippet)
 
         # count controls in ALL subtok from istart to ictrl
-        # these should be less
+        # that have not already been discounted.
         ur = countUnreadControls(tokens, self.ifound, self.ictrl, istart)
         subrange = self.ictrl - istart 
         H = min(r+ur, subrange)

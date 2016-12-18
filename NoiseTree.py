@@ -60,7 +60,7 @@ kTIMEOFDAY += "8 am,8 pm, 9 am, 9 pm, 10 am, 10 pm, 11 am, 11 pm, 12 am, 12 pm"
 
 
 
-kNOISEWORDS = "street sound, noise , nosie,noise level,rampage,noisy,hear # about,"
+kNOISEWORDS = "street sound, noise, nosie,noise level,rampage,noisy,hear # about,"
 kNOISEWORDS += "heard # of|from|how|great,blaring, loud ,deafening,deafning,racket # club,"
 kNOISEWORDS += "moan ,shout # out,crying,scream,slamming,slammed, barking ,yelling,talking # with|to,"
 kNOISEWORDS += "whistling,snoring,roaring,knocking,swearing"
@@ -168,12 +168,12 @@ windowD = KList("window", kWINDOW)
 kWALL = "wall,my|next $ door,floor"
 wallD = KList("wall", kWALL)
 
-kOPEN = " open , thin "
+kOPEN = "open, thin "
 openD = KList("open", kOPEN)
 kCLOSED = "closed,thick "
 closedD = KList("closed", kCLOSED)
 
-kLETIN = "let in, still hear, came in, came through, through , coming through, carries"
+kLETIN = "let in, still hear, came in, lets in, came through, through , coming through, carries"
 letinD = KList("letin", kLETIN)
 
 kKEEPOUT  = "keep out,the $ block, filter,cut down on,far away enough,"

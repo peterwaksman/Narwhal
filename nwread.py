@@ -619,6 +619,11 @@ class NWReader:
             self.rollUpCanVaultMany( records, 0.5)
             self.removeAllBlocksMany()
 
+        # note: no "OPENPAREN" processing yet
+        elif CTRL.isA("CLOSEPAREN"):
+            self.rollUpCanVaultMany( records, 0.5)
+            self.removeAllBlocksMany()
+
         elif CTRL.isA("PERIOD"):
             self.rollUpCanVaultMany(records, 0.1)
             self.removeAllBlocksMany()      
