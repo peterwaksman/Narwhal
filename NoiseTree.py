@@ -173,10 +173,10 @@ openD = KList("open", kOPEN)
 kCLOSED = "closed,thick "
 closedD = KList("closed", kCLOSED)
 
-kLETIN = "let in, still hear, came in, lets in, came through, through , coming through, carries"
+kLETIN = "let in, still hear, came in, lets in, lets * in, let * in, came through, through , coming through, carries"
 letinD = KList("letin", kLETIN)
 
-kKEEPOUT  = "keep out,the $ block, filter,cut down on,far away enough,"
+kKEEPOUT  = "keep out,keep * out,the $ block, filter,cut down on,far away enough,"
 kKEEPOUT += "far away from,shut out,cut out,block,keep out,kept out,drown out,"
 kKEEPOUT += "escape from"
 keepoutD = KList("keepout", kKEEPOUT)

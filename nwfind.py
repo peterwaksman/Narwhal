@@ -172,8 +172,12 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
     a = matchTOK(kpart[0], itok, tmp,   tokens)
     b = matchTOK(kpart[1], itok +2, tmp, tokens)
+    c = matchTOK(kpart[1], itok+3, tmp,tokens)
 
     if a and b :
+        ifound = tmp
+        return True
+    elif a and c :
         ifound = tmp
         return True
     else:

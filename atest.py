@@ -72,7 +72,7 @@ c = cause(r,s)
 text0 = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "it was very quiet"
 text1="the room was over a noisy bar"
-text2 = "my room got very hot as it was post-ac season (and opening windows lets in the noise)."
+text2 = "lets the noise in" #"my room got very hot as it was post-ac season (and opening windows lets in the noise)."
 text3 = "(opening windows lets in the noise.)"
 
 
