@@ -62,8 +62,8 @@ kTIMEOFDAY += "8 am,8 pm, 9 am, 9 pm, 10 am, 10 pm, 11 am, 11 pm, 12 am, 12 pm"
 
 kNOISEWORDS = "street sound, noise, nosie,noise level,rampage,noisy,hear # about,"
 kNOISEWORDS += "heard # of|from|how|great,blaring, loud ,deafening,deafning,racket # club,"
-kNOISEWORDS += "moan ,shout # out,crying,scream,slamming,slammed, barking ,yelling,talking # with|to,"
-kNOISEWORDS += "whistling,snoring,roaring,knocking,swearing"
+kNOISEWORDS += "moan ,shout # out, crying,scream,slamming,slammed, barking ,yelling,talking # with|to,"
+kNOISEWORDS += "whistling,snoring,roaring,knocking,swearing,footstep,flush,spoken, word spoken"
 
 kQUIETWORDS = "soft,low volume,tranquil,good sleep,silent,quiet,"
 kQUIETWORDS += "isolation, rested,soundly,oasis,peace,serene,frogs,birds, waves"
@@ -80,21 +80,22 @@ kEQUIPMENTSOURCES=" ac , a/c ,air con,air-con,a/c,aircon,air conditioner,air con
 kEQUIPMENTSOURCES += "tv,air shaft,drains,hvac,central heating,lift,elevator, fan ,"
 kEQUIPMENTSOURCES += " ice ,ventilation,clanking,clattering,rumbling"
 
-kTRAFFICSOURCES="truck,traffic,busy,busy street,road noise,highway,diesel,"
-kTRAFFICSOURCES+= " city , downtown , center, centre , garage , engine , tram,deliveries"
+kTRAFFICSOURCES="truck,traffic,busy,busy street,shopping, street, main , market , road noise,highway,diesel,"
+kTRAFFICSOURCES+= "road, alley, city , downtown , center, centre , garage , engine , tram,deliveries"
+
 
 kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering" 
 
 kOASISSOURCES="ocean"
 
-kNOISELOCSROOM="that,it, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
-kNOISELOCSROOM+="my door,on our floor,outside my door,adjacent room,next suite,"
+kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
+kNOISELOCSROOM+="my door,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom,walls"
 
 kNOISELOCSHOTEL="hotel, high $ floor,building,area, section,location,quiet hotel,"
-kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool,external,market,shopping,street, main ,"
-kNOISELOCSHOTEL+="road,alley"  
+kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool"
+ 
 
 
 
@@ -154,7 +155,7 @@ hotelD = KList("hotel", kNOISELOCSHOTEL)
  
 
 
-kNEAR = "nowhere $ near , near to ,in the heart of, over , on the ,being on, right on ,overlooked,overlooks, close to,next door"
+kNEAR = "nowhere $ near , near to ,in the heart of, over , on the ,on our,being on, right on ,overlooked,overlooks, close to,next door"
 nearD = KList("near", kNEAR)
 kFAR  = " far , far from,farthest from, away from,nowhere near"
 farD = KList("far",kFAR)
@@ -168,12 +169,12 @@ windowD = KList("window", kWINDOW)
 kWALL = "wall,my|next $ door,floor"
 wallD = KList("wall", kWALL)
 
-kOPEN = "open, thin "
+kOPEN = "open, thin , paper thin"
 openD = KList("open", kOPEN)
 kCLOSED = "closed,thick "
 closedD = KList("closed", kCLOSED)
 
-kLETIN = "let in, still hear, came in, lets in, lets * in, let * in, came through, through , coming through, carries"
+kLETIN = "let in, still hear, heard through, came in, lets in, lets * in, let * in, came through, through , coming through, carries"
 letinD = KList("letin", kLETIN)
 
 kKEEPOUT  = "keep out,keep * out,the $ block, filter,cut down on,far away enough,"

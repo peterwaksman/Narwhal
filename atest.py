@@ -72,34 +72,59 @@ c = cause(r,s)
 text0 = "Even though my room was close to an elevator and not far from the lobby, it was very quiet."
 #text = "it was very quiet"
 text1="the room was over a noisy bar"
-text2 = "lets the noise in" #"my room got very hot as it was post-ac season (and opening windows lets in the noise)."
-text3 = "(opening windows lets in the noise.)"
+text2 = "my room got very hot as it was post-ac season (and opening windows lets in the noise)."
+text3 = "It overlooks a main shopping street (hence very convenient) but could be a bit noisy in the evening."
+#text3 = "It overlooks a main shopping street"
+text4 = "Stayed here back in 2002 and was lovely and decided to return for a 'date night' \
+with the husband. After paying extortionate valet parking prices check in was uneventful. \
+The foyer looks lovely and lulls you into a false sense of security, however The rooms \
+whilst clean are outdated and old fashioned .i think the rooms actually looked better back\
+ in 2002. The bathrooms were standard and smelt of mould and damp and the towels were\
+ stained and grotty. The Pool area is tiny (thank god we didn't have the children with us).\
+ Not one to complain normally I was able to overlook this however I was not able to overlook\
+ the fact that the walls are pAper thin-every footstep, toilet flush, tap turned, and word \
+ spoken was heard through the walls and to top it all off we were unFortunate to have a \
+ wedding party/guests staying on our floor. These guests took it upon themselves to ruin \
+ our night. From 12.18am til 3.30am the fourth floor was a 3ring circus. At one point \
+ 10 people were outside my room having.a party. Only when I called reception did it go \
+ quiet-not for long though -yep it started again- people running up and down hallways, \
+ slamming doors, in and out of each other's rooms and being VERY loud. Then at 7am it was \
+ all on again. Don't know how it can be \
+ called 5 star hotel. Very disappointing Duxton. For the price of hotels or anything in \
+ Perth \for that matter I expect a lot more. No wonder I and others prefer to spend our \
+ hard earned cash overseas when this is the service and standard we get in Perth. Shame."
 
+text7 = "word spoken was heard through the walls"
+text6 = "the walls are paper thin-every footstep, toilet flush, tap turned, and word \
+spoken was heard through the walls "  
+text5 = "Not one to complain normally I was able to overlook this however I was not able to overlook\
+the fact that the walls are paper thin-every footstep, toilet flush, tap turned, and word \
+spoken was heard through the walls and to top it all off we were unFortunate to have\
+ a wedding party staying on our floor."
+text8 = "we were unFortunate to have a wedding party staying on our floor."
 
 prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
 letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
-#letin = event( BARRIER, SOUND, LETINOUT )
+problem = attribute( PROBLEM, SOUND )
 
 #tokens = TOKS(text3)
 #ifound = []
 #x = ReadText(letin,tokens,ifound)  # CAUTION: no PrepareTokens() 
 #ifound = cleanFound(ifound)
-#x=2
+ 
 #D = ABReader(E,letin)
 #D.readText(text)
 #x = 2
  
-R = [letin] #[ r , s , cause(r,s)] 
+R = [prox] #[ r , s , cause(r,s)] 
 K = NWReader(E, R  )
-#calibs     = [True, True, True]
-#K.setCalibration(calibs)
 
-K.readText(text2)
+K.readText(text8)
 out = K.report()
 print( out ) 
 x = 2
 
-#thresholds = [0.3 , 0.3, 0.3 ]
+##thresholds = [0.3 , 0.3, 0.3 ]
 #O = NWObject(E, R, calibs, thresholds)
 #O.readText(text)
 #x = O.report()
@@ -108,10 +133,16 @@ x = 2
 #print(y)
 
 
-  
+text5 = "Not one to complain normally I was able to overlook this however I was not able to overlook\
+the fact that the walls are paper thin-every footstep, toilet flush, tap turned, and word \
+spoken was heard through the walls and to top it all off we were unFortunate to have\
+ a wedding party staying on our floor."
 
+#text6 = "the walls are paper thin-every footstep, toilet flush, tap turned, and word \
+#spoken was heard through the walls "  
+#text7 = "word spoken was heard through the walls"
 #N = NoiseApp()
-#N.run()
+#N.test(text6)
 
 
 #x = 2

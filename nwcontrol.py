@@ -6,7 +6,7 @@ from nwutils import *
 ## I complain about how logicians co-opted natural language terms for their own uses. 
 ## But Narwhal needs to co-opt the same terms because the terms do, in fact, play a
 ## basic role in parsing out separate statements and whether the "value" they 
-## impart is to be blocked or unblocked. Also help determine when a new statement begins.
+## impart is to be blocked or unblocked. Also they help determine when a new statement begins.
 
 ################################## Logic Term Tree
 
@@ -62,7 +62,7 @@ kFORWARDNEGATIONS+= "without # being|a|hesitation|issue|issues|problems" #????
 kHEDGES = "but # more|also,other than,except,except for,however, yet "
 kFORWARDHEDGES = "although, even if,despite,for being,instead of,even though,even when,"
 
-kATTRIBUTORS = " with , of , had , hav, has , was, is # not , which , were, is , from the "
+kATTRIBUTORS = " with , of , had , hav, has , was, is # not , are , which , were, is , from the "
 
 # not used yet
 kDESIGNATORS = " that , it "
@@ -218,6 +218,8 @@ def replacePunctuation( text ):
             newtext += " _(_ "
         elif text[i]==")":
             newtext += " _)_ "
+        elif text[i]=="-":
+            newtext += " - " # for now
         else:
             newtext += text[i]
     return newtext
@@ -230,6 +232,7 @@ kQUERY = KList("QUERY"     , "_query_")
 kEXCLM = KList("EXCLAIM"   , "_hey_")
 kOPENPAREN = KList("OPENPAREN", "_(_")
 kCLOSEPAREN = KList("CLOSEPAREN", "_)_")
+kDASH = KList("DASH"," - ")
 
 PERIOD_OP = kPERIOD.var()
 COMMA_OP  = kCOMMA.var()
@@ -238,6 +241,7 @@ QUERY_OP  = kQUERY.var()
 EXCLM_OP  = kEXCLM.var()
 OPAREN_OP = kOPENPAREN.var()
 CPAREN_OP =  kCLOSEPAREN.var()
+DASH_OP = kDASH.var()
 
 kPUNCT = KList("PUNCTUATION", "")
 PUNCTUATION_OP = kPUNCT.var()
@@ -248,6 +252,7 @@ PUNCTUATION_OP.sub(QUERY_OP)
 PUNCTUATION_OP.sub(EXCLM_OP )
 PUNCTUATION_OP.sub(OPAREN_OP )
 PUNCTUATION_OP.sub(CPAREN_OP )
+#PUNCTUATION_OP.sub(DASH_OP )
 
 
 def findPunctuation(self, tokens, itok):

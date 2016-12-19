@@ -11,7 +11,7 @@ from NoiseTree import *
 # Each NAR corresponds with an intermediate sub-structure of the final data
 
 # problem_/noise
-problem = attribute( PROBLEM, NOISE )
+problem = attribute( PROBLEM, SOUND )
 
 # sound_/intensity_/source_/timeOfDay ::[me_/affect]
 sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
@@ -43,3 +43,9 @@ class NoiseApp:
             h = self.object.report()
             print(h)
             print( self.object.printFinal())
+
+    def test(self,text):
+            self.object.readText(text)
+            h = self.object.report()
+            print(h)
+            print( self.object.printFinal() )

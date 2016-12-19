@@ -45,6 +45,7 @@ class NarRecord:
         L = len(tokens)
         jfound = discountControls(tokens, self.ifound)
         jfound = cleanFound(jfound)
+        # (this r counts words and controls in read word range)
         r = histo( jfound, L )
         f = getFoundRange(jfound,L) # same as len(snippet)
 
@@ -52,11 +53,8 @@ class NarRecord:
         # that have not already been discounted.
         ur = countUnreadControls(tokens, self.ifound, self.ictrl, istart)
         subrange = self.ictrl - istart 
-        H = min(r+ur, subrange)
-        #if subrange>ur:
-        #    subrange = subrange-ur
-        #else:
-        #    print("Weirdness after countUnreadControls()")
+        # (this H counts words and controls over the entire range of text)
+        H = min(r+ur, subrange)  
 
         u = self.nused # a snapshot of state when the NarRecord is created
         n = self.nslots 
@@ -66,7 +64,7 @@ class NarRecord:
         if f==0 or n==0:
             G = 0
         else:
-            a = float(u)/float(n)
+            a = float(u)/float(n) 
             b = float(r)/float(f)
             c = float(H)/float( subrange )
             G = a*b*c

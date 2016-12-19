@@ -623,6 +623,10 @@ class NWReader:
         elif CTRL.isA("CLOSEPAREN"):
             self.rollUpCanVaultMany( records, 0.5)
             self.removeAllBlocksMany()
+     
+        elif CTRL.isA("OPENPAREN"):
+            self.rollUpCanVaultMany( records, 0.5)
+            self.removeAllBlocksMany()
 
         elif CTRL.isA("PERIOD"):
             self.rollUpCanVaultMany(records, 0.1)
@@ -632,8 +636,7 @@ class NWReader:
 
         else :
             print( "did not apply contol: "+ CTRL.knames[0] )
-
-
+            return istart+ max(1, len(CD.ctrl.ifound))
         self.clearIFoundMany()
             
         istart = self.newStart(CD)
