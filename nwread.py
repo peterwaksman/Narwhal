@@ -638,6 +638,7 @@ class NWReader:
             print( "did not apply contol: "+ CTRL.knames[0] )
             return istart+ max(1, len(CD.ctrl.ifound))
         self.clearIFoundMany()
+
             
         istart = self.newStart(CD)
             

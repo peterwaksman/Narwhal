@@ -47,7 +47,7 @@ NONRESPONSIVE += "no apology,disinterested,ignored,barely polite,unresponsive "
 RESPONSIVE = "very helpful,attentive,taking the trouble,positive,apologetic,"
 RESPONSIVE += "accomodat,worked hard,welcoming"
 
-kSLEEPPOSITIVES = "undisrupted,undisturb,sleep, rest # of "
+kSLEEPPOSITIVES = "undisrupted,undisturb,sleep, rest # of ,exhausted"
 
 kSLEEPNEGATIVES = "wake # up,awake,woke,awoke,waken,woken, disturb, disrupt,stirred,bother,sleepless"
 
@@ -132,7 +132,7 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad" #people hate to criticize and use understatement
+kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad, dreadful" #people hate to criticize and use understatement
 loudD = KList("loud", kLOUD)
 kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
 softD = KList("soft", kSOFT)

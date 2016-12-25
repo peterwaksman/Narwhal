@@ -7,14 +7,30 @@ from nwcontrol import *
 # It consists of an array of NarRecords.
 
 # for convenience, the nar record includes the relevant snippet of original text
-def getSnippet(ifound, tokens):
-     if len(ifound)<1:
+def getSnippet(istart, ictrl, tokens):
+     if ictrl<=istart:
          return ""
-     imin = minITOK(ifound)
-     imax = maxITOK(ifound)
-     snippet = tokens[imin:imax+1]
+     snippet = tokens[istart:ictrl]
      return snippet
  
+ # for convenience, the nar record includes the relevant snippet of original text
+ # plus some embelishments
+def getSnippet2(istart, ictrl, ifound, tokens):
+     if ictrl<=istart:
+         return ""
+
+     newtokens = tokens[:]
+     for j in range( len(ifound)):
+         i = ifound[j]
+         newtokens[i] = newtokens[i]+"*"
+
+     snippet = ""
+     for i in range(istart,ictrl):
+         snippet += newtokens[i]+" "
+
+     return snippet
+
+
 # The NarRecord reflects a collapsing of the data that has been kept 
 # as separate count of numSlotsUsed() and ifound (the indices of found tokens) 
 # during the reading process. These get scored and perhaps saved or "vaulted".
@@ -25,7 +41,7 @@ def getSnippet(ifound, tokens):
 
 class NarRecord:
     def __init__(self, nar, ifound, tokens, ictrl, istart):
-        self.snippet = getSnippet(ifound,tokens)
+        self.snippet = getSnippet2(istart,ictrl,ifound, tokens)
         self.nused = nar.numSlotsUsed()   # num slots used in nar, since nar.clear() erases this info.
         self.nslots = nar.numSlots()      # keep for convenience
         self.nactive = nar.numSlotsActive()
@@ -109,13 +125,15 @@ class NarVault:
             # controls perhaps DO behave like booleans
             if 1==self.nblocks%2: 
                 self.pre.block = True 
+                self.nblocks = 0
             self._vault.append( self.pre )    
         self.pre = 0
         # resetting nblocks is someone else's job     
                                    
     def abandonPre(self):
         self.pre = 0
-        
+        self.nblocks = 0
+
     def addBlock(self):
         self.nblocks = self.nblocks+1 
          

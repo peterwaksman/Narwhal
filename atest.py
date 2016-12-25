@@ -16,7 +16,7 @@ n = attribute( PROBLEM, SOUND )
 
 q = attribute( BARRIER, INSULATION)
 
-a = cause( attribute( NOISE, TOD ), AFFECT )
+a = cause( attribute( NOISE, [TOD] ), AFFECT )
 
 n = attribute( BARRIER, STATE)
 m = event( BARRIER, NOISE, LETINOUT )
@@ -102,29 +102,49 @@ the fact that the walls are paper thin-every footstep, toilet flush, tap turned,
 spoken was heard through the walls and to top it all off we were unFortunate to have\
  a wedding party staying on our floor."
 text8 = "we were unFortunate to have a wedding party staying on our floor."
+textQ = "You cannot go wrong staying at the Dolphin. Great location at a great price. Simple healthy breakfast and friendly helpful staff and free parking. Walk to the wharfs; great seafood and Mexican dining a stroll away and an easy drive to most of the highlights of the city. Only real critiscm is the wifi speed is good enough for surfing the net and e-mail but not for Netflix. Highly recommend; amazing value for $$. "
 
-prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
-letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
-problem = attribute( PROBLEM, SOUND )
+textU="Fell into bed exhausted but there is a continuing dreadful racket as the central heating starts up ever few minutes"
+textA = "Fell into bed exhausted but there is a continuing dreadful racket as the central heating starts up ever few minus and makes a huge noise and whine and there is no switch that works to switch it off."
+textB = "So blissfully quiet my wife was overjoyed (had suffered disturbed sleep in Firenze..whilst I slept like a log)."
+textC = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door - especially late at night and at 6 am when the deliveries started arriving."
 
-#tokens = TOKS(text3)
-#ifound = []
-#x = ReadText(letin,tokens,ifound)  # CAUTION: no PrepareTokens() 
-#ifound = cleanFound(ifound)
- 
+E.clearImplicits()
+#prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
+#letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
+#problem = attribute( PROBLEM, SOUND )
+
+
+sound = attribute(SOUND,INTENSITY)
+affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
+#affect  = cause( AFFECT, attribute(SOUND,INTENSITY)  )
+
+tokens = TOKS(textU)
+ifound = []
+
+#E.clear()
+#x = E.findInText(tokens)
+#r = histo(E.ifound, len(tokens))
+
+x = ReadText(affect,tokens,ifound)  # CAUTION: no PrepareTokens() 
+ifound = cleanFound(ifound)
+x = showFound(tokens, ifound)
+print(x) 
+
 #D = ABReader(E,letin)
 #D.readText(text)
 #x = 2
  
-R = [prox] #[ r , s , cause(r,s)] 
+
+R = [affect] #[ r , s , cause(r,s)] 
 K = NWReader(E, R  )
 
-K.readText(text8)
+K.readText(textU)
 out = K.report()
 print( out ) 
 x = 2
 
-##thresholds = [0.3 , 0.3, 0.3 ]
+#thresholds = [0.3 , 0.3, 0.3 ]
 #O = NWObject(E, R, calibs, thresholds)
 #O.readText(text)
 #x = O.report()
@@ -140,9 +160,11 @@ spoken was heard through the walls and to top it all off we were unFortunate to 
 
 #text6 = "the walls are paper thin-every footstep, toilet flush, tap turned, and word \
 #spoken was heard through the walls "  
-#text7 = "word spoken was heard through the walls"
+##text7 = "word spoken was heard through the walls"
+
 #N = NoiseApp()
-#N.test(text6)
+
+#N.testFile("Ones.txt")
 
 
 #x = 2

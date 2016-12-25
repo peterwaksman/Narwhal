@@ -49,3 +49,21 @@ class NoiseApp:
             h = self.object.report()
             print(h)
             print( self.object.printFinal() )
+
+    def testFile(self, filename):
+        fin = open(filename, "r")
+        fout = open("output.txt","w")
+
+        s = "START"
+        while len(s)>0 :
+            s = fin.readline()
+            if s=="\n":
+                continue
+            self.object.readText(s)
+            h = self.object.printFinal()+"\n"
+            fout.write(h)
+            print( s )
+            print( h )
+
+        fin.close()
+        fout.close()

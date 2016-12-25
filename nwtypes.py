@@ -100,6 +100,7 @@ class VAR:
         self.ifound = []
         for child in self.children:
             child.clearIFound()
+    
 
     def clearPolarity(self):
         self.polarity = True
@@ -166,7 +167,7 @@ class VAR:
                 tokens.append(tok.lower())
             
         # for each token 
-        wasFound = False # used to test newly found, nor re found
+        wasFound = False # used to test newly found and not what has already been found 
         for itok in range( len(tokens) ):
             ikname = 0 
             for kname in self.knames: # for each name in self's klist
