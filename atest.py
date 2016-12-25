@@ -116,8 +116,8 @@ E.clearImplicits()
 
 
 sound = attribute(SOUND,INTENSITY)
-affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
-#affect  = cause( AFFECT, attribute(SOUND,INTENSITY)  )
+#affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
+affect  = cause( AFFECT, attribute(SOUND,INTENSITY)  )
 
 tokens = TOKS(textU)
 ifound = []
@@ -126,14 +126,15 @@ ifound = []
 #x = E.findInText(tokens)
 #r = histo(E.ifound, len(tokens))
 
-x = ReadText(affect,tokens,ifound)  # CAUTION: no PrepareTokens() 
-ifound = cleanFound(ifound)
-x = showFound(tokens, ifound)
-print(x) 
+#x = ReadText(affect,tokens,ifound)  # CAUTION: no PrepareTokens() 
+#ifound = cleanFound(ifound)
+#x = showFound(tokens, ifound)
+#print(x) 
 
 #D = ABReader(E,letin)
 #D.readText(text)
 #x = 2
+
  
 
 R = [affect] #[ r , s , cause(r,s)] 

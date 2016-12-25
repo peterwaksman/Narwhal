@@ -389,8 +389,10 @@ class ABReader:
                 V.vault()
             else:
                 V.abandonPre()
+                nar.clearPolarity()
             istart = self.clearStart(CD) 
-            self.ifound = [] # fresh start
+            self.ifound = [] # fresh 
+            start
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)
@@ -533,6 +535,7 @@ class NWReader:
                 rd.V.vault()
             else:
                 rd.V.abandonPre()
+                rd.nar.clearPolarity()
             
     def addBlockMany(self):
        for rd in self.RD:
@@ -669,4 +672,3 @@ class NWReader:
             out += "\n" 
         out += "\n"
         return out
-
