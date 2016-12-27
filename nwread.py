@@ -127,47 +127,65 @@ def ReadTextAsAction(nar, tokens, ifound):
     else:
         return t + a + v
       
-    
+     # maximizes the "inner" score over all possible subdivisions into tokensA,tokensB
 def ReadTextAsCausal(nar, tokens, ifound):
     if nar.action != NAR_SO: 
         return 0 
    
+    # check for directionality of the SO_OP token
+    doFirstPass = True
+    doSecondPass = True
+    kfound = []
+    SO_OP.clear()
+    c  = ReadText(SO_OP, tokens, kfound)
+    if c>0:
+        if SO_OP.polarity==True:
+            doSecondPass = False
+        else:
+            doFirstPass = False
+    # In the "first pass" we check for the syntax of cause followed by effect:"A so B"
+    # In the "second pass" we check for syntax of effect preceeding cause: "B as A"
+    # The presense of a SO_OP token can save time, otherwise we check both syntaxes
+    # in two (slow) both passes.
+ 
     # maximizes the score over all possible subdivisions into tokensA,tokensB
     imax = 0
     maxab=0
     m = nar.copy() # to preserve the orginal
     firstPass = True
-    for i in range(len(tokens)+1):
-        kfound = []
-        tokensA = tokens[:i]
-        tokensB = tokens[i:]
-        m.thing.clear()
-        m.value.clear()
-        t  = ReadText(m.thing,  tokensA, kfound)
-        v  = ReadText(m.value, tokensB, kfound)
-        c  = ReadText(SO_OP, tokens, kfound)
+    if doFirstPass:
+        for i in range(len(tokens)+1):
+            kfound = []
+            tokensA = tokens[:i]
+            tokensB = tokens[i:]
+            m.thing.clear()
+            m.value.clear()
+            t  = ReadText(m.thing,  tokensA, kfound)
+            v  = ReadText(m.value, tokensB, kfound)
+            c  = ReadText(SO_OP, tokens, kfound)
     
-        # favors maximum balanced between the t and v
-        if maxab<=(t+1)*(v+1):
-            imax = i
-            maxab = (t+1)*(v+1)
+            # favors maximum balanced between the t and v
+            if maxab<=(t+1)*(v+1):
+                imax = i
+                maxab = (t+1)*(v+1)
 
     # repeat search in reverse order
-    for i in range(len(tokens)+1):
-        kfound = []
-        tokensA = tokens[:i]
-        tokensB = tokens[i:]
-        m.value.clear()
-        m.thing.clear()
-        v  = ReadText(m.value,  tokensA, kfound) #(thing and value are swapped)
-        t  = ReadText(m.thing, tokensB, kfound)
-        c  = ReadText(SO_OP, tokens, kfound)
+    if doSecondPass:
+        for i in range(len(tokens)+1):
+            kfound = []
+            tokensA = tokens[:i]
+            tokensB = tokens[i:]
+            m.value.clear()
+            m.thing.clear()
+            v  = ReadText(m.value,  tokensA, kfound) #(thing and value are swapped)
+            t  = ReadText(m.thing, tokensB, kfound)
+            c  = ReadText(SO_OP, tokens, kfound)
     
-        # favors maximum balanced between the t and v
-        if maxab<=(t+1)*(v+1):
-            imax = i
-            maxab = (t+1)*(v+1)   
-            firstPass = False    
+            # favors maximum balanced between the t and v
+            if maxab<=(t+1)*(v+1):
+                imax = i
+                maxab = (t+1)*(v+1)   
+                firstPass = False    
             
     if firstPass:          
         tokensA = tokens[:imax]

@@ -70,6 +70,10 @@ kAMPLIFIERS  = " very "
 
 kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,keep the, kept us"
 
+kCAUSESFWD = " so , therefore, therefor , because, hence ,keep the, kept us"
+kCAUSESBKD = "room $ for, due to, dueto, as "
+
+
 # pre conjunctions
 kIF = "as $ if "
 kNOTONLY = "not only, not just"
@@ -103,9 +107,12 @@ PRECONJ_OP = preconjD.var()
 andD = KList("AND", kCONJUNCTIONS )
 AND_OP = andD.var( )
 
-soD = KList("SO", kCAUSES)
-SO_OP = soD.var()
-
+#soD = KList("SO", kCAUSES)
+#SO_OP = soD.var()
+fwdCauseD = KList("so", kCAUSESFWD)
+bkdCauseD = KList("as", kCAUSESBKD)
+SO_OP = fwdCauseD.var() | bkdCauseD.var()
+ 
 
 attribD = KList( "HAS", kATTRIBUTORS )
 ATTRIB_OP = attribD.var()
