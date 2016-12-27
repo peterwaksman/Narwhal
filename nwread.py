@@ -136,6 +136,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
     imax = 0
     maxab=0
     m = nar.copy() # to preserve the orginal
+    firstPass = True
     for i in range(len(tokens)+1):
         kfound = []
         tokensA = tokens[:i]
@@ -147,35 +148,79 @@ def ReadTextAsCausal(nar, tokens, ifound):
         c  = ReadText(SO_OP, tokens, kfound)
     
         # favors maximum balanced between the t and v
-        if maxab<(t+1)*(v+1):
+        if maxab<=(t+1)*(v+1):
             imax = i
             maxab = (t+1)*(v+1)
-            
-    tokensA = tokens[:imax]
-    tokensB = tokens[imax:]
+
+    # repeat search in reverse order
+    for i in range(len(tokens)+1):
+        kfound = []
+        tokensA = tokens[:i]
+        tokensB = tokens[i:]
+        m.value.clear()
+        m.thing.clear()
+        v  = ReadText(m.value,  tokensA, kfound) #(thing and value are swapped)
+        t  = ReadText(m.thing, tokensB, kfound)
+        c  = ReadText(SO_OP, tokens, kfound)
     
-    kfound = []
-    nar.clearIFound()
-    t  = ReadText(nar.thing,  tokensA, kfound)
-    ifound.extend(kfound)
+        # favors maximum balanced between the t and v
+        if maxab<=(t+1)*(v+1):
+            imax = i
+            maxab = (t+1)*(v+1)   
+            firstPass = False    
+            
+    if firstPass:          
+        tokensA = tokens[:imax]
+        tokensB = tokens[imax:]
+    
+        kfound = []
+        nar.clearIFound()
+        t  = ReadText(nar.thing,  tokensA, kfound)
+        ifound.extend(kfound)
 
-    kfound = []
-    nar.clearIFound()
-    v  = ReadText(nar.value, tokensB, kfound)
-    for i in range(len(kfound)):
-        kfound[i] = kfound[i]+imax
-    ifound.extend(kfound)
-    SO_OP.clear()
-    c  = ReadText(SO_OP, tokens, kfound)
-    ifound.extend(kfound)
+        kfound = []
+        nar.clearIFound()
+        v  = ReadText(nar.value, tokensB, kfound)
+        for i in range(len(kfound)):
+            kfound[i] = kfound[i]+imax
+        ifound.extend(kfound)
+        SO_OP.clear()
+        c  = ReadText(SO_OP, tokens, kfound)
+        ifound.extend(kfound)
 
-    # polarity algorithm. Unfortunately AD HOC  
-    T = nar.thing.polarity
-    V = nar.value.polarity
-    if (T and V) or (not T and not V):
-        nar.polarity = True
+        # polarity algorithm. Unfortunately AD HOC  
+        T = nar.thing.polarity
+        V = nar.value.polarity
+        if (T and V) or (not T and not V):
+            nar.polarity = True
+        else:
+            nar.polarity = False
     else:
-        nar.polarity = False
+        tokensA = tokens[:imax]
+        tokensB = tokens[imax:]
+    
+        kfound = []
+        nar.clearIFound()
+        v  = ReadText(nar.value,  tokensA, kfound)
+        ifound.extend(kfound)
+
+        kfound = []
+        nar.clearIFound()
+        t  = ReadText(nar.thing, tokensB, kfound)
+        for i in range(len(kfound)):
+            kfound[i] = kfound[i]+imax
+        ifound.extend(kfound)
+        SO_OP.clear()
+        c  = ReadText(SO_OP, tokens, kfound)
+        ifound.extend(kfound)
+
+        # polarity algorithm. Unfortunately AD HOC  
+        T = nar.value.polarity
+        V = nar.thing.polarity
+        if (T and V) or (not T and not V):
+            nar.polarity = True
+        else:
+            nar.polarity = False
 
     return t+v+c
 

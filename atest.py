@@ -105,6 +105,7 @@ text8 = "we were unFortunate to have a wedding party staying on our floor."
 textQ = "You cannot go wrong staying at the Dolphin. Great location at a great price. Simple healthy breakfast and friendly helpful staff and free parking. Walk to the wharfs; great seafood and Mexican dining a stroll away and an easy drive to most of the highlights of the city. Only real critiscm is the wifi speed is good enough for surfing the net and e-mail but not for Netflix. Highly recommend; amazing value for $$. "
 
 textU="Fell into bed exhausted but there is a continuing dreadful racket as the central heating starts up ever few minutes"
+textV="there is a continuing dreadful racket as the central heating starts up ever few minutes"
 textA = "Fell into bed exhausted but there is a continuing dreadful racket as the central heating starts up ever few minus and makes a huge noise and whine and there is no switch that works to switch it off."
 textB = "So blissfully quiet my wife was overjoyed (had suffered disturbed sleep in Firenze..whilst I slept like a log)."
 textC = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door - especially late at night and at 6 am when the deliveries started arriving."
@@ -116,8 +117,8 @@ E.clearImplicits()
 
 
 sound = attribute(SOUND,INTENSITY)
-#affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
-affect  = cause( AFFECT, attribute(SOUND,INTENSITY)  )
+affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
+#affect  = cause( AFFECT, attribute(SOUND,INTENSITY)  )
 
 tokens = TOKS(textU)
 ifound = []
@@ -130,6 +131,7 @@ ifound = []
 #ifound = cleanFound(ifound)
 #x = showFound(tokens, ifound)
 #print(x) 
+#RR = NarRecord(affect,ifound, tokens, len(tokens), 0)
 
 #D = ABReader(E,letin)
 #D.readText(text)

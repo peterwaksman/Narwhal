@@ -61,7 +61,7 @@ kTIMEOFDAY += "8 am,8 pm, 9 am, 9 pm, 10 am, 10 pm, 11 am, 11 pm, 12 am, 12 pm"
 
 
 kNOISEWORDS = "street sound, noise, nosie,noise level,rampage,noisy,hear # about,"
-kNOISEWORDS += "heard # of|from|how|great,blaring, loud ,deafening,deafning,racket # club,"
+kNOISEWORDS += "heard # of|from|how|great,racket # club,"
 kNOISEWORDS += "moan ,shout # out, crying,scream,slamming,slammed, barking ,yelling,talking # with|to,"
 kNOISEWORDS += "whistling,snoring,roaring,knocking,swearing,footstep,flush,spoken, word spoken"
 
@@ -132,7 +132,7 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad, dreadful" #people hate to criticize and use understatement
+kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad, dreadful,blaring, loud ,deafening,deafning" #people hate to criticize and use understatement
 loudD = KList("loud", kLOUD)
 kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
 softD = KList("soft", kSOFT)
