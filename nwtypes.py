@@ -178,7 +178,8 @@ class VAR:
                 if found:
                     self.found = True # could have been true already
                     wasFound = True 
-                    # can switch frequently and reflects the last found token
+
+                    # this can switch frequently and reflects the last found token
                     if self.exclusive and ikname>0:
                         self.polarity = False
                     else:
@@ -202,7 +203,7 @@ class VAR:
         # although self.found can be False
         return (wasFound or self.foundInChildren)   
                 
-    ## can modify the .found  or .foundInChildren, or ifound 
+    ## This can modify the .found  or .foundInChildren, or ifound 
     # only use this for controls, or where you do not care about
     # corrupting the VARs in the tree 
     def find(self,tok):
@@ -219,16 +220,9 @@ class VAR:
             return found
 
     ## like findInText() but simply returns true/false and corrupts contents of self
-    def scan( self, originaltokens):
+    def scan( self, tokens):
         self.clear()
-        # ensure lower case
-        tokens = []
-        for tok in originaltokens:
-            if tok==0:
-                tokens.append(0)
-            else:
-                tokens.append(tok.lower())
-            
+       
         # for each token 
         for itok in range( len(tokens) ):
             ikname = 0 
@@ -244,6 +238,7 @@ class VAR:
             foundC = child.scan( tokens )
             if foundC :
                 return True
+        return False
 
     def str(self, ntabs):
         tab = ""

@@ -78,7 +78,7 @@ kPARTYSOURCES += " bar ,hofbrau,piano player,singer,partied,revellers"
 
 kEQUIPMENTSOURCES=" ac , a/c ,air con,air-con,a/c,aircon,air conditioner,air conditioning,"
 kEQUIPMENTSOURCES += "tv,air shaft,drains,hvac,central heating,lift,elevator, fan ,"
-kEQUIPMENTSOURCES += " ice ,ventilation,clanking,clattering,rumbling"
+kEQUIPMENTSOURCES += " ice ,ventilation,equipment,clanking,clattering,rumbling"
 
 kTRAFFICSOURCES="truck,traffic,busy,busy street,shopping, street, main , market , road noise,highway,diesel,"
 kTRAFFICSOURCES+= "road, alley, city , downtown , center, centre , garage , engine , tram,deliveries"

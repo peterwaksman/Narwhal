@@ -146,7 +146,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
     # In the "first pass" we check for the syntax of cause followed by effect:"A so B"
     # In the "second pass" we check for syntax of effect preceeding cause: "B as A"
     # The presense of a SO_OP token can save time, otherwise we check both syntaxes
-    # in two (slow) both passes.
+    # in two (slow) passes.
  
     # maximizes the score over all possible subdivisions into tokensA,tokensB
     imax = 0
@@ -506,6 +506,8 @@ class NWReader:
         for nar in nars:
             self.RD.append( NarReadData(tree, nar) )
 
+        self.topicVar = None # use to pre-scan text for relevance
+
     def setCalibration(self, calibs):
         for i in range( min( len(self.RD), len(calibs) ) ):
             self.RD[i].calib = calibs[i]
@@ -574,14 +576,14 @@ class NWReader:
     # a better way to generalize ABReader, although maybe...
     def rollUpMany( self, records, Threshold, block=False):
         for i in range( len(self.RD) ):
-            RD = self.RD[i]
-            RD.V.rollUp( records[i], Threshold, block)
+            rd = self.RD[i]
+            rd.V.rollUp( records[i], Threshold, block)
 
     def rollUpAndVaultMany( self, records, Threshold, block=False):
         for i in range( len(self.RD) ):
-            RD = self.RD[i]
-            RD.V.rollUp( records[i], Threshold, block)
-            self.RD[i].V.vault()
+            rd = self.RD[i]
+            rd.V.rollUp( records[i], Threshold, block)
+            rd.V.vault()
             
     def rollUpCanVaultMany(self, records, Threshold, block=False):
         for i in range( len(self.RD) ):
