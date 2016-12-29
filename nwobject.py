@@ -5,7 +5,7 @@ from nwvault import *
 from nwread import *
 
 
-MIXED_POLARITY=0
+MIXED_POLARITY=5
 UNDEFINED_POLARITY=10
 POSITIVE_POLARITY=1
 NEGATIVE_POLARITY=-1
@@ -110,11 +110,13 @@ class NWObject:
                 polarity = self.finalPolarity[n] # first "defined" polarity
         
             if polarity != self.finalPolarity[n]:# look for conflicts
-                self.totalPolarity = MIXED_POLARITY
+                polarity = MIXED_POLARITY
                 break
             
         if polarity==UNDEFINED_POLARITY:
-            self.totalPolarity = UNDEFINED_POLARITY          
+            self.totalPolarity = UNDEFINED_POLARITY     
+        elif polarity==MIXED_POLARITY:
+            self.totalPolarity = MIXED_POLARITY     
         elif polarity==True:
             self.totalPolarity = POSITIVE_POLARITY
         elif polarity==False:

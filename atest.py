@@ -39,7 +39,7 @@ NoiseText = "We did find it a bit noisy with the balcony doors open due "
 NoiseText += "to the McDonalds next door - especially late at night and at 6 am "
 NoiseText += "when the deliveries started arriving."
 
-#E = EXPERIENCE
+E = EXPERIENCE
 
 #r = attribute( LOC, SOURCE, PROX )
 
@@ -109,6 +109,8 @@ textB = "So blissfully quiet my wife was overjoyed (had suffered disturbed sleep
 textC = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door - especially late at night and at 6 am when the deliveries started arriving."
 textD = "window open at night and found the ventilation equipment a bit noisy."
 textE = "The street outside was a busy one with a popular wine bar so a little noisy with the windows open"
+textG = "The only downfall of our stay was there was a city work crew running extremely loud machinery (like cutting concrete) for almost 2 straight hours between the hours of 5:00am and 7:00am this was obviously beyond the control of the hotel staff, but nonetheless extremely disappointing for us as we were abruptly woken up and then unable to go back to sleep on our relaxing getaway. "
+
 #E.clearImplicits()
 #prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
 #letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
@@ -119,29 +121,27 @@ textE = "The street outside was a busy one with a popular wine bar so a little n
 #affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
 #letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
  
-#tokens = TOKS(textD)
-#ifound = []
+tokens = TOKS(textG)
+ifound = []
 
-#E.clear()
-#x = E.findInText(tokens)
-#r = histo(E.ifound, len(tokens))
+E.clear()
 
-#x = ReadText(letin,tokens,ifound)  # CAUTION: no PrepareTokens() 
+#x = ReadText(affect,tokens,ifound)  # CAUTION: no PrepareTokens() 
 #ifound = cleanFound(ifound)
 #x = showFound(tokens, ifound)
 #print(x) 
-#RR = NarRecord(letin,ifound, tokens, len(tokens), 0)
+#RR = NarRecord(affect,ifound, tokens, len(tokens), 0)
 
 #D = ABReader(E,letin)
 #D.readText(text)
 #x = 2
 
  
-#E = EXPERIENCE
-#R = [sound] #[ r , s , cause(r,s)] 
+ 
+#R = [affect] #[ r , s , cause(r,s)] 
 #K = NWReader(E, R  )
 
-#K.readText(textE)
+#K.readText(textG)
 #out = K.report()
 #print( out ) 
 #x = 2
@@ -166,7 +166,7 @@ spoken was heard through the walls and to top it all off we were unFortunate to 
 
 N = NoiseApp()
 #N.testFile("One.txt")
-N.test(text5)
+N.test(NoiseText)
 
 
 

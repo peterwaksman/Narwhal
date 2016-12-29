@@ -49,7 +49,7 @@ RESPONSIVE += "accomodat,worked hard,welcoming"
 
 kSLEEPPOSITIVES = "undisrupted,undisturb,sleep, rest # of ,exhausted"
 
-kSLEEPNEGATIVES = "wake # up,awake,woke,awoke,waken,woken, disturb, disrupt,stirred,bother,sleepless"
+kSLEEPNEGATIVES = "wake # up,awake,woke,awoke,unable to,unable to go back to,waken,woken, disturb, disrupt,stirred,bother,sleepless"
 
 kTIMEOFDAY = " am ,pm ,all night, nights ,throughout the night,early, late ,all hours,"
 kTIMEOFDAY += "morning,each morning,half the night,at night,middle of the night,every night,"
@@ -123,7 +123,7 @@ UNPROFFESIONAL += "not experienced,inexperienced,over enthusiastic,failed,refuse
 kEXPERIENCE = "experience,we found,I found,we did find"
 experienceD = KList("experience", kEXPERIENCE)  
 
-kPROBLEM = "problem,issue,drawback,not for you"
+kPROBLEM = "problem,issue,drawback,not for you,unfortunate,disappoint"
 problemD = KList("problem", kPROBLEM)
 
 kSOUND = "sound"
