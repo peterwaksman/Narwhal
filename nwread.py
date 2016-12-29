@@ -473,7 +473,7 @@ class ABReader:
             V.nblocks = 0 
             nar.clearPolarity()
 
-        elif CTRL.isA("PERIOD"):
+        elif CTRL.isA("PERIOD") or CTRL.isA("EXCLAIM") or CTRL.isA("DASH"):
             rOK = V.rollUp(record, 0.1)
             if rOK:
                 V.vault()
@@ -696,7 +696,7 @@ class NWReader:
             self.rollUpCanVaultMany( records, 0.5)
             self.removeAllBlocksMany()
 
-        elif CTRL.isA("PERIOD"):
+        elif CTRL.isA("PERIOD") or CTRL.isA("EXCLAIM") or CTRL.isA("DASH"):
             self.rollUpCanVaultMany(records, 0.1)
             self.removeAllBlocksMany()      
                
@@ -704,9 +704,9 @@ class NWReader:
 
         else :
             print( "did not apply contol: "+ CTRL.knames[0] )
+            self.clearIFoundMany()
             return istart+ max(1, len(CD.ctrl.ifound))
         self.clearIFoundMany()
-
             
         istart = self.newStart(CD)
             

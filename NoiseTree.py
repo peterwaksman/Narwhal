@@ -74,7 +74,7 @@ kPEOPLESOURCES += "shower,couples,neighbors,dogs,hustle,bustle,squeak,"
 
 
 kPARTYSOURCES="stadium,party,function,wedding,drunk,club,mcdonalds,music,"
-kPARTYSOURCES += " bar ,hofbrau,piano player,singer,partied,revellers"
+kPARTYSOURCES += " bar ,wine bar,hofbrau,piano player,singer,partied,revellers"
 
 kEQUIPMENTSOURCES=" ac , a/c ,air con,air-con,a/c,aircon,air conditioner,air conditioning,"
 kEQUIPMENTSOURCES += "tv,air shaft,drains,hvac,central heating,lift,elevator, fan ,"
@@ -132,7 +132,7 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "very noisy,loud,very loud, a bit of, a bit,bad, dreadful, loud ,deafening,deafning" #people hate to criticize and use understatement
+kLOUD = "very noisy,loud,very loud, a bit of, a bit,a little,bad, dreadful, loud ,deafening,deafning" #people hate to criticize and use understatement
 loudD = KList("loud", kLOUD)
 kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
 softD = KList("soft", kSOFT)
@@ -155,7 +155,7 @@ hotelD = KList("hotel", kNOISELOCSHOTEL)
  
 
 
-kNEAR = "nowhere $ near , near to ,in the heart of, over , on the ,on our,being on, right on ,overlooked,overlooks, close to,next door"
+kNEAR = "nowhere $ near , near to ,in the heart of, over ,outside,next to, on the ,on our,being on,across from, right on ,overlooked,overlooks, close to,next door,faced"
 nearD = KList("near", kNEAR)
 kFAR  = " far , far from,farthest from, away from,nowhere near"
 farD = KList("far",kFAR)

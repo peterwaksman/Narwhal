@@ -32,6 +32,7 @@ class NoiseApp:
         nars      = [ problem, sound, affect, proximity, letin]
         calibs    = [ True,    True,  True,   True,      True ]     
         thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
+#        thresholds= [ 0.3,     0.3,   0.3,    0.3,  0.3       ]
  
         self.object = NWObject(EXPERIENCE, nars, calibs, thresholds) 
 
@@ -57,9 +58,12 @@ class NoiseApp:
         s = "START"
         while len(s)>0 :
             s = fin.readline()
-            if s=="\n":
+ #           if s=="\n" or len(s)<1 or s=='\n':
+            if not s.strip():
                 continue
             self.object.readText(s)
+            fout.write(s)
+            fout.write("A:")
             h = self.object.printFinal()+"\n"
             fout.write(h)
             print( s )

@@ -10,23 +10,21 @@ from NoiseApp import *
 
 
 
-n = attribute( PROBLEM, SOUND )
+#n = attribute( PROBLEM, SOUND )
  
 
 
-q = attribute( BARRIER, INSULATION)
+#q = attribute( BARRIER, INSULATION)
 
-a = cause( attribute( NOISE, [TOD] ), AFFECT )
+#n = attribute( BARRIER, STATE)
+#m = event( BARRIER, NOISE, LETINOUT )
+#m2 = event( n, NOISE, LETINOUT )
 
-n = attribute( BARRIER, STATE)
-m = event( BARRIER, NOISE, LETINOUT )
-m2 = event( n, NOISE, LETINOUT )
+#sext = "even though there was a wind"
+#sokens = TOKS(sext)
+#x = isLogicControl(sokens,0)
 
-sext = "even though there was a wind"
-sokens = TOKS(sext)
-x = isLogicControl(sokens,0)
-
-j=2
+#j=2
 # "open windows let in the noise"
 # "the walls were thin and noise carries"
 
@@ -41,22 +39,22 @@ NoiseText = "We did find it a bit noisy with the balcony doors open due "
 NoiseText += "to the McDonalds next door - especially late at night and at 6 am "
 NoiseText += "when the deliveries started arriving."
 
-E = EXPERIENCE
+#E = EXPERIENCE
 
-r = attribute( LOC, SOURCE, PROX )
+#r = attribute( LOC, SOURCE, PROX )
 
-#A = NWReader(E,r)
-#A.readText("The hotel was near the border and far from downtown")
+##A = NWReader(E,r)
+##A.readText("The hotel was near the border and far from downtown")
  
-I = INTENSITY
-s = attribute( SOUND, I)
+#I = INTENSITY
+#s = attribute( SOUND, I)
 
 
-s = attribute( SOUND, [attribute(SOURCE, [attribute(INTENSITY,[TOD])] )] )
+#s = attribute( SOUND, [attribute(SOURCE, [attribute(INTENSITY,[TOD])] )] )
 
 
 #c = sequence(r,s)
-c = cause(r,s)
+#c = cause(r,s)
 #c=r
  
 
@@ -110,18 +108,19 @@ textA = "Fell into bed exhausted but there is a continuing dreadful racket as th
 textB = "So blissfully quiet my wife was overjoyed (had suffered disturbed sleep in Firenze..whilst I slept like a log)."
 textC = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door - especially late at night and at 6 am when the deliveries started arriving."
 textD = "window open at night and found the ventilation equipment a bit noisy."
-E.clearImplicits()
+textE = "The street outside was a busy one with a popular wine bar so a little noisy with the windows open"
+#E.clearImplicits()
 #prox = attribute( LOC, attribute(SOURCE, [NOISE]), PROX)  
 #letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
 #problem = attribute( PROBLEM, SOUND )
 
 
-sound = attribute(SOUND,INTENSITY)
-affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
-letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
+#sound = attribute(SOUND,INTENSITY)
+#affect  = cause( attribute(SOUND,INTENSITY), AFFECT )
+#letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
  
-tokens = TOKS(textD)
-ifound = []
+#tokens = TOKS(textD)
+#ifound = []
 
 #E.clear()
 #x = E.findInText(tokens)
@@ -138,15 +137,14 @@ ifound = []
 #x = 2
 
  
+#E = EXPERIENCE
+#R = [sound] #[ r , s , cause(r,s)] 
+#K = NWReader(E, R  )
 
-R = [letin] #[ r , s , cause(r,s)] 
-K = NWReader(E, R  )
-
-K.topicVar = SOUND
-K.readText(textD)
-out = K.report()
-print( out ) 
-x = 2
+#K.readText(textE)
+#out = K.report()
+#print( out ) 
+#x = 2
 
 #thresholds = [0.3 , 0.3, 0.3 ]
 #O = NWObject(E, R, calibs, thresholds)
@@ -166,9 +164,10 @@ spoken was heard through the walls and to top it all off we were unFortunate to 
 #spoken was heard through the walls "  
 ##text7 = "word spoken was heard through the walls"
 
-#N = NoiseApp()
+N = NoiseApp()
+#N.testFile("One.txt")
+N.test(text5)
 
-#N.testFile("Ones.txt")
 
 
 #x = 2
