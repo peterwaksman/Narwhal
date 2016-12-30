@@ -506,7 +506,7 @@ class NWReader:
         for nar in nars:
             self.RD.append( NarReadData(tree, nar) )
 
-        self.topicVar = None # use to pre-scan text for relevance
+        self.topicVar = None # (will) use to pre-scan text for relevance
 
     def setCalibration(self, calibs):
         for i in range( min( len(self.RD), len(calibs) ) ):
