@@ -1,0 +1,91 @@
+Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWReader. 
+
+You initialize a narwhal class with: 
+ - a collection of **keyword lists** (each list defines a "variable") 
+ - a collection of **narrative patterns** (each one is a "formula" defining a relation between the variables)
+
+
+The syntax is: 
+
+	N = NWReader( variables, formulas )
+
+To read, the syntax is: 
+
+	N.readText(text)                      
+
+After a read, the class N will contain a "vault" of records of how the narratives were found in the text, along with a "goodnesss of fit" score between narratives and text. You can act on these records or summarize them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were discovered by examining examples manually or through machine learning, these read operations will be completely transparent and tune-able.] 
+ 
+
+Example: fruit quality
+----------------------
+----------------
+CREATE VARIABLES
+----------------
+Start by creating keyword lists (you will add more words later)
+
+	kGOOD = {good, great, wonderful, high quality}
+	kBAD  = {bad, terrible, sucks, low quality}
+
+	kFRUIT = {fruit}
+	kAPPLE = {apple, macintosh, granny smith, gala} 
+	kORANGE= {orange}
+
+
+Create variables from these lists:
+
+	GOOD = kGOOD.var()
+	BAD = kBAD.var()
+	QUALITY = (GOOD | BAD) # create an 'exclusive' variable
+
+	APPLE = kAPPLE.var()
+	ORANGE = kORANGE.var()
+	FRUIT = kFRUIT.var()   # create one variable with its own word list and 2 children
+ 
+
+Organize into a tree by grouping, as follows:
+
+	FRUIT.sub(APPLE)
+	FRUIT.sub(ORANGE)       
+
+	FRUITQ = kFRUITQ.var()
+	FRUITQ.sub(FRUIT)
+	FRUITQ.sub(QUALITY)
+
+
+This creates a tree with keyword lists for nodes and structure like this:
+
+	FRUITQ()
+	    FRUIT()
+                APPLE()
+                ORANGE()
+            QUALITY(GOOD|BAD)
+		
+-----------------
+CREATE NARRATIVES
+-----------------
+The simplest narrative is 'thing has attribute". In this case:
+
+	fruitqual = attribute(FRUIT,QUALITY)
+
+		
+------------------------ 
+CREATE A NARRWHAL READER
+------------------------ 
+You can write:
+
+	R = NWReader( FRUITQ, [fruitqual])
+
+Then read sentences of 'text' and fill one vault in NWReader using:
+
+	R.readText(text)
+
+To reverse the polarity of the output use
+
+	R.setCalibration([True])
+ 
+
+If you have two narratives defined using variables from the same tree you use syntaxes like:
+	
+	R = NWReader( FRUITQ, [nar1, nar2])
+	R.setCalibration( [True, True] )
+	R.readText(text) 
