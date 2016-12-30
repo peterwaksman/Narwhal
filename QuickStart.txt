@@ -84,8 +84,4 @@ To reverse the polarity of the output use
 	R.setCalibration([True])
  
 
-If you have two narratives defined using variables from the same tree you use syntaxes like:
-	
-	R = NWReader( FRUITQ, [nar1, nar2])
-	R.setCalibration( [True, True] )
-	R.readText(text) 
+For more complicated examples see "atest.py" and "NoiseApp.py".
