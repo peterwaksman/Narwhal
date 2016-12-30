@@ -13,7 +13,11 @@ To read, the syntax is:
 
 	N.readText(text)                      
 
-After a read, the class N will contain a "vault" of records of how the narratives were found in the text, along with a "goodnesss of fit" score between narratives and text. You can act on these records or summarize them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were discovered by examining examples manually or through machine learning, these read operations will be completely transparent and tune-able.] 
+After a read, the class N will contain a "vault" of records of how the narratives were found in the text, 
+along with a "goodnesss of fit" score between narratives and text. You can act on these records or summarize 
+them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were discovered by 
+examining examples manually or through machine learning, these read operations will be completely transparent
+and tune-able.] 
  
 
 Example: fruit quality
@@ -69,7 +73,7 @@ The simplest narrative is 'thing has attribute". In this case:
 
 		
 ------------------------ 
-CREATE A NARRWHAL READER
+CREATE A NARWHAL READER
 ------------------------ 
 You can write:
 
