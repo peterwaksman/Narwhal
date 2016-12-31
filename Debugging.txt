@@ -1,0 +1,41 @@
+I know I will forget everthing soon enough. I already am vague about some of the details of the NarReadData and which responsibities go with which piece of sub data. Anyway, some tips for debugging.
+
+Here are things I frequently do:
+
+	tokens = TOKS(text)
+When I am wondering about a single VAR 'v' and how it is/is not working, I call 
+	
+	v.findInText(tokens) # step in here
+	print showFound(tokens, v.ifound)
+
+There are some v.Print( ) methods to use to see the whole tree underneath a VAR.	
+
+When I am wondering about a single NAR 'n' and how it is/is not working, I call
+	ifound = []
+	x = ReadText(n,tokens,ifound)   # step in here
+	ifound = cleanFound(ifound)
+	x = showFound(tokens, ifound)
+	print(x) 
+	RR = NarRecord(n,ifound, tokens, len(tokens), 0)
+
+Consider calling nar.str(). It shows the slots of the nar and sub-nars, with 'used' indicators in the form of '*'. 
+
+When stepping into ReadText() you have your work cut out for you in the different ReadTextAs...() methods and the recursive nature of the code. I sometimes am in the ReadTextAsCausal() in the text splitting code, trying to see why the answer is as it is. And then why the polartity algorithm is working or not [I hope it is now!].
+
+It is important to understand that this is limited because ReadText( ) reads an an entire block of text without control separators. Also it has no token preparation for things like punctuation.
+
+--------------------------------------------------------------
+Things start to get more complicated with the ABReader and its array version the NWReader. These readers scan the text for the next control (like "and", "not", or ".") and feed those sections into a reader that fills a nar (or several) progressively, while evaluating 'found' token indices for goodness-of-fit in each section. 
+
+Here the readText() method is central and I put a breakpoint at the line:
+
+	istart = self.applyControl(CD, istart, len(subtoks) )
+
+At this place, we are reading through sections of text between istart and CD.ictrl. In the previous line we did a readMany() and have just changed nar's and ifound's in each NarReadData. Now, if we step into applyControl(), we enter a space cleanly divided into different nightmares. Each one involves deciding how to update things for this control. This is some of the most difficult code and relates to what information in the NarReadData needs to be cleared and re-used in the next section of text reading, and which information gets rolled over and added to, without being cleared. I have tried to keep the ABReader up to date and this may be easier to use.
+
+The theory is that the slots of a nar are filled progressively, while the 'found' token indices are reset within each section of text between controls. Part of clearing is the "contract" of not clearing the nar's 'used' slots until they have had a chance to be converted to a NarRecord and vaulted. That should happen on a period '.' or and end of text.
+
+
+
+
+
