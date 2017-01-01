@@ -516,6 +516,9 @@ class NWReader:
     def prepareTokens(self, text): 
             # encode punctuations  
         text = replacePunctuation(text)    
+
+            # one of several future cleanups
+        text = cleanAMPM(text)
             
              # lower case tokens 
         tokens = text.split(' ')

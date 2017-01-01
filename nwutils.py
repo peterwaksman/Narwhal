@@ -231,6 +231,33 @@ def shiftFoundIndices(ifound, shift):
     cleanFound(ifound)
     return ifound
      
+def cleanAMPM(text):
+    L = len(text)
+    newtext = ""
+    i = 0
+    while i < L:
+        c = text[i]
+        if c=='I' and i<L-3: # test for "I am"
+            newtext += "I_am" 
+            i += 4
+        elif c.isdigit() and i<L-2:
+            d = text[i+1]
+            e = text[i+2]
+           
+            if d.lower()=='a' and e.lower()=='m':
+                newtext += c + ' ' + 'a' + 'm' 
+                i += 3
+            elif  d.lower()=='p' and e.lower()=='m':
+                newtext += c + ' ' + 'p' + 'm' 
+                i += 3
+            else:
+                newtext += c
+                i +=1
+        else:
+            newtext += c
+            i +=1
 
+    return newtext
+    
      
 

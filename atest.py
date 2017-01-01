@@ -10,6 +10,10 @@ from nwobject import *
 from NoiseTree import *
 from NoiseApp import *
 
+text="2 straight hours between the hours of 5:00am and 7:00am and I am a very light sleeper"
+newtext = cleanAMPM(text)
+
+
 #------------ this 'constant' is the root of the NoiseTree
 E = EXPERIENCE 
 
