@@ -237,7 +237,7 @@ def cleanAMPM(text):
     i = 0
     while i < L:
         c = text[i]
-        if c=='I' and i<L-3: # test for "I am"
+        if c=='I' and i<L-3 and text[i+1]==' ' and text[i+2]=='a' and text[i+3]=='m': # test for "I am"
             newtext += "I_am" 
             i += 4
         elif c.isdigit() and i<L-2:
