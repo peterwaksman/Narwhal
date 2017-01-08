@@ -203,7 +203,14 @@ def _findInText( klist, tokens, itok, ifound ):
 
 ###############################################################      
 ###############################################################     
-
+def _detectInText( klist, tokens, itok):  
+    for kword in klist.list:
+        # look for this kword at itok position in tokens
+        # and return with ifound storing itok and any  
+        # adjacent indices used during the matching
+        if matchTOK(kword, itok, ifound, tokens):
+            return True
+    return False
 
 
     

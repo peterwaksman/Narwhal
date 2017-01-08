@@ -25,6 +25,9 @@ class KList:
                 # This method returns True or False
     def findInText(self, tokens, itok, ifound):
          return nwfind._findInText(self, tokens, itok, ifound)
+
+    def detectInText(self,tokens,itok):
+        return nwfind._detectInText(self, tokens, itok)
     
 NULL_KLIST = KList("nullK","")
 
@@ -219,6 +222,22 @@ class VAR:
             self.ifound = ifound[:] # restore
             return found
 
+                   # loops through text for every kname.
+    def detectInText( self, tokens):
+        # assume lower case
+        for itok in range( len(tokens) ):
+            for kname in self.knames: # for each name in self's klist       
+                klist = KList.instances[ kname ]               
+                found = klist.findInText(tokens, itok, self.ifound) 
+                if found:
+                    return True
+        for child in self.children:
+            if child.detectInText( tokens ):
+                return True
+        
+        return False 
+
+    ## DEPRECATED
     ## like findInText() but simply returns true/false and corrupts contents of self
     def scan( self, tokens):
         self.clear()

@@ -375,7 +375,7 @@ class ABReader:
          
          # look for control data.  
         istart = 0       
-        CD  = scanNextControl(tokens, istart)
+        CD  = scanNextControl0(tokens, istart)
 
         while CD.type != END_CTRLTYPE :
               
@@ -506,7 +506,7 @@ class NWReader:
         for nar in nars:
             self.RD.append( NarReadData(tree, nar) )
 
-        self.topicVar = None # (will) use to pre-scan text for relevance
+        self.topicVAR = tree # scratchpad to pre-scan text for relevance
 
     def setCalibration(self, calibs):
         for i in range( min( len(self.RD), len(calibs) ) ):
@@ -632,16 +632,23 @@ class NWReader:
          
          # look for control data.  
         istart = 0       
-        CD  = scanNextControl(tokens, istart)
 
-        while CD.type != END_CTRLTYPE :              
+        CD = scanNextControl(self.topicVAR, tokens,istart)
+
+        while CD.type != END_CTRLTYPE :  
+
+            if CD.type==SKIP_CTRLTYPE: # no topic words found in this segment to text
+                istart = self.newStart(CD)
+                CD = scanNextControl(self.topicVAR, tokens, istart)
+                continue
+                        
             subtoks = tokens[istart : CD.ictrl]  
 
             self.readMany( subtoks, istart )
 
             istart = self.applyControl(CD, istart, len(subtoks) )
 
-            CD = scanNextControl(tokens, istart)
+            CD = scanNextControl(self.topicVAR, tokens, istart)
         
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]

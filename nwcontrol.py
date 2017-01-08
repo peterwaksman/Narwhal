@@ -355,6 +355,7 @@ NO_CTRLTYPE          = 0
 PUNCTUATION_CTRLTYPE = 1 
 OPERATOR_CTRLTYPE    = 2   
 END_CTRLTYPE         = 3
+SKIP_CTRLTYPE         = 4
 
 class ControlData:
     def __init__(self):
@@ -370,7 +371,7 @@ class ControlData:
 
 # return with ictrl either the index of the control or
 # L=len(tokens). Generally read up to <ictrl
-def scanNextControl(tokens, istart):
+def scanNextControl0(tokens, istart):
     CD = ControlData()
     L = len(tokens);
     if istart>L-1:
@@ -388,4 +389,14 @@ def scanNextControl(tokens, istart):
             return CD
 
     CD.set(END_CTRLTYPE, NULL_VAR, L)
+    return CD
+
+def scanNextControl(vtopic, tokens, istart):
+    CD = scanNextControl0(tokens,istart)
+    if CD.type==END_CTRLTYPE :
+        return CD
+    vtopic.clear()
+    if not vtopic.detectInText(tokens):
+        CD.type = SKIP_CTRLTYPE
+
     return CD

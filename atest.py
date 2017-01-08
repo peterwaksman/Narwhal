@@ -140,8 +140,9 @@ text7 = "word spoken was heard through the walls"
 #--- setup
 #R = #[ r , s , cause(r,s)] 
 #calibs = [true, true, true]
-#R.setCalibration(calibs)
+
 #K = NWReader(E, R  )   # this is the central reading capability
+#K.setCalibration(calibs)
 
 #--- read
 #K.readText(textG)
@@ -163,8 +164,11 @@ text7 = "word spoken was heard through the walls"
 
 #-------------- test a final application
 N = NoiseApp()
-N.test(NoiseText)      # on a single sentence
-N.testFile("Ones.txt") # on a file of sentences, for batch testing.
+text = "And I think they have what has to be the quietest HVAC system I've never heard."
+#text = "was compensated for by an excellent ample breakfast and by the good service"
+#N.test(text)
+N.test(text)      # on a single sentence
+#N.testFile("Ones.txt") # on a file of sentences, for batch testing.
 
 
 
