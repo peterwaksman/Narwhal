@@ -1,0 +1,5 @@
+Version 1.0 of Narwhal is Complete as of Jan 2016. 
+
+IT HAS SEVER PERFORMANCE PROBLEMS. I am redesigning it to replace reading of text with conversion of text to "segmented indexing" and reading of the segmented data. That way only one time through the dictionaries will be needed.
+
+Stay tuned as we try to see what kind of "release label" I can apply here on GitHub.
