@@ -8,6 +8,7 @@ DEBUG_TXT = ""
 # K(ey word)Lists are initialized with comma-separated strings
 # thanks to Stack Exchange for idea of making it into a factory 
 # and repository
+# they have no "state".
 class KList:
     instances={}
     def __init__(self, name, inString):
@@ -34,7 +35,7 @@ NULL_KLIST = KList("nullK","")
 # design pattern is a bit strange: relatively concrete containers are used
 # to generate more abstract ones that wrap them.
 
- # VARS are lists of keyword lists (actually just the names of keyword lists)
+# VARS are lists of keyword lists (actually just the names of keyword lists)
 # with an attribute of "exclusive" if an input word can match just one
 # of the KLists. If not "exclusive", an input word can match any KList
 
@@ -54,7 +55,7 @@ class VAR:
 
         # FOR READING:
         self.found = False 
-            # to storeindices of tokens in text, with matches words of self's KLists.
+            # to store indices of tokens in text, with matches words of self's KLists.
         self.ifound= []   
             # to record what happened in the children
         self.foundInChildren = False
@@ -76,12 +77,7 @@ class VAR:
         for child in self.children:
             child.makeExplicit()
 
-    #def refreshImplicits(self, parentWasImplicit):
-    #    if parentWasImplicit or self.explicit==False:
-    #        self.makeImplicit()
-    #        for child in self.children:
-    #            child.refreshImplicit(True)    
-    
+       
     def clearImplicits(self):
         self.explicit = True
         for child in self.children:
@@ -104,6 +100,10 @@ class VAR:
         for child in self.children:
             child.clearIFound()
     
+    def numIFound(self):
+        self.ifound = cleanFound(self.ifound)
+        return len(self.ifound)
+       
 
     def clearPolarity(self):
         self.polarity = True
@@ -158,7 +158,12 @@ class VAR:
             if x!=NULL_VAR:      
                 return x
         return NULL_VAR          
-    
+   
+        # typically a "var<=nar" means the var is a slot or a child of a slot 
+    def __le__(self,other):
+        return recursiveLE(self,other)
+       
+
                     # loops through text for every kname.
     def findInText( self, originaltokens):
         # ensure lower case
@@ -635,6 +640,27 @@ class NAR:
             n += self.value.numSlotsActive()
             return n
           
+    def getIFound(self):
+        if self==NULL_VAR:
+            return []
+
+        # ifound in one slot
+        if isinstance(self,VAR):
+            return self.ifound[:]
+
+        # ifound in several in the different slots
+        all = []
+        all.extend(self.thing.ifound)
+        all.extend(self.action.ifound)
+        all.extend(self.value.ifound)
+        all.extend(self.relation.ifound)
+        # consolidate them and count
+        all = cleanFound(all)
+        return all
+
+    def numIFound(self):
+        return len( self.getIFound() )
+     
     def getType(nar):
         thing    = nar.thing
         action   = nar.action

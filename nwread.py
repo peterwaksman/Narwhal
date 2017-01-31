@@ -3,6 +3,27 @@ from nwtypes import *
 from nwcontrol import *
 from nwvault import *
 
+# this global should be used rather than class method versions
+def prepareTokens( text): 
+        # encode punctuations  
+    text = replacePunctuation(text)    
+
+        # one of several future cleanups
+    text = cleanAMPM(text)
+            
+            # lower case tokens 
+    tokens = text.split(' ')
+    newtokens = []
+    for tok in tokens: 
+        if len(tok)>0:
+            newtokens.append(tok)
+
+    for i in range( len(newtokens)):
+        tok = newtokens[i].lower()
+        newtokens[i] = tok 
+
+    return newtokens
+
 # works with indexing relative to subtoks
 def PlainRead( nar, subtoks):
     jfound = []
@@ -244,7 +265,7 @@ def ReadTextAsCausal(nar, tokens, ifound):
 
 def ReadTextAsSequential(nar, tokens, ifound):
     if nar.action != NAR_THEN: 
-        return False
+        return 0
     
     imax = 0
     maxab = -1
@@ -391,10 +412,10 @@ class ABReader:
 
             #### negate forward or backward, propose and vault, as needed 
             #### and (ifound should be ignored before istart)
-            istart = self.applyControl(CD, istart, len(subtoks) )
+            istart = self.applyControl(CD, istart )
 
             #### next control 
-            CD = scanNextControl(tokens, istart)
+            CD = scanNextControl0(tokens, istart)
         
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]
@@ -402,14 +423,14 @@ class ABReader:
         jfound = shiftFoundIndices(jfound, istart )
         ifound.extend(jfound)
         self.ifound = ifound[:]
-        self.applyControl( CD, istart, len(subtoks))
+        self.applyControl( CD, istart)
 
 
     ############################################
     ########### APPLY CONTROL ##################
     ############################################
     # return an updated istart
-    def applyControl( self, CD, istart, subrange) :
+    def applyControl( self, CD, istart) :
         if CD.type==NO_CTRLTYPE :
             return istart
 
@@ -633,7 +654,7 @@ class NWReader:
          # look for control data.  
         istart = 0       
 
-        CD = scanNextControl(self.topicVAR, tokens,istart)
+        CD = scanNextControl(self.topicVAR, tokens, istart)
 
         while CD.type != END_CTRLTYPE :  
 
@@ -646,21 +667,21 @@ class NWReader:
 
             self.readMany( subtoks, istart )
 
-            istart = self.applyControl(CD, istart, len(subtoks) )
+            istart = self.applyControl(CD, istart )
 
             CD = scanNextControl(self.topicVAR, tokens, istart)
         
         # now CD should be of END_CTRLTYPE
         subtoks= tokens[istart : len(tokens)]
         self.readMany(subtoks, istart )
-        self.applyControl( CD, istart, len(subtoks))
+        self.applyControl( CD, istart )
 
 
         ################################################# 
         ########### APPLY CONTROL ####################### 
         ################################################# 
         # return an updated istart
-    def applyControl( self, CD, istart, subrange) :
+    def applyControl( self, CD, istart) :
         if CD.type==NO_CTRLTYPE :
             return istart
 

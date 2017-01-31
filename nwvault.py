@@ -66,28 +66,15 @@ class NarRecord:
         r = histo( jfound, L )
         f = getFoundRange(jfound,L) # same as len(snippet)
 
-        # Deprecated:
-        # count controls in ALL subtok from istart to ictrl
-        # that have not already been discounted.
-        ur = countUnreadControls(tokens, self.ifound, self.ictrl, istart)
-        subrange = self.ictrl - istart 
-        # (this H counts words and controls over the entire range of text)
-        H = min(r+ur, subrange)  
-
-
         u = self.nused # a snapshot of state when the NarRecord is created
-        n = self.nslots 
+        n = self.nslots
         av = self.nactive
-        n = av # deploy the 'implicits'
-        n = max(n,2)  # but de-emphasize single-VAR narratives
+        n = av         # deploy the 'implicits'
+        n = max(n,2)   # but de-emphasize single-VAR narratives
 
         if f==0 or n==0:
             G = 0
         else:
-            #a = float(u)/float(n) 
-            #b = float(r)/float(f)
-            #c = float(H)/float( subrange )
-            #G = a*b*c
             a = float(u)/float(max(n,2)) # de-emphasize 1-word matches, for one slot narratives
             b = float(r)/float(f)         
             G = a*b 

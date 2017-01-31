@@ -10,7 +10,7 @@
 ##    HOTEL( hotelD )
 ##    PROX( nearD | farD )
 ##  INSULATION()
-##    MATERIAL( windowD + wallD )
+##    BARRIER( windowD + wallD )
 ##    STATE( openD | closedD )
 ##    TRANSPARENCY( letInD | keepOutD )
 ##  TOD( timeofdayD )
@@ -91,7 +91,7 @@ kOASISSOURCES="ocean"
 kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
 kNOISELOCSROOM+="my door,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
-kNOISELOCSROOM+="bathroom,walls"
+kNOISELOCSROOM+="bathroom"
 
 kNOISELOCSHOTEL="hotel, high $ floor,building,area, section,location,quiet hotel,"
 kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool"
@@ -166,7 +166,9 @@ insulationD = KList("insul", kINSULATION)
 
 kWINDOW = " window, balcony "
 windowD = KList("window", kWINDOW)
-kWALL = "wall,my|next $ door,floor"
+
+ 
+kWALL = "walls,my|next $ door,floor"
 wallD = KList("wall", kWALL)
 
 kOPEN = "open, thin , paper thin"

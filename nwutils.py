@@ -109,18 +109,19 @@ def getMinMax(ifound, thresh, mlo, mhi ):
 def minITOK(ifound):
     if len(ifound)==0:
         return -1
-
     imin = 1000000
-    for j in range(len(ifound)):
-        if imin>ifound[j]:
-            imin = ifound[j]
+    for i in ifound:
+        if imin>i:
+            imin = i
     return imin
 
 def maxITOK(ifound):
+    if len(ifound)==0:
+        return -1
     imax = 0
-    for j in range(len(ifound)):
-        if imax<ifound[j]:
-            imax = ifound[j]
+    for i in ifound:
+        if imax<i:
+            imax = i
     return imax
 
 def getFoundRange(ifound, ithresh):
@@ -260,4 +261,31 @@ def cleanAMPM(text):
     return newtext
     
      
+def prepareTokens( text): 
+        # encode punctuations  
+    text = replacePunctuation(text)    
 
+        # one of several future cleanups
+    text = cleanAMPM(text)
+            
+            # lower case tokens 
+    tokens = text.split(' ')
+    newtokens = []
+    for tok in tokens: 
+        if len(tok)>0:
+            newtokens.append(tok)
+
+    for i in range( len(newtokens)):
+        tok = newtokens[i].lower()
+        newtokens[i] = tok 
+
+    return newtokens
+
+# I was not able to use a recursive definition inside the VAR.__le__() 
+def recursiveLE(self,other):
+        if self.knames==other.knames:
+            return True
+        for child in other.children:
+            if recursiveLE(self,child):
+                return True
+        return False

@@ -400,3 +400,20 @@ def scanNextControl(vtopic, tokens, istart):
         CD.type = SKIP_CTRLTYPE
 
     return CD
+
+#################### put it together
+kGENERAL = KList("GENERAL"," GEN ")
+
+GENERAL_OP = kGENERAL.var()
+GENERAL_OP.sub(LOGIC_OP)
+GENERAL_OP.sub(DULL_OP)
+GENERAL_OP.sub(SKIP_OP)
+GENERAL_OP.sub(PUNCTUATION_OP)
+
+#kCONTROL = KList("CONTROL", " CTRL ")
+#CONTROL_OP = kCONTROL.var()
+#CONTROL_OP.sub(LOGIC_OP)
+#CONTROL_OP.sub(DULL_OP)
+#CONTROL_OP.sub(SKIP_OP)
+
+
