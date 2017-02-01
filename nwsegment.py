@@ -372,23 +372,23 @@ def wordReadRange(segment, nar, imin, imax):
     #remove any punctuations
     return max(0,final)
 
-def gof( segment, nar, imin, imax):
-    u = nar.numSlotsUsed()
-    n = nar.numSlots()# temp, just to examine in debugger
-    av = nar.numSlotsActive()
-    r = wordReadCount(segment, nar, imin, imax)
-    f = wordReadRange(segment, nar, imin, imax)
+#def gof( segment, nar, imin, imax):
+#    u = nar.numSlotsUsed()
+#    n = nar.numSlots()# temp, just to examine in debugger
+#    av = nar.numSlotsActive()
+#    r = wordReadCount(segment, nar, imin, imax)
+#    f = wordReadRange(segment, nar, imin, imax)
     
-    n = av         # deploy the 'implicits'
-    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
+#    n = av         # deploy the 'implicits'
+#    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
-    if f==0:
-        G = 0
-    else:
-        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-        b = float(r)/float(f)         
-        G = a*b 
-    return G
+#    if f==0:
+#        G = 0
+#    else:
+#        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
+#        b = float(r)/float(f)         
+#        G = a*b 
+#    return G
 
 
 def showSEG( segment ):
@@ -413,7 +413,9 @@ class NWSReader:
         self.tree.clear()
         self.tree.clearImplicits()
     
-        self.nars = nars
+        self.nars = nars[:]
+
+        nar = nars[0]
 
         self.calibs = []
         self.setCalibration([]) # later you can call set calibs with some 'True' entries
@@ -611,15 +613,15 @@ class NarSRecord:
         f = getFoundRange(jfound,L) # same as len(snippet)
 
         u = self.nused # a snapshot of state when the NarRecord is created
-        n = self.nslots
+        n = self.nslots# temporary, for viewing in debugger
         av = self.nactive
         n = av         # deploy the 'implicits'
-        n = max(n,2)   # but de-emphasize single-VAR narratives
+        n = max(n,2)   # AD HOC? De-emphasize single-VAR narratives
 
         if f==0 or n==0:
             G = 0
         else:
-            a = float(u)/float(max(n,2)) # de-emphasize 1-word matches, for one slot narratives
+            a = float(u)/float(n)  
             b = float(r)/float(f)         
             G = a*b 
         return G

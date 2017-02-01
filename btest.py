@@ -14,7 +14,7 @@ E = EXPERIENCE
 letin = event( BARRIER, SOUND, LETINOUT )
 
 text = "word spoken was heard through the walls"
-text = "the hotel was far from the border and near to town"
+text = "open window let in the noise"
 segment = prepareSegment( E, text)
 s = showSEG(segment)
 print(s)

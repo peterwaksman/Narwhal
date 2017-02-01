@@ -88,7 +88,7 @@ kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maint
 
 kOASISSOURCES="ocean"
 
-kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,window,balcony door,next to,door ,next door,"
+kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,next to,door ,next door,"
 kNOISELOCSROOM+="my door,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom"
@@ -164,7 +164,7 @@ kINSULATION = "insulation,filter,isolated from, away from , deaden,soundproof,gl
 kINSULATION += "glazing,sound deadening,sound proof,sound prof,sound insulation,insulate,"
 insulationD = KList("insul", kINSULATION)
 
-kWINDOW = " window, balcony "
+kWINDOW = " window, balcony,balcony door"
 windowD = KList("window", kWINDOW)
 
  
