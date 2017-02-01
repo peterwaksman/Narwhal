@@ -1,3 +1,10 @@
+Feb 1
+Narwhal version 2 is running - may need further debugging and 
+definately still needs wrapping  with "App" totality. But there 
+is now, at least, a new stake in the ground. The concept of 
+segmented text, replacing tokenized text, is going well.
+
+-------------------------------------------------------------
 Jan 20: Version 1 uses direct text processing, which leads to the same 
 KList lookups occurring over and over - completely inefficiently. 
 It was my goal for the code to be true to an intuition about the 
