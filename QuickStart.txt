@@ -2,9 +2,8 @@ Narhwal is for reading topic specific text. The tutorial below covers some of th
 
 You initialize an NWReader with:
  
- - a collection of **keyword lists** (each list defines a "variable" which can be of as a dimension.)
-
- - a collection of **narrative patterns** (each one is a formula defining a relation 
+ - A collection of **keyword lists** (each list defines a "variable" which can be thought of as a dimension.)
+ - A collection of **narrative patterns** (each one is a formula defining a relation 
 between the variables)
 
 
