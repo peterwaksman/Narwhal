@@ -1,23 +1,27 @@
-Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWReader. 
+Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWReader class.
 
-You initialize a narwhal class with: 
- - a collection of **keyword lists** (each list defines a "variable") 
- - a collection of **narrative patterns** (each one is a "formula" defining a relation between the variables)
+You initialize an NWReader with:
+ 
+ - a collection of **keyword lists** (each list defines a "variable" which can be of as a dimension.)
+
+ - a collection of **narrative patterns** (each one is a formula defining a relation 
+between the variables)
 
 
-The syntax is: 
+The syntax for constructing an NWReader is: 
 
 	N = NWReader( variables, formulas )
 
-To read, the syntax is: 
+The syntax for reading text is: 
 
 	N.readText(text)                      
 
-After a read, the class N will contain a "vault" of records of how the narratives were found in the text, 
-along with a "goodnesss of fit" score between narratives and text. You can act on these records or summarize 
-them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were discovered by 
-examining examples manually or through machine learning, these read operations will be completely transparent
-and tune-able.] 
+The class N contains a "vault" of saved instances of the formulas. After a read, the vault 
+inside N will contain records of how the narratives formulas were found in the text, along with a 
+"goodnesss of fit" score between narratives and text. You can act on these records or summarize 
+them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were 
+discovered by examining examples manually or through machine learning, these read operations 
+will be completely transparent and tune-able.] 
  
 
 Example: fruit quality
@@ -64,9 +68,9 @@ This creates a tree with keyword lists for nodes and structure like this:
                 ORANGE()
             QUALITY(GOOD|BAD)
 		
------------------
-CREATE NARRATIVES
------------------
+-----------------------------
+CREATE NARRATIVES ("formuas")
+-----------------------------
 The simplest narrative is 'thing has attribute". In this case:
 
 	fruitqual = attribute(FRUIT,QUALITY)
@@ -77,15 +81,16 @@ CREATE A NARWHAL READER
 ------------------------ 
 You can write:
 
-	R = NWReader( FRUITQ, [fruitqual])
+	N = NWReader( FRUITQ, [fruitqual])
 
-Then read sentences of 'text' and fill one vault in NWReader using:
+Then read sentences of 'text' like "we had a short breakfast because the oranges were bad". This
+will fill a vault in NWReader using:
 
-	R.readText(text)
+	N.readText(text)
 
 To reverse the polarity of the output use
 
-	R.setCalibration([True])
+	N.setCalibration([True])
  
 
 For more complicated examples see "atest.py" and "NoiseApp.py".
