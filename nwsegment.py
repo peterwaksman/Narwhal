@@ -1,74 +1,92 @@
-## nwsegment.py for handling text semgentation
+## nwsegment.py for handling text segmentation utilities. 
+## used by the NWSReader. Contains utilities and the inner loop read() methods
 from nwtypes import *  
 from nwutils import *
 from nwcontrol import *
-from nwread import *
 
 
 
-##################################
 #################################
-
-
-                # Finds VAR matching at itok. Only visit
-                # children if no direct match is found
-def findInText2( self, tokens, itok):  
-    ikname = 0 
-    wasFound = False
-    for kname in self.knames: # for each name in self's klist         
-        klist = KList.instances[ kname ]                
-        found = klist.findInText(tokens, itok, self.ifound) 
-        if found:
-            self.found = True # could have been true already
-            # this can switch frequently and reflects the last found token
-            if self.exclusive and ikname>0:
-                self.polarity = False
-            else:
-                self.polarity = True   
-                                     
-            wasFound = True   
-                         
-        ikname += 1           
-     
-    # If nothing was found, search iteratively inside the children
-    for child in self.children:
-        foundC = findInText2( child, tokens , itok)
-        if foundC!=NULL_VAR :
-            self.foundInChildren = True
-            self.ifound.extend( child.ifound )
-            self.ifound = cleanFound(self.ifound)
-            if not wasFound:
-                self.polarity = child.polarity
-
-            return foundC
-
-    if wasFound:
-        return self
-    else:
-        return NULL_VAR
-
-
-
-        # convert text to a segment
-def prepareSegment( tree, text):
+#################################
+ 
+        # convert text to a segment 
+def prepareSegment( tree, tokens):
     tree.clear()
+    GENERAL_OP.clear()
     seg = []
-    tokens = prepareTokens(text)
-    for itok in range( len(tokens) ):
-        var = findInText2( tree, tokens, itok) 
+    itok = 0
+    for itok in range(len(tokens)):      
+        if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
+            continue
+        var = tree.findInText2( tokens, itok) 
         if var!=NULL_VAR:
+            var.ifound = cleanFound(var.ifound)
             newvar = var.copy()
-            seg.append(newvar)
+            seg.append(newvar)             
         else:
-            var = findInText2( GENERAL_OP, tokens, itok)
+            var = GENERAL_OP.findInText2( tokens, itok)
             if var != NULL_VAR:
+                var.ifound = cleanFound(var.ifound)
                 newvar = var.copy()
                 seg.append(newvar)
             else:
                 seg.append(NULL_VAR) 
-                #pads the segment with empty VARs and flags un-recognized words
-
     return seg
+
+        # a sort of inverse to findInText2()
+        # you return with the first var whose ifound contains itok
+        # or else return NULL_VAR
+def findInSegment(segment, itok):
+    for var in segment:
+        if itok in var.ifound:
+            return var
+    return NULL_VAR
+
+  ####################################################
+    # these  try to use the "latest" result in the vars of a segment
+def getLo(segment):
+    lo = 10000
+    for var in segment:
+        x = max(var.ifound)
+        if lo>x :
+            lo = x
+    return lo
+def getHi(segment):
+    hi = -1
+    for var in segment:
+        x = max(var.ifound)
+        if hi<x :
+            hi = x
+    return hi
+
+def isInLoHi( nar, lo, hi):
+    ifound = nar.getIFound()
+    for i in ifound:
+        if lo<= i and i<= hi:
+            return True 
+    return False
+##################################
+def varstring(var):
+    if var==NULL_VAR:
+        return "?"
+    else:
+        return var.string(0)
+
+def showSEG( segment, text ):
+    tokens = prepareTokens(text)
+    out =  ""
+    for itok in range(len(tokens)):
+        out += tokens[itok].rjust(10) + " "
+        var = findInSegment(segment,itok)
+        out += varstring(var) + "\n"
+        #out += " "
+    return out
+
+def printSEG(segment):
+    out = ""
+    for var in segment:
+        out += varstring(var) + " "
+    return out
 
 ################################################
 ################### inner read loop ############
@@ -102,16 +120,14 @@ def ReadSegment0( nar, seg ):
         return 0    
     if len( seg )==0:
         return 0 
-
     foundNow = False
-
     for var in seg:
         if var<=nar:
             nar.ifound.extend( var.ifound )
             nar.ifound = cleanFound( nar.ifound )
             nar.found = True
-            foundNow = True
-   
+            nar.polarity = var.polarity
+            foundNow = True   
     if foundNow:
         return 1
     else:
@@ -347,24 +363,33 @@ def opCount(segment, op, imin, imax ):
     ifound = OpIFound(segment, op, imin, imax)   
     return len( ifound )
 
-def wordReadCount(segment, nar, imin, imax):
-    ifound = nar.getIFound()
+def wordReadCount(segment, ifound, imin, imax):
+    #ifound = nar.getIFound()
     foundMin = max( imin, minITOK(ifound ) )  
     foundMax = min( imax, maxITOK(ifound ) )
 
     # get all the words read  
-    ifound.extend( getControlIFound(segment, foundMin, foundMax ) )
+    cfound = getControlIFound(segment, foundMin, foundMax )
+    ifound.extend( cfound )
     ifound = cleanFound(ifound)
+    # limit between imin and imax
+    jfound = ifound
+    ifound = []
+    for j in jfound:
+        if foundMin<=j and j<=foundMax:
+            ifound.append(j)
 
     pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax ) 
 
     #remove any punctuations
     final = len(ifound) - pcount
 
+#    ifound = cleanIFound(ifound)
+
     return max(0, final)
 
-def wordReadRange(segment, nar, imin, imax):
-    ifound = nar.getIFound()
+def wordReadRange(segment, ifound, imin, imax):
+    #ifound = nar.getIFound()
     foundMin = max( imin, minITOK(ifound ) )  
     foundMax = min( imax, maxITOK( ifound ) )
     pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax ) 
@@ -373,8 +398,6 @@ def wordReadRange(segment, nar, imin, imax):
     return max(0,final)
 
         # "goodness of fit"
-        # the subrange is the length of the subtokens used for this ifound
-        # Not same as tokens
 def gof( segment, nar, imin, imax):
     u = nar.numSlotsUsed()
     n = nar.numSlots()# temp, just to examine in debugger
@@ -393,224 +416,24 @@ def gof( segment, nar, imin, imax):
         G = a*b 
     return G
 
+def gof2( segment, nar, ifound, imin, imax):
+    u = nar.numSlotsUsed()
+    n = nar.numSlots()# temp, just to examine in debugger
+    av = nar.numSlotsActive()
+    r = wordReadCount(segment, ifound, imin, imax)
+    f = wordReadRange(segment, ifound, imin, imax)
+    ifound = cleanFound(ifound)
+    n = av         # deploy the 'implicits'
+    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
-def showSEG( segment ):
-    out =  ""
-    for var in segment:
-        if var==NULL_VAR:
-            out += "?"
-        else:
-            out += var.string(0)
-        out += " "
-    return out
+    f = max(f,av)   # AD HOC? Now for segments I want this
 
-
-##############################################
-#  "NWS" = NarWhalSegment
-
-class NWSReader:
-    # assume the nars are defined using treeroot 
-    # The will retains their individual explicit/implicit settings
-    def __init__(self,treeroot, nars):
-        self.tree = treeroot.copy()
-        self.tree.clear()
-        self.tree.clearImplicits()
-    
-        self.nars = nars #[:]
-
-        nar = nars[0]
-
-        self.calibs = []
-        self.setCalibration([]) # later you can call set calibs with some 'True' entries
-
-        # for vaulting NarSRecords
-        self.vaults = []
-        for nar in self.nars:
-            self.vaults.append( NarVault() )
-
-           
-    def setCalibration(self, newcalibs):
-        self.calibs = []
-        for nar in self.nars:        
-                self.calibs.append(False)
-
-        for i in range( min( len(self.nars), len(newcalibs) ) ):
-            self.calib[i] = newcalibs[i]
-
-    def clearAll(self):
-        self.tree.clear()
-        i = 0
-        for nar in self.nars:     
-            nar.clear()  
-            self.vaults[i].clear() 
-             
-    def readMany(self, segment):
-        for nar in self.nars:
-            ReadSegment(nar, segment)
-    
-    def recordMany( self, segment, imin, imax):
-        records = []
-        for nar in self.nars:
-            ifound = nar.getIFound()[imin:imax]
-            if len(ifound)>0:
-                record = NarSRecord( nar, segment, imin, imax)
-            else:
-                record = None
-            records.append( record )
-        return records
-
-    # each "rollUp" method works slightly differently. I did not see
-    # a better way to generalize 
-    def rollUpMany( self, records, Threshold, block=False):
-        for i in range( len(self.nars) ):
-            V = self.vaults[i]
-            V.rollUp( records[i], Threshold, block)
-
-    def rollUpAndVaultMany( self, records, Threshold, block=False):
-        for i in range( len(self.nars) ):
-            V = self.vaults[i]
-            V.rollUp( records[i], Threshold, block)
-            V.vault()
-
-    def rollUpCanVaultMany(self, records, Threshold, block=False):
-        for i in range( len(self.nars) ):  
-            V = self.vaults[i]
-            rOK = V.rollUp( records[i], Threshold, block)
-            if rOK:
-                V.vault()
-    
-    def rollUpCanVaultOrAbandonMany( self, records, Threshold, block=False):
-        for i in range( len(self.nars) ):
-            V = self.vaults[i]
-            rOK = V.rollUp( records[i], Threshold, block)
-            if rOK:
-                V.vault()
-            else:
-                V.abandonPre()
-                nar[i].clearPolarity()
-    
-    def addBlockMany(self):
-       for V in self.vaults:
-           V.addBlock()            
-
-    def removeAllBlocksMany(self):
-        for i in range (len(self.nars) ): 
-            self.vaults[i].nblocks = 0
-            self.nars[i].clearPolarity()
-   
-    def clearIFoundMany( self ):
-        for nar in self.nars :
-            nar.clearIFound()
-
-    def newStart(self, CD, istart):
-        # a control occupies only one index in the segment
-        return CD.ictrl + 1
- 
-    #####################################################
-    ##################### outer read loop ###############
-    def readText( self, text ):   
-        self.clearAll()
-        segment = prepareSegment( self.tree, text)
-        if len(segment)==0:
-            return 
-     
-        istart = 0 # i will be the index of a VAR in the whole segment
-        CD = scanNextControl2(segment, istart)
-        
-        while CD.type != END_CTRLTYPE :
-            subseg = segment[istart : CD.ictrl]
-            self.readMany(subseg)
-            istart = self.applyControl(CD, istart, segment)
-
-            CD = scanNextControl2(segment, istart)
-        
-        subseg= segment[istart : len(segment)]
-        self.readMany(subseg )
-        self.applyControl( CD, istart, segment)
-
-    ############################################
-    def applyControl(self, CD, istart, segment):
-        if CD.type==NO_CTRLTYPE :
-            return istart 
-
-            # prepare records for all nars (some can be  "None")
-        records = self.recordMany(segment, istart, CD.ictrl)
-        if records==None or len(records)==0:
-            return istart
-   
-        if CD.type==END_CTRLTYPE:
-            self.rollUpAndVaultMany(records, 0.1)
-            return len(segment)
+    if f==0:
+        G = 0
+    else:
+        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
+        b = float(r)/float(f)         
+        G = a*b 
+    return G
 
 
-        CTRL = CD.ctrl
-    
-            # this is current "and" processing. It is closely tied to
-            # to how "AND" is declared, as a SKIP, or LOGIC OPerator.
-            # Take this code out if you want it to SKIP
-            # Also consider changing the 0.5 to tune sub-vaulting
-        if CTRL.isA("AND"):
-            self.rollUpMany( records, 0.5)
-
-        elif CTRL.isA("NEG") or CTRL.isA("HEDGE"):                   
-            BLOCK = True  # block backward
-            self.rollUpCanVaultOrAbandonMany(records, 0.5, BLOCK)
-
-        elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
-            self.rollUpAndVaultMany( records, 0.5)
-            self.addBlockMany()# block forward
-       
-        elif CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):
-            self.rollUpCanVaultMany( records, 0.5)
-            self.removeAllBlocksMany()
-
-        # note: no "OPENPAREN" processing yet
-        elif CTRL.isA("CLOSEPAREN"):
-            self.rollUpCanVaultMany( records, 0.5)
-            self.removeAllBlocksMany()
-     
-        elif CTRL.isA("OPENPAREN"):
-            self.rollUpCanVaultMany( records, 0.5)
-            self.removeAllBlocksMany()
-
-        elif CTRL.isA("PERIOD") or CTRL.isA("EXCLAIM") or CTRL.isA("DASH"):
-            self.rollUpCanVaultMany(records, 0.1)
-            self.removeAllBlocksMany()      
-               
-            self.clearMany() # a clean start
-
-        else :
-            print( "did not apply contol: "+ CTRL.knames[0] )
-            self.clearIFoundMany()
-            return istart+ max(1, len(CD.ctrl.ifound))
-
-        self.clearIFoundMany()
-            
-        istart = self.newStart(CD, istart)
-            
-        return istart         
-
-    
-## compatible with NarRecord. Either type can be stored in the vault
-class NarSRecord:
-    def __init__(self, nar, segment, imin, imax):
-        #self.snippet = getSnippet2(istart,ictrl,ifound, tokens)
-        self.nar = nar.copy()
-        self.imin = imin 
-        self.imax = imax
-        self.GOF = gof( segment, nar, imin, imax)
-        self.block = False    
-
-    def block(self):
-        self.block = True
-
-    def finalPolarity( self, calib):
-        p = self.narpolarity
-        if calib: # flip interpretation
-            p = not p
-
-        b = self.block
-        if b==p:  # it works out as this
-            return False
-        else:
-            return True      

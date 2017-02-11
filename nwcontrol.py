@@ -31,7 +31,7 @@ from nwutils import *
 # the more thoroughly we list "dull" words to ignore, the more effective
 # the word counting, I had "it" listed but choose to put it in the hotel word list.
 kDULL = " a , the , an , did "  
-dullD = KList("DULL",kDULL )
+dullD = KList("DU",kDULL )
 DULL_OP = dullD.var()
 
 
@@ -344,6 +344,30 @@ def countUnreadControls(tokens, ifound, ictrl, istart):
 
     return count
  
+
+################## prepareTokens() ###################
+################## an important method "hiding" here in nwcontrol.py
+##################
+def prepareTokens( text): 
+        # encode punctuations  
+    text = replacePunctuation(text)    
+
+        # one of several future cleanups
+    text = cleanAMPM(text)
+            
+            # lower case tokens 
+    tokens = text.split(' ')
+    newtokens = []
+    for tok in tokens: 
+        if len(tok)>0:
+            newtokens.append(tok)
+
+    for i in range( len(newtokens)):
+        tok = newtokens[i].lower()
+        newtokens[i] = tok 
+
+    return newtokens
+
 #######################################################    
 #######################################################    
 ### ControlData 
@@ -415,5 +439,7 @@ GENERAL_OP.sub(PUNCTUATION_OP)
 #CONTROL_OP.sub(LOGIC_OP)
 #CONTROL_OP.sub(DULL_OP)
 #CONTROL_OP.sub(SKIP_OP)
+
+
 
 

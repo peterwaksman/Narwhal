@@ -154,7 +154,12 @@ class NarVault:
             if r.ictrl==ictrl:
                 return r
         return None
-
+   
+    def getRecordByCtrl2( self, itok):
+        for r in self._vault:
+            if len(r.ifound)>0 and max(r.ifound)==itok:
+                return r
+        return None
 ### This is a class manages nar and related "found" information after a read
 ### It is a nar plus ifound plus Vault
 ### It relieves some of the complexity of the NarReader. 

@@ -103,7 +103,9 @@ class VAR:
     def numIFound(self):
         self.ifound = cleanFound(self.ifound)
         return len(self.ifound)
-       
+    
+    def getIFound(self):   
+        return self.ifound
 
     def clearPolarity(self):
         self.polarity = True
@@ -211,6 +213,45 @@ class VAR:
         # although self.found can be False
         return (wasFound or self.foundInChildren)   
                 
+    
+                # Finds VAR matching at itok. Only visit
+                # children if no direct match is found
+    def findInText2( self, tokens, itok):  
+        ikname = 0 
+        wasFound = False
+        for kname in self.knames: # for each name in self's klist         
+            klist = KList.instances[ kname ]                
+            found = klist.findInText(tokens, itok, self.ifound) 
+            if found:
+                self.found = True # could have been true already
+                # this can switch frequently and reflects the last found token
+                if self.exclusive and ikname>0:
+                    self.polarity = False
+                else:
+                    self.polarity = True   
+                                     
+                wasFound = True   
+                         
+            ikname += 1           
+     
+        # If nothing was found, search iteratively inside the children
+        for child in self.children:
+            foundC = child.findInText2( tokens , itok)
+            if foundC!=NULL_VAR :
+                self.foundInChildren = True
+                self.ifound.extend( child.ifound )
+                self.ifound = cleanFound(self.ifound)
+                if not wasFound:
+                    self.polarity = child.polarity
+
+                return foundC
+
+        if wasFound:
+            return self
+        else:
+            return NULL_VAR
+
+
     ## This can modify the .found  or .foundInChildren, or ifound 
     # only use this for controls, or where you do not care about
     # corrupting the VARs in the tree 
@@ -650,10 +691,10 @@ class NAR:
 
         # ifound in several in the different slots
         all = []
-        all.extend(self.thing.ifound)
-        all.extend(self.action.ifound)
-        all.extend(self.value.ifound)
-        all.extend(self.relation.ifound)
+        all.extend(self.thing.getIFound())
+        all.extend(self.action.getIFound())
+        all.extend(self.value.getIFound())
+        all.extend(self.relation.getIFound())
         # consolidate them and count
         all = cleanFound(all)
         return all

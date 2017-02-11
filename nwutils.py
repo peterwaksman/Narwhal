@@ -261,25 +261,6 @@ def cleanAMPM(text):
     return newtext
     
      
-def prepareTokens( text): 
-        # encode punctuations  
-    text = replacePunctuation(text)    
-
-        # one of several future cleanups
-    text = cleanAMPM(text)
-            
-            # lower case tokens 
-    tokens = text.split(' ')
-    newtokens = []
-    for tok in tokens: 
-        if len(tok)>0:
-            newtokens.append(tok)
-
-    for i in range( len(newtokens)):
-        tok = newtokens[i].lower()
-        newtokens[i] = tok 
-
-    return newtokens
 
 # I was not able to use a recursive definition inside the VAR.__le__() 
 def recursiveLE(self,other):

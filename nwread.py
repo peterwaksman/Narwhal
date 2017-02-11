@@ -475,13 +475,13 @@ class ABReader:
                 V.abandonPre()
                 nar.clearPolarity()
             istart = self.clearStart(CD) 
-            self.ifound = [] # fresh 
-            start
+            self.ifound = [] # fresh start 
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE") :
             rOK = V.rollUp(record, 0.5)
             V.vault()
             istart = self.clearStart(CD)
+
             # block forward
             V.addBlock()
        
