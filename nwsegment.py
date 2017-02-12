@@ -47,6 +47,8 @@ def findInSegment(segment, itok):
 def getLo(segment):
     lo = 10000
     for var in segment:
+        if var==NULL_VAR:
+            continue
         x = max(var.ifound)
         if lo>x :
             lo = x
@@ -54,6 +56,8 @@ def getLo(segment):
 def getHi(segment):
     hi = -1
     for var in segment:
+        if var==NULL_VAR:
+            continue
         x = max(var.ifound)
         if hi<x :
             hi = x
@@ -86,6 +90,21 @@ def printSEG(segment):
     out = ""
     for var in segment:
         out += varstring(var) + " "
+    return out
+
+def getWords( tokens, ifound):
+    out = ""
+    for i in ifound:
+        out += tokens[i] + " "
+    return out
+
+def showSEG2(segment, text):
+    tokens = prepareTokens(text)
+    out =  ""
+    for var in segment:
+        h = ""
+        h = varstring(var).rjust(10) + " " + getWords(tokens, var.ifound) + "\n"
+        out += h
     return out
 
 ################################################
@@ -397,43 +416,43 @@ def wordReadRange(segment, ifound, imin, imax):
     #remove any punctuations
     return max(0,final)
 
-        # "goodness of fit"
-def gof( segment, nar, imin, imax):
-    u = nar.numSlotsUsed()
-    n = nar.numSlots()# temp, just to examine in debugger
-    av = nar.numSlotsActive()
-    r = wordReadCount(segment, nar, imin, imax)
-    f = wordReadRange(segment, nar, imin, imax)
+#        # "goodness of fit"
+#def gof( segment, nar, imin, imax):
+#    u = nar.numSlotsUsed()
+#    n = nar.numSlots()# temp, just to examine in debugger
+#    av = nar.numSlotsActive()
+#    r = wordReadCount(segment, nar, imin, imax)
+#    f = wordReadRange(segment, nar, imin, imax)
     
-    n = av         # deploy the 'implicits'
-    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
+#    n = av         # deploy the 'implicits'
+#    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
-    if f==0:
-        G = 0
-    else:
-        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-        b = float(r)/float(f)         
-        G = a*b 
-    return G
+#    if f==0:
+#        G = 0
+#    else:
+#        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
+#        b = float(r)/float(f)         
+#        G = a*b 
+#    return G
 
-def gof2( segment, nar, ifound, imin, imax):
-    u = nar.numSlotsUsed()
-    n = nar.numSlots()# temp, just to examine in debugger
-    av = nar.numSlotsActive()
-    r = wordReadCount(segment, ifound, imin, imax)
-    f = wordReadRange(segment, ifound, imin, imax)
-    ifound = cleanFound(ifound)
-    n = av         # deploy the 'implicits'
-    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
+#def gof2( segment, nar, ifound, imin, imax):
+#    u = nar.numSlotsUsed()
+#    n = nar.numSlots()# temp, just to examine in debugger
+#    av = nar.numSlotsActive()
+#    r = wordReadCount(segment, ifound, imin, imax)
+#    f = wordReadRange(segment, ifound, imin, imax)
+#    ifound = cleanFound(ifound)
+#    n = av         # deploy the 'implicits'
+#    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
-    f = max(f,av)   # AD HOC? Now for segments I want this
+#    f = max(f,av)   # AD HOC? Now for segments I want this
 
-    if f==0:
-        G = 0
-    else:
-        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-        b = float(r)/float(f)         
-        G = a*b 
-    return G
+#    if f==0:
+#        G = 0
+#    else:
+#        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
+#        b = float(r)/float(f)         
+#        G = a*b 
+#    return G
 
 

@@ -111,8 +111,8 @@ class NarVault:
         self.pre   = 0
         self.nblocks = 0 
           
-    def vault(self):
-        if self.pre!=0 and self.pre.GOF>0.1:
+    def vault(self,Threshold):
+        if self.pre!=0 and self.pre.GOF>Threshold:
             # Apply blocks. Although polarity of a nar need
             # not behave like a boolean, the blocks arising from 
             # controls perhaps DO behave like booleans
@@ -135,13 +135,13 @@ class NarVault:
             self.nblocks = self.nblocks-1 
 
     def rollUp( self, record, Threshold, block=False):
-        self.vault()
+        self.vault(Threshold)
 
         if block:
             self.addBlock()
 
-        if record!=None and record.GOF>Threshold:
-            self.vault() # saves old pre, as needed
+        if record!=None:
+            self.vault(Threshold) # saves old pre, as needed
             self.pre = record
             return True
         else:

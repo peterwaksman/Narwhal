@@ -607,7 +607,7 @@ class NWReader:
         for i in range( len(self.RD) ):
             rd = self.RD[i]
             rd.V.rollUp( records[i], Threshold, block)
-            rd.V.vault()
+            rd.V.vault(Threshold)
             
     def rollUpCanVaultMany(self, records, Threshold, block=False):
         for i in range( len(self.RD) ):

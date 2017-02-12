@@ -24,6 +24,16 @@ E = EXPERIENCE
 letin = event( BARRIER, SOUND, LETINOUT )
 affect  = cause( attribute(SOUND,[TOD]), AFFECT )
 proximity = attribute( LOC, SOURCE, PROX)    
+problem = attribute( PROBLEM, SOUND )
+
+
+
+problem = attribute( PROBLEM, SOUND )
+sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
+affect  = cause( attribute(SOUND,[TOD]), AFFECT )
+proximity = attribute( LOC, SOURCE, PROX)        
+letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
+
 
 text = "word spoken was heard through the walls"
 #text = "the maiden let in the noise"
@@ -35,13 +45,14 @@ text = "word spoken was heard through the walls"
 
 text = NoiseText
 text = "My room was far from the elevator and far from the lobby, so it was very quiet."
+text = "Although my room was next to the elevator, it was perfectly quiet and dark at night so I was able to sleep much better than most European cities"
+text = "it was perfectly quiet and dark at night "
 
+ab = NWReader(E,[problem])
+ab.readText(text)
+print ab.report()
 
-#ab = NWReader(E,[proximity])
-#ab.readText(text)
-#print ab.report()
-
-nw = NWSReader(E, [proximity] )
+nw = NWSReader(E, [problem] )
 nw.readText(text)
 s = nw.report(text)
 print s

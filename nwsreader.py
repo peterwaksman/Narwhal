@@ -5,6 +5,26 @@
 from nwvault import *
 from nwsegment import *
 
+def gof2( segment, nar, ifound, imin, imax):
+    u = nar.numSlotsUsed()
+    n = nar.numSlots()# temp, just to examine in debugger
+    av = nar.numSlotsActive()
+    r = wordReadCount(segment, ifound, imin, imax)
+    f = wordReadRange(segment, ifound, imin, imax)
+    ifound = cleanFound(ifound)
+    n = av         # deploy the 'implicits'
+    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
+
+    f = max(f,av)   # AD HOC? Now for segments I want this
+
+    if f==0:
+        G = 0
+    else:
+        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
+        b = float(r)/float(f)         
+        G = a*b 
+    return G
+
 def getSnippet3(tokens, ifound):
     L = len(tokens)
     if L==0 :
@@ -118,10 +138,8 @@ class NWSReader:
             g = segment[imin:imax+1]
             lo = getLo(g)
             hi = getHi(g)
-            if isInLoHi(nar,lo, hi):
-            #ifound = nar.getIFound()[imin:imax]
-            #if len(ifound)>0:
-                record = NarSRecord( nar, segment,lo,hi, self.tokens)
+            if isInLoHi(nar, lo, hi):
+                record = NarSRecord( nar, segment, lo, hi, self.tokens)
             else:
                 record = None
             records.append( record )
@@ -138,21 +156,21 @@ class NWSReader:
         for i in range( len(self.nars) ):
             V = self.vaults[i]
             V.rollUp( records[i], Threshold, block)
-            V.vault()
+            V.vault(Threshold)
 
     def rollUpCanVaultMany(self, records, Threshold, block=False):
         for i in range( len(self.nars) ):  
             V = self.vaults[i]
             rOK = V.rollUp( records[i], Threshold, block)
             if rOK:
-                V.vault()
+                V.vault(Threshold)
     
     def rollUpCanVaultOrAbandonMany( self, records, Threshold, block=False):
         for i in range( len(self.nars) ):
             V = self.vaults[i]
             rOK = V.rollUp( records[i], Threshold, block)
             if rOK:
-                V.vault()
+                V.vault(Threshold)
             else:
                 V.abandonPre()
                 nar[i].clearPolarity()
@@ -164,7 +182,7 @@ class NWSReader:
     def removeAllBlocksMany(self):
         for i in range (len(self.nars) ): 
             self.vaults[i].nblocks = 0
-            #self.nars[i].clearPolarity() # AD HOC?
+            self.nars[i].clearPolarity() # comment out AD HOC?
    
     def clearIFoundMany( self ):
         for nar in self.nars :
@@ -185,7 +203,7 @@ class NWSReader:
         self.tokens = prepareTokens(text)
 
         segment = prepareSegment( self.tree, self.tokens)
-
+       
         if len(segment)==0:
             return 
      
