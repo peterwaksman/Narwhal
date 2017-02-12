@@ -1,3 +1,10 @@
+Feb 12
+Version 2 now working pretty much as desired. Questions with AD HOC solutions
+are creeping in in several places: the gof() depends a bit on segment structure
+the vault thresholds on vaulting rather than on setting the pre. Both V1 and V2
+will continue in parallel for a bit longer.
+
+
 Feb 1
 Narwhal version 2 is running - may need further debugging and 
 definately still needs wrapping  with "App" totality. But there 
