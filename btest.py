@@ -45,31 +45,31 @@ text = "My room was far from the elevator and far from the lobby, so it was very
 text = "Although my room was next to the elevator, it was perfectly quiet and dark at night so I was able to sleep much better than most European cities"
 text = "it was perfectly quiet and dark at night "
 text = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door."
- 
-
-ab = NWReader(E,[proximity])
-ab.readText(text)
-print ab.report()
-
-nw = NWSReader(E, [proximity] )
-nw.readText(text)
-s = nw.report(text)
-print s
-x = 2
- 
-#nars      = [ problem, sound, affect, proximity, letin]
-#calibs    = [ True,    True,  True,   True,      True ]     
-#thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
 
 
-#nwo = NWObject(E, nars, calibs, thresholds)
-#nwo.readText(text)
-#s = nwo.report()
-#print s
- 
-#nwa = NWApp(E, nars, calibs, thresholds)
-#nwa.readText(text)
-#s =  nwa.report(text)
+#ab = NWReader(E,[proximity])
+#ab.readText(text)
+#print ab.report()
+
+#nw = NWSReader(E, [proximity] )
+#nw.readText(text)
+#s = nw.report(text)
 #print s
 #x = 2
+ 
+nars      = [ problem, sound, affect, proximity, letin]
+calibs    = [ True,    True,  True,   True,      True ]     
+thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
+
+
+nwo = NWObject(E, nars, calibs, thresholds)
+nwo.readText(text)
+s = nwo.report()
+print s
+ 
+nwa = NWApp(E, nars, calibs, thresholds)
+nwa.readText(text)
+s =  nwa.report(text)
+print s
+x = 2
 

@@ -18,17 +18,21 @@ def prepareSegment( tree, tokens):
     for itok in range(len(tokens)):      
         if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
             continue
-        var = tree.findInText2( tokens, itok) 
-        if var!=NULL_VAR:
-            var.ifound = cleanFound(var.ifound)
-            newvar = var.copy()
-            seg.append(newvar)             
-        else:
-            var = GENERAL_OP.findInText2( tokens, itok)
-            if var != NULL_VAR:
+        vars = tree.findInText2( tokens, itok) 
+        # here we had a single returned var, and no loop in the following
+        # now we can findInText2() can return a list of all vars matching here.
+        if len(vars)>0:
+            for var in vars:
                 var.ifound = cleanFound(var.ifound)
                 newvar = var.copy()
-                seg.append(newvar)
+                seg.append(newvar)             
+        else:
+            vars = GENERAL_OP.findInText2( tokens, itok)
+            if len(vars)>0:
+                for var in vars:
+                    var.ifound = cleanFound(var.ifound)
+                    newvar = var.copy()
+                    seg.append(newvar)
             else:
                 seg.append(NULL_VAR) 
     return seg

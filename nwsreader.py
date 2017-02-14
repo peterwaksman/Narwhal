@@ -293,7 +293,7 @@ class NWSReader:
         out = ""
         L = len(tokens)
         for i in range(len(tokens)+1):
-            if i< len(tokens):
+            if i<len(tokens):
                 out += tokens[i].rjust(10) + " "
             else: 
                 out += "END".rjust(10) + " "
@@ -302,7 +302,9 @@ class NWSReader:
                 V = self.vaults[j]     # j not i!
                 cal = self.calibs[j]
                  
-                r = V.getRecordByCtrl2(i) # i not j!
+                r = None
+                if i>0 :
+                    r = V.getRecordByCtrl2(i-1) # i not j!
                 if r==None:
                     out += " "
                 else:

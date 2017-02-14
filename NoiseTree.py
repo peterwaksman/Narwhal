@@ -88,7 +88,7 @@ kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maint
 
 kOASISSOURCES="ocean"
 
-kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,door ,"
+kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,door ,next to, next door,"
 kNOISELOCSROOM+="my door,outside my door,adjacent room,next suite,"
 kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
 kNOISELOCSROOM+="bathroom"
@@ -155,7 +155,7 @@ hotelD = KList("hotel", kNOISELOCSHOTEL)
  
 
 
-kNEAR = "nowhere $ near , near to ,in the heart of, over ,outside,next to, on the ,on our,being on,across from, right on ,overlooked,overlooks, close to,next,faced"
+kNEAR = "nowhere $ near , near to ,in the heart of, over ,outside,next to, on the ,on our,being on,across from, right on ,overlooked,overlooks, close to,next to, next door,faced"
 nearD = KList("near", kNEAR)
 kFAR  = " far , far from,farthest from, away from,nowhere near"
 farD = KList("far",kFAR)

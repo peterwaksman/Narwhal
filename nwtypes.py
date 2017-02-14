@@ -214,7 +214,44 @@ class VAR:
         return (wasFound or self.foundInChildren)   
                 
     
-                # Finds VAR matching at itok. Only visit
+    #            # Finds VAR matching at itok. Only visit
+    #            # children if no direct match is found
+    #def findInText2( self, tokens, itok):  
+    #    ikname = 0 
+    #    wasFound = False
+    #    for kname in self.knames: # for each name in self's klist         
+    #        klist = KList.instances[ kname ]                
+    #        found = klist.findInText(tokens, itok, self.ifound) 
+    #        if found:
+    #            self.found = True # could have been true already
+    #            # this can switch frequently and reflects the last found token
+    #            if self.exclusive and ikname>0:
+    #                self.polarity = False
+    #            else:
+    #                self.polarity = True   
+                                     
+    #            wasFound = True   
+                         
+    #        ikname += 1           
+     
+    #    # If nothing was found, search iteratively inside the children
+    #    for child in self.children:
+    #        foundC = child.findInText2( tokens , itok)
+    #        if foundC!=NULL_VAR :
+    #            self.foundInChildren = True
+    #            self.ifound.extend( child.ifound )
+    #            self.ifound = cleanFound(self.ifound)
+    #            if not wasFound:
+    #                self.polarity = child.polarity
+
+    #            return foundC
+
+    #    if wasFound:
+    #        return self
+    #    else:
+    #        return NULL_VAR
+
+                    # Finds VAR matching at itok. Only visit
                 # children if no direct match is found
     def findInText2( self, tokens, itok):  
         ikname = 0 
@@ -235,21 +272,20 @@ class VAR:
             ikname += 1           
      
         # If nothing was found, search iteratively inside the children
+        if wasFound:
+            return [self]
+
+        vars = []
         for child in self.children:
             foundC = child.findInText2( tokens , itok)
-            if foundC!=NULL_VAR :
+            if len(foundC)>0:
                 self.foundInChildren = True
                 self.ifound.extend( child.ifound )
                 self.ifound = cleanFound(self.ifound)
                 if not wasFound:
                     self.polarity = child.polarity
-
-                return foundC
-
-        if wasFound:
-            return self
-        else:
-            return NULL_VAR
+                vars.extend( foundC )
+        return vars # empty list if none found in children
 
 
     ## This can modify the .found  or .foundInChildren, or ifound 
