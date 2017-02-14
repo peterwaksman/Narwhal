@@ -65,8 +65,8 @@ class NWApp:
             out = "nothing was said"         
         return out       
                    
-    def report(self):
-         return self.reader.report()
+    def report(self, text):
+         return self.reader.report(text)
 
      # run through the vaults, find maxGOF/polarity for each
     def summarize(self, text):
@@ -136,7 +136,7 @@ class NWApp:
         ##################################
 
         self.numToks = len( self.reader.tokens )
-        polarity = self.summarize(  )
+        polarity = self.summarize( text )
 
         return polarity
         

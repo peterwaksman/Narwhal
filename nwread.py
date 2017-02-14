@@ -614,14 +614,14 @@ class NWReader:
             rd = self.RD[i]
             rOK = rd.V.rollUp( records[i], Threshold, block)
             if rOK:
-                rd.V.vault()
+                rd.V.vault(Threshold)
             
     def rollUpCanVaultOrAbandonMany( self, records, Threshold, block=False):
         for i in range( len(self.RD) ):
             rd = self.RD[i]
             rOK = rd.V.rollUp( records[i], Threshold, block)
             if rOK:
-                rd.V.vault()
+                rd.V.vault(Threshold)
             else:
                 rd.V.abandonPre()
                 rd.nar.clearPolarity()

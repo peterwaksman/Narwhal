@@ -15,7 +15,7 @@ def gof2( segment, nar, ifound, imin, imax):
     n = av         # deploy the 'implicits'
     n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
-    f = max(f,av)   # AD HOC? Now for segments I want this
+    #f = max(f,av)   # AD HOC? Now for segments I want this
 
     if f==0:
         G = 0
@@ -54,7 +54,6 @@ class NarSRecord:
             if imin<=i and i<=imax:
                 ifound.append(i)
         self.ifound = ifound 
-#        self.ifound = nar.getIFound()[imin:imax]
         self.snippet = getSnippet3(tokens, self.ifound)
 
         self.nar = nar.copy()
@@ -62,7 +61,6 @@ class NarSRecord:
         self.imax = imax
         self.block = False    
         self.ictrl = imax 
-        #self.GOF = gof( segment, nar, imin, imax)
         self.GOF = gof2(segment, nar, self.ifound, imin, imax)
         self.ifound = cleanFound(self.ifound)
         self.narpolarity = nar.polarity
@@ -115,7 +113,7 @@ class NWSReader:
                 self.calibs.append(False)
 
         for i in range( min( len(self.nars), len(newcalibs) ) ):
-            self.calib[i] = newcalibs[i]
+            self.calibs[i] = newcalibs[i]
 
     def clearAll(self):
         self.tree.clear()
