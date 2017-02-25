@@ -1,0 +1,25 @@
+algorithm:
+
+First pass: semantic based splitting:
+
+ - If there are any client NARs that are "SO"s, try them at each possible position in the text where there is a "so" word [incuding "and"]. Score them.
+
+ - If there are any client NARs that are "AND"s, try them at each possible position in text where there is a "and". Score them.
+
+Second pass: text form based splitting followed by more semantic handling
+
+ - if there are any "splitter" words IN THE TEXT, try the appropriate split pattern
+   if:        if A CONJ_OP B
+   but:       A BLOCK_OP B
+   although:  FWDHEDGE A CONJ_OP B
+   although:  A FWHEDGE B
+
+With each of these we need to try all the other client NARs in positions A and B
+
+ - Otherwise submit all other client  NARs to all of text
+
+
+
+
+Fumbling:
+You can stage a narrative for vaulting whenever it begins to be detected in the text. Once staged it can be updated regularly. Then a trigger even occurs and the narrative, complete or not, goes into a segondary staging area. It can still be negated but probably no longer is updated. The trigger could be that the narrative was completed, or that a control word occurred.

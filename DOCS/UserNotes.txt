@@ -1,0 +1,63 @@
+Compound keywordslike "each morning" or "nowhere $ near" , should not begin or end with space. This could be fixed in matchTOK() but is not currently allowed.
+
+All keywords should be lower case (see VAR.findInText())
+
+You can put space around before and after keywords, but not two spaces.
+
+Do not use LOGIC_OP subvariables as variables of your narratives. It surely will confuse the engine.
+
+
+We have: K = NarReader( E, m)
+Where E = the EXPERIENCE tree
+and   m = event( BARRIER, NOISE, TRANSPARENCY )
+
+After reading text="windows shut out the noise"
+
+>>> print K.tree.PrintSimple() [THIS SHOWS THE TREE]
+experience
+  problem
+  sound
+    noise|quiet|*
+    loud|soft|
+    people party equip traffic constr oasis
+  loc
+    room
+    hotel
+  near|far|
+  insul
+    window wall *
+    open|closed|
+    letin|keepout|*-
+  tod
+  stress|relax|
+
+>>> K.found()  [THIS SHOWS THE EVOLVING GOODNESS OF FIT OF THE NARRATIVE]
+
+   windows   u:1/3 r:1/1
+      shut   u:1/3 r:2/2
+       out - u:2/3 r:3/3
+       the   .
+     noise   u:3/3 r:4/5 d:1
+
+
+************************************************************
+
+
+A good way to set calibrs for .setCalibration( calibs ):
+For each nar in reader, use ">>>>print nar.str()" to see the default settings of the nar. 
+Calibrate appropriately. 
+For example:
+"problem" is a nar with the str()
+T:problem
+R:nullN
+A:nullK
+V:noise
+ - clearly when this is said it is bad, so calib needs to be True, to flip interpretation
+
+
+
+
+
+
+
+ 
