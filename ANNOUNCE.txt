@@ -1,8 +1,12 @@
+Feb25
+V2.0 release created. I now have enough confidence to delete v1.
+
+
 Feb 12
 Version 2 now working pretty much as desired. Questions with AD HOC solutions
 are creeping in in several places: the gof() depends a bit on segment structure
 the vault thresholds on vaulting rather than on setting the pre. Both V1 and V2
-will continue in parallel for a bit longer.
+will continue in parallel for a bit longer. Speedup is phenomenal.
 
 
 Feb 1

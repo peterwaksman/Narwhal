@@ -1,6 +1,6 @@
-Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWReader class.
+Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWSReader class.
 
-You initialize an NWReader with:
+You initialize an NWSReader with:
  
  - A collection of **keyword lists** (each list defines a "variable" which can be thought of as a dimension.)
  - A collection of **narrative patterns** (each one is a formula defining a relation 
@@ -9,7 +9,7 @@ between the variables)
 
 The syntax for constructing an NWReader is: 
 
-	N = NWReader( variables, formulas )
+	N = NSWReader( variables, formulas )
 
 The syntax for reading text is: 
 
@@ -80,7 +80,7 @@ CREATE A NARWHAL READER
 ------------------------ 
 You can write:
 
-	N = NWReader( FRUITQ, [fruitqual])
+	N = NWSReader( FRUITQ, [fruitqual])
 
 Then read sentences of 'text' like "we had a short breakfast because the oranges were bad". This
 will fill a vault in NWReader using:
@@ -92,4 +92,4 @@ To reverse the polarity of the output use
 	N.setCalibration([True])
  
 
-For more complicated examples see "atest.py" and "NoiseApp.py".
+For more complicated examples see "btest.py" and "NoiseApp.py".
