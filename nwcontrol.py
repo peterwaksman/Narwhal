@@ -393,37 +393,37 @@ class ControlData:
         self.ictrl = ictrl
   
 
-# return with ictrl either the index of the control or
-# L=len(tokens). Generally read up to <ictrl
-def scanNextControl0(tokens, istart):
-    CD = ControlData()
-    L = len(tokens);
-    if istart>L-1:
-        CD.set(END_CTRLTYPE, NULL_VAR, L)
-        return CD
+## return with ictrl either the index of the control or
+## L=len(tokens). Generally read up to <ictrl
+#def scanNextControl0(tokens, istart):
+#    CD = ControlData()
+#    L = len(tokens);
+#    if istart>L-1:
+#        CD.set(END_CTRLTYPE, NULL_VAR, L)
+#        return CD
    
-    for itok in range(istart, L):
-        ctrl = isLogicControl(tokens,itok)
-        if ctrl!=NULL_VAR:
-            CD.set(OPERATOR_CTRLTYPE, ctrl, itok)
-            return CD
-        ctrl = isPunctuationControl(tokens, itok)
-        if ctrl!=NULL_VAR:
-            CD.set(PUNCTUATION_CTRLTYPE, ctrl, itok)
-            return CD
+#    for itok in range(istart, L):
+#        ctrl = isLogicControl(tokens,itok)
+#        if ctrl!=NULL_VAR:
+#            CD.set(OPERATOR_CTRLTYPE, ctrl, itok)
+#            return CD
+#        ctrl = isPunctuationControl(tokens, itok)
+#        if ctrl!=NULL_VAR:
+#            CD.set(PUNCTUATION_CTRLTYPE, ctrl, itok)
+#            return CD
 
-    CD.set(END_CTRLTYPE, NULL_VAR, L)
-    return CD
+#    CD.set(END_CTRLTYPE, NULL_VAR, L)
+#    return CD
 
-def scanNextControl(vtopic, tokens, istart):
-    CD = scanNextControl0(tokens,istart)
-    if CD.type==END_CTRLTYPE :
-        return CD
-    vtopic.clear()
-    if not vtopic.detectInText(tokens):
-        CD.type = SKIP_CTRLTYPE
+#def scanNextControl(vtopic, tokens, istart):
+#    CD = scanNextControl0(tokens,istart)
+#    if CD.type==END_CTRLTYPE :
+#        return CD
+#    vtopic.clear()
+#    if not vtopic.detectInText(tokens):
+#        CD.type = SKIP_CTRLTYPE
 
-    return CD
+#    return CD
 
 #################### put it together
 kGENERAL = KList("GENERAL"," GEN ")

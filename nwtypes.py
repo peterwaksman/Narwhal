@@ -27,8 +27,6 @@ class KList:
     def findInText(self, tokens, itok, ifound):
          return nwfind._findInText(self, tokens, itok, ifound)
 
-    def detectInText(self,tokens,itok):
-        return nwfind._detectInText(self, tokens, itok)
     
 NULL_KLIST = KList("nullK","")
 
@@ -44,7 +42,7 @@ class VAR:
         
         # ---these are constant in the VAR
         self.knames = []  # a VAR can always have its own KList
-        self.exclusive = False
+        self.exclusive = False # true means VAR represents a binary choice (I did not implement ternary...)
         self.parent = 0 # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
         self.explicit = True # When False, this allows nars to be multi purpose. Slots that 
@@ -145,8 +143,6 @@ class VAR:
             return x # x.copy().
         else:
             return NULL_VAR
-   
-    
 
     # returns self, if kname in knames
     # or child with this name, else NULL_VAR
@@ -164,94 +160,9 @@ class VAR:
         # typically a "var<=nar" means the var is a slot or a child of a slot 
     def __le__(self,other):
         return recursiveLE(self,other)
-       
-
-                    # loops through text for every kname.
-    def findInText( self, originaltokens):
-        # ensure lower case
-        tokens = []
-        for tok in originaltokens:
-            if tok==0:
-                tokens.append(0)
-            else:
-                tokens.append(tok.lower())
-            
-        # for each token 
-        wasFound = False # used to test newly found and not what has already been found 
-        for itok in range( len(tokens) ):
-            ikname = 0 
-            for kname in self.knames: # for each name in self's klist
                 
-                klist = KList.instances[ kname ]
-                
-                found = klist.findInText(tokens, itok, self.ifound) 
-                if found:
-                    self.found = True # could have been true already
-                    wasFound = True 
-
-                    # this can switch frequently and reflects the last found token
-                    if self.exclusive and ikname>0:
-                        self.polarity = False
-                    else:
-                        self.polarity = True                          
-                ikname += 1               
-                    # all the way through the call stack, self.ifound updates
-                    # a list of indices of tokens found. This will be
-                    # confusing, as they may not sync with itok exactly,
-                    # when multi-word KList entries are used.      
-
-        # Search iteratively inside the children
-        for child in self.children:
-            foundC = child.findInText( tokens )
-            if foundC :
-                self.foundInChildren = True
-                self.ifound.extend( child.ifound )
-                if not wasFound:
-                    self.polarity = child.polarity
-        
-        # tell the caller that something below it was found
-        # although self.found can be False
-        return (wasFound or self.foundInChildren)   
-                
-    
-    #            # Finds VAR matching at itok. Only visit
-    #            # children if no direct match is found
-    #def findInText2( self, tokens, itok):  
-    #    ikname = 0 
-    #    wasFound = False
-    #    for kname in self.knames: # for each name in self's klist         
-    #        klist = KList.instances[ kname ]                
-    #        found = klist.findInText(tokens, itok, self.ifound) 
-    #        if found:
-    #            self.found = True # could have been true already
-    #            # this can switch frequently and reflects the last found token
-    #            if self.exclusive and ikname>0:
-    #                self.polarity = False
-    #            else:
-    #                self.polarity = True   
-                                     
-    #            wasFound = True   
-                         
-    #        ikname += 1           
-     
-    #    # If nothing was found, search iteratively inside the children
-    #    for child in self.children:
-    #        foundC = child.findInText2( tokens , itok)
-    #        if foundC!=NULL_VAR :
-    #            self.foundInChildren = True
-    #            self.ifound.extend( child.ifound )
-    #            self.ifound = cleanFound(self.ifound)
-    #            if not wasFound:
-    #                self.polarity = child.polarity
-
-    #            return foundC
-
-    #    if wasFound:
-    #        return self
-    #    else:
-    #        return NULL_VAR
-
-                    # Finds VAR matching at itok. Only visit
+ 
+                # Finds VAR matching at itok. Only visit
                 # children if no direct match is found
     def findInText2( self, tokens, itok):  
         ikname = 0 
@@ -286,60 +197,6 @@ class VAR:
                     self.polarity = child.polarity
                 vars.extend( foundC )
         return vars # empty list if none found in children
-
-
-    ## This can modify the .found  or .foundInChildren, or ifound 
-    # only use this for controls, or where you do not care about
-    # corrupting the VARs in the tree 
-    def find(self,tok):
-            ifound = self.ifound[:] 
-            tokens = []
-            tokens.append(tok)
-            self.ifound = []
-            self.findInText(tokens) 
-            if len(self.ifound)>0:
-                found = True
-            else:
-                found = False
-            self.ifound = ifound[:] # restore
-            return found
-
-                   # loops through text for every kname.
-    def detectInText( self, tokens):
-        # assume lower case
-        for itok in range( len(tokens) ):
-            for kname in self.knames: # for each name in self's klist       
-                klist = KList.instances[ kname ]               
-                found = klist.findInText(tokens, itok, self.ifound) 
-                if found:
-                    return True
-        for child in self.children:
-            if child.detectInText( tokens ):
-                return True
-        
-        return False 
-
-    ## DEPRECATED
-    ## like findInText() but simply returns true/false and corrupts contents of self
-    def scan( self, tokens):
-        self.clear()
-       
-        # for each token 
-        for itok in range( len(tokens) ):
-            ikname = 0 
-            for kname in self.knames: # for each name in self's klist
-                
-                klist = KList.instances[ kname ]
-                
-                found = klist.findInText(tokens, itok, self.ifound) 
-                if found:
-                    return True
-  
-        for child in self.children:
-            foundC = child.scan( tokens )
-            if foundC :
-                return True
-        return False
 
     def str(self, ntabs):
         tab = ""
@@ -503,39 +360,14 @@ def countVAR(array):
     return count
         
 
-####################### REFERENCE CONSTANTS for NAR class ################
-NULL_NARTYPE  = 0  # for empty nar, like NULL_NAR
-THING_NARTYPE = 1  # for nar without actioN or relation
-ATTRIB_NARTYPE= 2  # non empty relation
-EVENT_NARTYPE = 3  # user defined event
-SO_NARTYPE    = 4  # cause/"so" nar ("so" is more for internal use)
-THEN_NARTYPE  = 5  # sequence/"then" nar ("then is more for internal use)
 
-def strNarType(type):
-    if   type==NULL_NARTYPE:
-        return "NULL"
-    elif type==THING_NARTYPE:
-        return "THING"
-    elif type==ATTRIB_NARTYPE:
-        return "ATTRIB"
-    elif type==EVENT_NARTYPE:
-        return "EVENT"
-    elif type==SO_NARTYPE:
-        return "CAUSE"
-    elif type==THEN_NARTYPE:
-        return "SEQ"
-
-
-#######################################################################
-#######################################################################
-# this class stores several VAR-like entitites in its members. 
-# But the implementation is TREE-like because "operators" of the form
-#               self.thing = (some other self)
-# can get recursive
+############################## 
+#            NAR             #
+##############################
 class NAR:   
     def __init__(self):
-        self.order = 0 # the level of pattern-inside-pattern depth
-        self.explicit = True # don't know if I want this
+        self.order = 0 # the level of pattern-inside-pattern depth. Currently it is informational
+        self.explicit = True # don't know if I want this [ANSWER: to implement implicit variables]
 
         self.polarity = True 
         
@@ -641,50 +473,7 @@ class NAR:
         n.relation= self.relation.copyUsing(tree)
         n.value   = self.value.copyUsing(tree)
         return n   
-
-    #def refreshImplicits(self, parentWasImplicit):
-    #    if not self.explicit: # as soon as you hit an implicit...so also its sub narratives
-    #        parentWasImplicit =True
-
-    #    if self.thing!=NULL_VAR:
-    #        self.thing.refreshImplicits(parentWasImplicit)
-    #    if self.action!=NULL_VAR:
-    #        self.action.refreshImplicits(parentWasImplicit)
-    #    if self.relation!=NULL_VAR:
-    #        self.relation.refreshImplicits(parentWasImplicit)
-    #    if self.value!=NULL_VAR:
-    #        self.value.refreshImplicits(parentWasImplicit)
-              
-            # means the token is part of the narrative. This changes the state of 
-            # underlying VARs but note it is prevented from changing the ifound
-    def find(self,tok):
-        if ORDER(self)==0 :
-            tokens = []
-            tokens.append(tok)
-            return self.findInText(tokens) 
-        t = self.thing.find(tok) 
-        a = self.action.find(tok) 
-        r = self.relation.find(tok) 
-        v = self.value.find(tok)
-        return t or a or r or v
-
-    # returns True if any token finds a match in self.
-    def scan( self, originaltokens):
-        if ORDER(self)==0:
-            return self.scan(originaltokens)
-        if self.thing.scan(originaltokens):
-            return True
-        elif self.thing.action.scan(originaltokens):
-            return True
-        elif self.thing.relation.scan(originaltokens):
-            return True
-        elif self.value.scan(originaltokens):
-            return True
-        return False
-    def Scan(self, text):
-        tokens = TOKS(text)
-        return scan(self, tokens)
-
+  
     def numSlots(self):
         if isinstance(self, VAR):  
            return self.numSlots()
@@ -809,10 +598,6 @@ def ORDER( X ):
         return X.order
 
 
-
-
-
-
 #----------- OPERATORS that should have been methods of NAR() but I could not
 # figure out how to program them. Their default args need to be globals that are
 # not acceptable to the VAR() class.
@@ -905,8 +690,8 @@ def cause(x,y):
 ## is closer to some versions of "and". Meanwhile they co-opted "or" and created the straw horse
 ## of "and not both". Further, don't tell me that chronology "X,Y" can be co-opted as a bi-
 ## directional relation like logical "or" and "and", or as a sub-part of an "if then" (which has
-## lost its connection to chronology) So here, for a change, it means chronology. To achieve bi-directionalty,
-## for now requires using both X,Y and Y,X and you can design code making them equivalent
+## lost its connection to chronology) So here, for a change, it means chronology. To achieve bi-
+## directionalty,for now, requires using both X,Y and Y,X and you can design code making them equivalent
 NAR_THEN = KList("then","").var().nar() # used to identify the "and"/"then" type of statement
 
 def sequence(x,y):
@@ -921,3 +706,26 @@ def sequence(x,y):
     return n
 
 ##########################################
+
+
+####################### REFERENCE CONSTANTS for NAR class ################
+NULL_NARTYPE  = 0  # for empty nar, like NULL_NAR
+THING_NARTYPE = 1  # for nar without actioN or relation
+ATTRIB_NARTYPE= 2  # non empty relation
+EVENT_NARTYPE = 3  # user defined event
+SO_NARTYPE    = 4  # cause/"so" nar ("so" is more for internal use)
+THEN_NARTYPE  = 5  # sequence/"then" nar ("then is more for internal use)
+
+def strNarType(type):
+    if   type==NULL_NARTYPE:
+        return "NULL"
+    elif type==THING_NARTYPE:
+        return "THING"
+    elif type==ATTRIB_NARTYPE:
+        return "ATTRIB"
+    elif type==EVENT_NARTYPE:
+        return "EVENT"
+    elif type==SO_NARTYPE:
+        return "CAUSE"
+    elif type==THEN_NARTYPE:
+        return "SEQ"

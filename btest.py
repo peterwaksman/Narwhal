@@ -2,11 +2,10 @@
 #--------- some core includes
 from nwtypes import *
 from nwutils import *
-from nwread import *
 from nwcontrol import *
 from nwsreader import *
 from nwapp import *
-from nwobject import *
+
 
 print("\n\n")
 
@@ -47,10 +46,6 @@ text = "it was perfectly quiet and dark at night "
 text = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door."
 
 
-#ab = NWReader(E,[proximity])
-#ab.readText(text)
-#print ab.report()
-
 #nw = NWSReader(E, [proximity] )
 #nw.readText(text)
 #s = nw.report(text)
@@ -62,14 +57,11 @@ calibs    = [ True,    True,  True,   True,      True ]
 thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
 
 
-nwo = NWObject(E, nars, calibs, thresholds)
-nwo.readText(text)
-s = nwo.report()
-print s
  
 nwa = NWApp(E, nars, calibs, thresholds)
 nwa.readText(text)
 s =  nwa.report(text)
 print s
 x = 2
+
 

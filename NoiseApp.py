@@ -1,6 +1,6 @@
 from nwtypes import *
-from nwread import *
-from nwobject import *
+from nwsreader import *
+from nwapp import *
 
 # app specific
 from NoiseTree import *
@@ -33,7 +33,7 @@ class NoiseApp:
         calibs    = [ True,    True,  True,   True,      True ]     
         thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
  
-        self.object = NWObject(EXPERIENCE, nars, calibs, thresholds) 
+        self.object = NWApp(EXPERIENCE, nars, calibs, thresholds) 
 
     def run(self):
         text = ""
@@ -46,7 +46,7 @@ class NoiseApp:
 
     def test(self,text):
             self.object.readText(text)
-            h = self.object.report()
+            h = self.object.report(text)
             print(h)
             print( self.object.printFinal() )
 
