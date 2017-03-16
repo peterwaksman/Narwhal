@@ -1,5 +1,5 @@
-import nwfind
-from narwhal.nwutils import *
+from narwhal import nwfind
+from narwhal import nwutils
 
 print("Hello")
 
@@ -28,7 +28,7 @@ class KList:
         # it is the responsibility to the client to pass in ifound
         # This method returns True or False
     def findInText(self, tokens, itok, ifound):
-        return nwfind._findInText(self, tokens, itok, ifound)
+        return nwfind.findInText(self, tokens, itok, ifound)
 
 
 NULL_KLIST = KList("nullK", "")
@@ -104,7 +104,7 @@ class VAR:
             child.clearIFound()
 
     def numIFound(self):
-        self.ifound = cleanFound(self.ifound)
+        self.ifound = nwutils.cleanFound(self.ifound)
         return len(self.ifound)
 
     def getIFound(self):
@@ -164,7 +164,7 @@ class VAR:
 
         # typically a "var<=nar" means the var is a slot or a child of a slot
     def __le__(self, other):
-        return recursiveLE(self, other)
+        return nwutils.recursiveLE(self, other)
 
         # Finds VAR matching at itok. Only visit
         # children if no direct match is found
@@ -196,7 +196,7 @@ class VAR:
             if len(foundC) > 0:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
-                self.ifound = cleanFound(self.ifound)
+                self.ifound = nwutils.cleanFound(self.ifound)
                 if not wasFound:
                     self.polarity = child.polarity
                 vars.extend(foundC)
@@ -272,7 +272,7 @@ class VAR:
                 output += name + "|"
         if self.found:
             output += "*"
-        if self.polarity == False:
+        if not self.polarity:
             output += "-"
         output += '\n'
         for child in self.children:
@@ -349,22 +349,15 @@ class VAR:
     # nor does it climb down the tree searching for childern. (Gosh someone
     # should do that)
     def isA(self, name):
-        if name == self.knames[0]:
-            return True
-        else:
-            return False
+        return name == self.knames[0]
 
 
-#-----------ZERO for VAR type
+# -----------ZERO for VAR type
 NULL_VAR = NULL_KLIST.var()
 
 
 def countVAR(array):
-    count = 0
-    for i in range(len(array)):
-        if array[i] != NULL_VAR:
-            count += 1
-    return count
+    return sum(1 for i in array if i != NULL_VAR)
 
 
 ##############################
@@ -526,7 +519,7 @@ class NAR:
         all.extend(self.value.getIFound())
         all.extend(self.relation.getIFound())
         # consolidate them and count
-        all = cleanFound(all)
+        all = nwutils.cleanFound(all)
         return all
 
     def numIFound(self):
@@ -589,14 +582,14 @@ class NAR:
 #####################################################
 
 
-#------------ZERO for NAR() type
+# ------------ZERO for NAR() type
 NULL_NAR = NULL_VAR.nar()  # used as a default arg
 
 # NOTE: NULL_VAR is used to indicate an uninitialized NAR
 # and NULL_NAR is used to indicate a NAR that is empty. NULL_NAR
 # is used as a deliberate place holder
 
-#----------- UTILITIES FOR VARS AND NARS
+# ----------- UTILITIES FOR VARS AND NARS
 
 
 def ORDER(X):
@@ -606,7 +599,7 @@ def ORDER(X):
         return X.order
 
 
-#----------- OPERATORS that should have been methods of NAR() but I could not
+# ----------- OPERATORS that should have been methods of NAR() but I could not
 # figure out how to program them. Their default args need to be globals that are
 # not acceptable to the VAR() class.
 #
@@ -624,7 +617,7 @@ def ORDER(X):
 # This co-ops the list syntax of Python, to indicate implicit arguments
 # It returns (possibly modified) input
 def a2n(arg):
-    if type(arg) is list:
+    if isinstance(arg, list):
         n = arg[0]
         n.explicit = False
     else:
@@ -632,7 +625,7 @@ def a2n(arg):
     return n
 
 
-#-------implements:  "X_REL_/A" - the adjective relation. X,A, and REL are NARs
+# -------implements:  "X_REL_/A" - the adjective relation. X,A, and REL are NARs
 #  ATTN! only use the REL variable if it is defined with A
 # TODO: put in a check for this
 
@@ -650,7 +643,7 @@ def attribute(x, y, rel=NULL_NAR):
     n.order = max(ORDER(X), ORDER(REL), ORDER(Y)) + 1
     return n
 
-#-------implements:  "X-ACT->Y" - the verb relation
+# -------implements:  "X-ACT->Y" - the verb relation
 
 
 def event(x, y, act):
@@ -673,7 +666,7 @@ def event(x, y, act):
 # as causally connected, and the seq(X,Y) function describes them purely as a sequential.
 # Note "SO" is used internally for cause and "THEN" and "AND" for sequence.
 
-#-------Implements:  causal "X::Y" . This operator indicates transformation, becoming, causality,
+# -------Implements:  causal "X::Y" . This operator indicates transformation, becoming, causality,
 # and is a bit like logical "therefor". Words in text like "so", "because", or "but"
 # are listed in internal KLists and are not needed from the client
 # Worth mentioning (as part of another rant below) that these words in English are
@@ -733,16 +726,16 @@ SO_NARTYPE = 4  # cause/"so" nar ("so" is more for internal use)
 THEN_NARTYPE = 5  # sequence/"then" nar ("then is more for internal use)
 
 
-def strNarType(type):
-    if type == NULL_NARTYPE:
+def strNarType(nar_type):
+    if nar_type == NULL_NARTYPE:
         return "NULL"
-    elif type == THING_NARTYPE:
+    elif nar_type == THING_NARTYPE:
         return "THING"
-    elif type == ATTRIB_NARTYPE:
+    elif nar_type == ATTRIB_NARTYPE:
         return "ATTRIB"
-    elif type == EVENT_NARTYPE:
+    elif nar_type == EVENT_NARTYPE:
         return "EVENT"
-    elif type == SO_NARTYPE:
+    elif nar_type == SO_NARTYPE:
         return "CAUSE"
-    elif type == THEN_NARTYPE:
+    elif nar_type == THEN_NARTYPE:
         return "SEQ"

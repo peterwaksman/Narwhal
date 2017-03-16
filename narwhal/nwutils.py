@@ -1,7 +1,3 @@
-##from narwhal.nwtypes import *
-##from NoiseTree import *
-
-
 import sys
 
 
@@ -13,7 +9,7 @@ def PythonMajorVersion():
 # to call a function of one variable and redirect ouput
 def sendToFileA(printFn, a):
     orig_stdout = sys.stdout
-    f = file('out.txt', 'w')
+    f = open('out.txt', 'w')
     sys.stdout = f
 
     printFn(a)
@@ -26,7 +22,7 @@ def sendToFileA(printFn, a):
 
 def sendToFileAB(printFn, a, b):
     orig_stdout = sys.stdout
-    f = file('out.txt', 'w')
+    f = open('out.txt', 'w')
     sys.stdout = f
 
     printFn(a, b)
@@ -44,45 +40,31 @@ def TOKS(text):
 
 
 def compressFound(T, ifound):
-    tmp = []
-    for i in range(T):
-        tmp.append(False)
-    for j in range(len(ifound)):
-        if ifound[j] < T:
-            tmp[ifound[j]] = True
+    tmp = [False for _ in range(T)]
+    for ifval in ifound:
+        if ifval < T:
+            tmp[ifval] = True
     return tmp
 
 
 def expandFound(T, tmp):
-    ifound = []
-    for i in range(T):
-        if tmp[i]:
-            ifound.append(i)
+    ifound = [i for i in range(T) if tmp[i]]
     return ifound
 
 
 def countFound0(T, ifound):
-    count = 0
     tmp = compressFound(T, ifound)
-    for i in range(T):
-        if tmp[i]:
-            count += 1
+    count = sum(1 for i in range(T) if tmp[i])
     return count
 
 
 def countFound(ifound):
-    max = -1
-    for i in ifound:
-        if max < i:
-            max = i
-    if max == -1:
+    if not ifound:
         return 0
+    imax = max(i for i in ifound)
 
-    count = 0
-    tmp = compressFound(max + 1, ifound)
-    for i in range(max + 1):
-        if tmp[i]:
-            count += 1
+    tmp = compressFound(imax + 1, ifound)
+    count = sum(1 for i in range(imax + 1) if tmp[i])
     return count
 
 # assumes a cleanFound(), otherwise it changes you data
@@ -92,93 +74,52 @@ def histo(ifound, i):
     if len(ifound) < 1:
         return 0
     ifound = cleanFound(ifound)
-    count = 0
-    for j in range(len(ifound)):
-        if ifound[j] <= i:
-            count += 1
+    count = sum(1 for j, ifval in enumerate(ifound) if ifval <= i)
     return count
 
 
 def cleanFound(ifound):
-    max = -1
-    for i in ifound:
-        if max < i:
-            max = i
-    if max == -1:
+    if len(ifound) < 1:
         return []
-    tmp = compressFound(max + 1, ifound)
-    ifound = expandFound(max + 1, tmp)
+    imax = max(i for i in ifound)
+    tmp = compressFound(imax + 1, ifound)
+    ifound = expandFound(imax + 1, tmp)
     return ifound
 
 
-def getMinMax(ifound, thresh, mlo, mhi):
-    mlo = 3
-    mhi = 4
-
-
 def minITOK(ifound):
-    if len(ifound) == 0:
+    if not ifound:
         return -1
-    imin = 1000000
-    for i in ifound:
-        if imin > i:
-            imin = i
-    return imin
+    return min(i for i in ifound)
 
 
 def maxITOK(ifound):
-    if len(ifound) == 0:
+    if not ifound:
         return -1
-    imax = 0
-    for i in ifound:
-        if imax < i:
-            imax = i
-    return imax
+    return max(i for i in ifound)
 
 
 def getFoundRange(ifound, ithresh):
-    if len(ifound) == 0:
+    if not ifound:
         return 0
-    imin = 3000
-    imax = -1
-    for j in range(len(ifound)):
-        i = ifound[j]
-        if i > ithresh:
-            continue
-        if imax < i:
-            imax = i
-        if imin > i:
-            imin = i
+    imin = min(i for i in ifound if i <= ithresh)
+    imax = max(i for i in ifound if i <= ithresh)
     return imax - imin + 1
 
 
 def dullCount(ifound, dull, ithresh):
     # same as in getFoundRange()
-    if len(ifound) == 0:
+    if not ifound:
         return 0
-    imin = 3000
-    imax = -1
-    for j in range(len(ifound)):
-        i = ifound[j]
-        if i > ithresh:
-            continue
-        if imax < i:
-            imax = i
-        if imin > i:
-            imin = i
-    count = 0   # this could be more efficient and more error prone
-    for i in range(len(dull)):
-        if dull[i] and imin <= i and i <= imax:
-            count += 1
+    imin = min(i for i in ifound if i <= ithresh)
+    imax = max(i for i in ifound if i <= ithresh)
+
+    count = sum(1 for i, d in enumerate(dull) if d and imin <= i <= imax)
     return count
 
 
 def countBool(array):
-    count = 0
-    for i in range(len(array)):
-        if array[i]:
-            count += 1
-    return count
+    return sum(1 for i in array if i)
 
 
 def showFound(tokens, ifound):
@@ -192,10 +133,8 @@ def showFound(tokens, ifound):
             t += "* "
         else:
             t += " "
-        #print( t ),
         total.append(t)
     s = ''.join(total)
- #   print( s )
     return s
 
 
@@ -211,7 +150,6 @@ def filterFile(filename, var):
             var.clear()
             F = var.findInText(tokens)
             if F:
-                #print("FOUND" + showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
 
         if len(outstring) > 0:
@@ -243,7 +181,7 @@ def readFile(fineame, nar):
 
 def shiftFoundIndices(ifound, shift):
     for itok in range(len(ifound)):
-        ifound[itok] = ifound[itok] + shift
+        ifound[itok] += shift
     cleanFound(ifound)
     return ifound
 

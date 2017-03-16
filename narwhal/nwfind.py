@@ -23,9 +23,11 @@
 ##
 # Also you are supposed to ignore wildcards so
 # abc * def
-# means match by searcing forward from abc allowing one word in between [could be more complicated] before def.
+# means match by searcing forward from abc allowing one word in between
+# [could be more complicated] before def.
 ##
-# By the way, space before or after a keyword, means its ending (at the space) must match the ending of the
+# By the way, space before or after a keyword, means its ending (at the space)
+# must match the ending of the
 # token. Without the space, different beginnings or endings are allowed in
 # matching a substring of the token.
 
@@ -166,7 +168,7 @@ def matchWordToToken_dollar(kpart, itok, ifound, tokens):
     if itok == 0:
         return matchTOK(kpart[1], itok, ifound, tokens)
 
-    #prev = tokens[itok-1]
+    # prev = tokens[itok-1]
     exclude = kpart[0].split('|')  # list of words to exclude
     for exc in exclude:
         tmp = []
@@ -184,7 +186,7 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
     tmp = ifound
 
-    a = matchTOK(kpart[0], itok, tmp,   tokens)
+    a = matchTOK(kpart[0], itok, tmp, tokens)
     b = matchTOK(kpart[1], itok + 2, tmp, tokens)
     c = matchTOK(kpart[1], itok + 3, tmp, tokens)
 
@@ -199,7 +201,7 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
 
 # ------------------------------------------------
-def _findInText(klist, tokens, itok, ifound):
+def findInText(klist, tokens, itok, ifound):
     found = False
 
     for kword in klist.list:
@@ -207,12 +209,9 @@ def _findInText(klist, tokens, itok, ifound):
         # and return with ifound storing itok and any
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
-            #print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
+            # print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
             found = True
-    if found:
-        return True
-    else:
-        return False
+    return found
 
 ###############################################################
 ###############################################################
