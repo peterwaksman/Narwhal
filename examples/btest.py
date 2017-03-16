@@ -63,5 +63,3 @@ nwa.readText(text)
 s =  nwa.report(text)
 print s
 x = 2
-
-
