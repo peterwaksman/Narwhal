@@ -1,8 +1,8 @@
-from nwutils import *
-from nwtypes import *
-from nwcontrol import *
-from nwvault import *
-from nwsreader import *
+from narwhal.nwutils import *
+from narwhal.nwtypes import *
+from narwhal.nwcontrol import *
+from narwhal.nwvault import *
+from narwhal.nwsreader import *
 
 
 MIXED_POLARITY=5

@@ -1,6 +1,6 @@
-from nwtypes import *
-from nwsreader import *
-from nwapp import *
+from narwhal.nwtypes import *
+from narwhal.nwsreader import *
+from narwhal.nwapp import *
 
 # app specific
 from NoiseTree import *

@@ -1,10 +1,10 @@
 
 #--------- some core includes
-from nwtypes import *
-from nwutils import *
-from nwcontrol import *
-from nwsreader import *
-from nwapp import *
+from narwhal.nwtypes import *
+from narwhal.nwutils import *
+from narwhal.nwcontrol import *
+from narwhal.nwsreader import *
+from narwhal.nwapp import *
 
 
 print("\n\n")

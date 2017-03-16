@@ -1,5 +1,5 @@
 import nwfind
-from nwutils import *
+from narwhal.nwutils import *
 
 print("Hello")
 

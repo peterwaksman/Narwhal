@@ -1,5 +1,5 @@
-from nwtypes import *
-from nwutils import *
+from narwhal.nwtypes import *
+from narwhal.nwutils import *
 
 # LOGICAL OPERATORS AND PUNCTUATION ARE CONSIDERED "CONTROLS" THAT AFFECT READING
 

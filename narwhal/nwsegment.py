@@ -1,8 +1,8 @@
 ## nwsegment.py for handling text segmentation utilities.
 ## used by the NWSReader. Contains utilities and the inner loop read() methods
-from nwtypes import *
-from nwutils import *
-from nwcontrol import *
+from narwhal.nwtypes import *
+from narwhal.nwutils import *
+from narwhal.nwcontrol import *
 
 
 

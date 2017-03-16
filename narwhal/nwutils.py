@@ -1,4 +1,4 @@
-##from nwtypes import *
+##from narwhal.nwtypes import *
 ##from NoiseTree import *
 
 

@@ -1,9 +1,9 @@
 ## nwsegment.py for handling text semgentation
-#from nwtypes import *
-#from nwutils import *
-#from nwcontrol import *
-from nwvault import *
-from nwsegment import *
+#from narwhal.nwtypes import *
+#from narwhal.nwutils import *
+#from narwhal.nwcontrol import *
+from narwhal.nwvault import *
+from narwhal.nwsegment import *
 
 def gof2( segment, nar, ifound, imin, imax):
     u = nar.numSlotsUsed()

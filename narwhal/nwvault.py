@@ -1,6 +1,6 @@
-from nwtypes import * # brings in nwutils and nwfind
-from nwutils import *
-from nwcontrol import *
+from narwhal.nwtypes import * # brings in nwutils and nwfind
+from narwhal.nwutils import *
+from narwhal.nwcontrol import *
 from math import sqrt
 
 # The "vault" (NarVault below) is a repository for instances of a
