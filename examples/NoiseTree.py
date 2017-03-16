@@ -1,4 +1,4 @@
-#this file is for the Noise application with VAR tree like this:
+# this file is for the Noise application with VAR tree like this:
 ##EXPERIENCE( experienceD )
 ##  PROBLEM( problemD )
 ##  SOUND( soundD )
@@ -9,7 +9,7 @@
 ##    ROOM( roomD )
 ##    HOTEL( hotelD )
 ##    PROX( nearD | farD )
-##  INSULATION()
+# INSULATION()
 ##    BARRIER( windowD + wallD )
 ##    STATE( openD | closedD )
 ##    TRANSPARENCY( letInD | keepOutD )
@@ -20,13 +20,13 @@
 from narwhal.nwtypes import *
 
 
-kOTHERTOPICS = "tourist,boulangerie,flight,write,located,neighborhood,feeling, far ,looked,trip, deal,carpet,decor,big,inn,days,month,usd,sauna,mention,stay ,dinner,smell,speak,cheap,gym,remodeled,buffet,decorations,refurbished,seal out,view,safe,apart from,otherwise,central,cost , clean, tidy,towel,sheets, bed, neat";
+kOTHERTOPICS = "tourist,boulangerie,flight,write,located,neighborhood,feeling, far ,looked,trip, deal,carpet,decor,big,inn,days,month,usd,sauna,mention,stay ,dinner,smell,speak,cheap,gym,remodeled,buffet,decorations,refurbished,seal out,view,safe,apart from,otherwise,central,cost , clean, tidy,towel,sheets, bed, neat"
 
 
 # KEYWORDS SHOULD BE IN LOWER CASE
 
 ########### FOR ANOTHER DAY#############
-kSUPER    = "very pleased,soothing,a gem, love ,home away from home,\
+kSUPER = "very pleased,soothing,a gem, love ,home away from home,\
                           homely,wow,wonderful,bliss,happy,superb,gorgeous,spotless,\
                           immaculate,phenomenal,fantastic,perfect,relax,excellent,\
                           spectacular,peaceful,lovely,beautiful,amazing,impressive,\
@@ -38,8 +38,7 @@ kHORRIBLE = "unacceptable,filthy,dump,mildew,lousy,awful,horrible,\
                           terrible,bugs,spider"
 
 
-
-############################ SOUND EXPERIENCE WORD LISTS #####################################
+############################ SOUND EXPERIENCE WORD LISTS #################
 NONRESPONSIVE = "grumpy,abrupt,aloof,non responsive,clueless,did nothing,"
 NONRESPONSIVE += " nothing was done,no one followed up,ineffective,disorganized,"
 NONRESPONSIVE += "no apology,disinterested,ignored,barely polite,unresponsive "
@@ -59,7 +58,6 @@ kTIMEOFDAY += " 1 am, 1 pm, 2 am, 2 pm, 3 am, 3 pm, 4 am, 4 pm, 5 am, 5 pm, 6 am
 kTIMEOFDAY += "8 am,8 pm, 9 am, 9 pm, 10 am, 10 pm, 11 am, 11 pm, 12 am, 12 pm"
 
 
-
 kNOISEWORDS = "street sound, noise, nosie,noise level,rampage,noisy,hear # about,"
 kNOISEWORDS += "heard # of|from|how|great,racket # club,blaring,"
 kNOISEWORDS += "moan ,shout # out, crying,scream,slamming,slammed, barking ,yelling,talking # with|to,"
@@ -68,35 +66,33 @@ kNOISEWORDS += "whistling,snoring,roaring,knocking,swearing,footstep,flush,spoke
 kQUIETWORDS = "soft,low volume,tranquil,good sleep,silent,quiet,"
 kQUIETWORDS += "isolation, rested,soundly,oasis,peace,serene,frogs,birds, waves"
 
-kPEOPLESOURCES="kitchen,maids,steps # from|away,people,fisherman,fishermen,our $ group,"
+kPEOPLESOURCES = "kitchen,maids,steps # from|away,people,fisherman,fishermen,our $ group,"
 kPEOPLESOURCES += "other guest,other guests,neighbors,neighbours,kids,teenagers,"
 kPEOPLESOURCES += "shower,couples,neighbors,dogs,hustle,bustle,squeak,"
 
 
-kPARTYSOURCES="stadium,party,function,wedding,drunk,club,mcdonalds,music,"
+kPARTYSOURCES = "stadium,party,function,wedding,drunk,club,mcdonalds,music,"
 kPARTYSOURCES += " bar ,wine bar,hofbrau,piano player,singer,partied,revellers"
 
-kEQUIPMENTSOURCES=" ac , a/c ,air con,air-con,a/c,aircon,air conditioner,air conditioning,"
+kEQUIPMENTSOURCES = " ac , a/c ,air con,air-con,a/c,aircon,air conditioner,air conditioning,"
 kEQUIPMENTSOURCES += "tv,air shaft,drains,hvac,central heating,lift,elevator, fan ,"
 kEQUIPMENTSOURCES += " ice ,ventilation,equipment,clanking,clattering,rumbling"
 
-kTRAFFICSOURCES="truck,traffic,busy,busy street,shopping, street, main , market , road noise,highway,diesel,"
-kTRAFFICSOURCES+= "road, alley, city , downtown , center, centre , garage , engine , tram,deliveries"
+kTRAFFICSOURCES = "truck,traffic,busy,busy street,shopping, street, main , market , road noise,highway,diesel,"
+kTRAFFICSOURCES += "road, alley, city , downtown , center, centre , garage , engine , tram,deliveries"
 
 
-kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering"
+kCONSTRUCTIONSOURCES = "banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering"
 
-kOASISSOURCES="ocean"
+kOASISSOURCES = "ocean"
 
-kNOISELOCSROOM="that, it ,our floor, room # for,my room,our room,outside,door ,next to, next door,"
-kNOISELOCSROOM+="my door,outside my door,adjacent room,next suite,"
-kNOISELOCSROOM+="next room,neighboring roof,above,below,hallway,hall,corridor,"
-kNOISELOCSROOM+="bathroom"
+kNOISELOCSROOM = "that, it ,our floor, room # for,my room,our room,outside,door ,next to, next door,"
+kNOISELOCSROOM += "my door,outside my door,adjacent room,next suite,"
+kNOISELOCSROOM += "next room,neighboring roof,above,below,hallway,hall,corridor,"
+kNOISELOCSROOM += "bathroom"
 
-kNOISELOCSHOTEL="hotel, high $ floor,building,area, section,location,quiet hotel,"
-kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool"
-
-
+kNOISELOCSHOTEL = "hotel, high $ floor,building,area, section,location,quiet hotel,"
+kNOISELOCSHOTEL += "lobby,patio,neighborhood,pool"
 
 
 #-------------OTHER LISTS FROM THE OLD NOISE APP--------
@@ -132,33 +128,33 @@ soundD = KList("sound", kSOUND)
 noiseD = KList("noise", kNOISEWORDS)
 quietD = KList("quiet", kQUIETWORDS)
 
-kLOUD = "very noisy,loud,very loud, a bit of, a bit,a little,bad, dreadful, loud ,deafening,deafning" #people hate to criticize and use understatement
+# people hate to criticize and use understatement
+kLOUD = "very noisy,loud,very loud, a bit of, a bit,a little,bad, dreadful, loud ,deafening,deafning"
 loudD = KList("loud", kLOUD)
-kSOFT = "soft, low # volume|tide, down ,very quiet" #I'm too lazy to implement "keep the noise down"
+# I'm too lazy to implement "keep the noise down"
+kSOFT = "soft, low # volume|tide, down ,very quiet"
 softD = KList("soft", kSOFT)
 
 peopleD = KList("people", kPEOPLESOURCES)
-partyD  = KList("party", kPARTYSOURCES)
+partyD = KList("party", kPARTYSOURCES)
 equipmentD = KList("equip", kEQUIPMENTSOURCES)
 trafficD = KList("traffic", kTRAFFICSOURCES)
 constructionD = KList("constr", kCONSTRUCTIONSOURCES)
 oasisD = KList("oasis", kOASISSOURCES)
-## unfotunately, to work around a bug:
-nsourceD = KList("nsource", kPEOPLESOURCES + kPARTYSOURCES + kEQUIPMENTSOURCES + kTRAFFICSOURCES + kCONSTRUCTIONSOURCES)
-qsourceD = KList("oasis",kOASISSOURCES)
-
-
+# unfotunately, to work around a bug:
+nsourceD = KList("nsource", kPEOPLESOURCES + kPARTYSOURCES +
+                 kEQUIPMENTSOURCES + kTRAFFICSOURCES + kCONSTRUCTIONSOURCES)
+qsourceD = KList("oasis", kOASISSOURCES)
 
 
 roomD = KList("room", kNOISELOCSROOM)
 hotelD = KList("hotel", kNOISELOCSHOTEL)
 
 
-
 kNEAR = "nowhere $ near , near to ,in the heart of, over ,outside,next to, on the ,on our,being on,across from, right on ,overlooked,overlooks, close to,next to, next door,faced"
 nearD = KList("near", kNEAR)
-kFAR  = " far , far from,farthest from, away from,nowhere near"
-farD = KList("far",kFAR)
+kFAR = " far , far from,farthest from, away from,nowhere near"
+farD = KList("far", kFAR)
 
 kINSULATION = "insulation,filter,isolated from, away from , deaden,soundproof,glazed,"
 kINSULATION += "glazing,sound deadening,sound proof,sound prof,sound insulation,insulate,"
@@ -179,7 +175,7 @@ closedD = KList("closed", kCLOSED)
 kLETIN = "let in, still hear, heard through, came in, lets in, lets * in, let * in, came through, through , coming through, carries"
 letinD = KList("letin", kLETIN)
 
-kKEEPOUT  = "keep out,keep * out,the $ block, filter,cut down on,far away enough,"
+kKEEPOUT = "keep out,keep * out,the $ block, filter,cut down on,far away enough,"
 kKEEPOUT += "far away from,shut out,cut out,block,keep out,kept out,drown out,"
 kKEEPOUT += "escape from"
 keepoutD = KList("keepout", kKEEPOUT)
@@ -198,9 +194,9 @@ EXPERIENCE = experienceD.var()
 PROBLEM = problemD.var()
 SOUND = soundD.var()
 
-NOISE = noiseD.var()|quietD.var()
+NOISE = noiseD.var() | quietD.var()
 
-INTENSITY = loudD.var()|softD.var()
+INTENSITY = loudD.var() | softD.var()
 
 
 SOURCE = nsourceD.var() | qsourceD.var()
@@ -208,17 +204,17 @@ SOURCE = nsourceD.var() | qsourceD.var()
 #SOURCE = (peopleD.var() + partyD.var() + equipmentD.var()+ trafficD.var() + constructionD.var()) | oasisD.var()
 
 
-LOC = KList("loc","").var() #VAR()
+LOC = KList("loc", "").var()  # VAR()
 ROOM = roomD.var()
-HOTEL =  hotelD.var()
+HOTEL = hotelD.var()
 
-PROX =  nearD.var()|farD.var()  # typically an adjective val
+PROX = nearD.var() | farD.var()  # typically an adjective val
 INSULATION = insulationD.var()
 BARRIER = windowD.var() + wallD.var()
-STATE = openD.var()|closedD.var()
-LETINOUT = letinD.var()|keepoutD.var() # typically a verb
+STATE = openD.var() | closedD.var()
+LETINOUT = letinD.var() | keepoutD.var()  # typically a verb
 TOD = timeofdayD .var()
-AFFECT = stressD.var()|relaxD.var()
+AFFECT = stressD.var() | relaxD.var()
 
 #--------------define the tree built from these VARs
 EXPERIENCE.sub(PROBLEM)
@@ -229,7 +225,7 @@ EXPERIENCE.sub(INSULATION)
 EXPERIENCE.sub(TOD)
 EXPERIENCE.sub(AFFECT)
 
-#PROBLEM
+# PROBLEM
 #
 SOUND.sub(NOISE)
 SOUND.sub(INTENSITY)
@@ -237,7 +233,7 @@ SOUND.sub(SOURCE)
 #
 LOC.sub(ROOM)
 LOC.sub(HOTEL)
-#LOC.sub(PROX) moved up
+# LOC.sub(PROX) moved up
 #
 INSULATION.sub(BARRIER)
 INSULATION.sub(STATE)
@@ -255,4 +251,3 @@ INSULATION.sub(LETINOUT)
 #                       (barrier_/state)-letInOut->sound
 #                       location _nearfar_/ source
 #                       X_/Y :: sound
-

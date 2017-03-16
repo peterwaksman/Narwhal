@@ -4,13 +4,14 @@
 
 import sys
 
+
 def PythonMajorVersion():
-    return int( sys.version[0] )
+    return int(sys.version[0])
 
 
 # Thanks to Gringo Suave:
 # to call a function of one variable and redirect ouput
-def sendToFileA( printFn, a):
+def sendToFileA(printFn, a):
     orig_stdout = sys.stdout
     f = file('out.txt', 'w')
     sys.stdout = f
@@ -21,143 +22,156 @@ def sendToFileA( printFn, a):
     f.close()
 
 # to call a function of two variables
-def sendToFileAB( printFn, a, b):
+
+
+def sendToFileAB(printFn, a, b):
     orig_stdout = sys.stdout
     f = file('out.txt', 'w')
     sys.stdout = f
 
-    printFn(a,b)
+    printFn(a, b)
 
     sys.stdout = orig_stdout
     f.close()
 
 
-
-def TOKS( text ):
+def TOKS(text):
     tokens = text.split(' ')
     return tokens
 
-
     # T = numTokens. It is assume ifound is list of indices from
     # in [0, T)
-def compressFound( T , ifound ):
+
+
+def compressFound(T, ifound):
     tmp = []
-    for i in range( T ):
+    for i in range(T):
         tmp.append(False)
-    for j in range( len(ifound) ):
-        if ifound[j]< T:
-            tmp[ ifound[j] ] = True
+    for j in range(len(ifound)):
+        if ifound[j] < T:
+            tmp[ifound[j]] = True
     return tmp
 
-def expandFound( T, tmp):
+
+def expandFound(T, tmp):
     ifound = []
     for i in range(T):
-        if tmp[ i ]:
-            ifound.append( i )
+        if tmp[i]:
+            ifound.append(i)
     return ifound
 
-def countFound0(T, ifound ):
+
+def countFound0(T, ifound):
     count = 0
-    tmp = compressFound( T, ifound)
+    tmp = compressFound(T, ifound)
     for i in range(T):
-        if tmp[i] :
+        if tmp[i]:
             count += 1
     return count
 
-def countFound(ifound ):
+
+def countFound(ifound):
     max = -1
     for i in ifound:
-        if max<i:
+        if max < i:
             max = i
-    if max==-1:
+    if max == -1:
         return 0
 
     count = 0
-    tmp = compressFound( max+1, ifound)
-    for i in range(max+1):
-        if tmp[i] :
+    tmp = compressFound(max + 1, ifound)
+    for i in range(max + 1):
+        if tmp[i]:
             count += 1
     return count
 
 # assumes a cleanFound(), otherwise it changes you data
-def histo(ifound,i):
-    if len(ifound)<1:
+
+
+def histo(ifound, i):
+    if len(ifound) < 1:
         return 0
     ifound = cleanFound(ifound)
     count = 0
     for j in range(len(ifound)):
-        if ifound[j]<=i:
+        if ifound[j] <= i:
             count += 1
     return count
 
 
-def cleanFound( ifound ):
+def cleanFound(ifound):
     max = -1
     for i in ifound:
-        if max<i:
+        if max < i:
             max = i
-    if max==-1:
+    if max == -1:
         return []
-    tmp = compressFound( max+1, ifound )
-    ifound = expandFound(max+1, tmp )
+    tmp = compressFound(max + 1, ifound)
+    ifound = expandFound(max + 1, tmp)
     return ifound
 
-def getMinMax(ifound, thresh, mlo, mhi ):
+
+def getMinMax(ifound, thresh, mlo, mhi):
     mlo = 3
     mhi = 4
 
+
 def minITOK(ifound):
-    if len(ifound)==0:
+    if len(ifound) == 0:
         return -1
     imin = 1000000
     for i in ifound:
-        if imin>i:
+        if imin > i:
             imin = i
     return imin
 
+
 def maxITOK(ifound):
-    if len(ifound)==0:
+    if len(ifound) == 0:
         return -1
     imax = 0
     for i in ifound:
-        if imax<i:
+        if imax < i:
             imax = i
     return imax
 
+
 def getFoundRange(ifound, ithresh):
-    if len(ifound)==0 :
+    if len(ifound) == 0:
         return 0
     imin = 3000
     imax = -1
-    for j in range( len(ifound) ):
+    for j in range(len(ifound)):
         i = ifound[j]
-        if i>ithresh:
+        if i > ithresh:
             continue
-        if imax<i :
+        if imax < i:
             imax = i
-        if imin>i :
+        if imin > i:
             imin = i
     return imax - imin + 1
 
+
 def dullCount(ifound, dull, ithresh):
     # same as in getFoundRange()
-    if len(ifound)==0 :
+    if len(ifound) == 0:
         return 0
     imin = 3000
     imax = -1
-    for j in range( len(ifound) ):
+    for j in range(len(ifound)):
         i = ifound[j]
-        if i>ithresh:
+        if i > ithresh:
             continue
-        if imax<i :
+        if imax < i:
             imax = i
-        if imin>i :
+        if imin > i:
             imin = i
     count = 0   # this could be more efficient and more error prone
     for i in range(len(dull)):
-        if dull[i] and imin<=i and i<= imax:
+        if dull[i] and imin <= i and i <= imax:
             count += 1
     return count
+
 
 def countBool(array):
     count = 0
@@ -166,14 +180,15 @@ def countBool(array):
             count += 1
     return count
 
-def showFound( tokens, ifound ):
+
+def showFound(tokens, ifound):
     T = len(tokens)
     t = []
     total = []
-    tmp = compressFound( T, ifound)
+    tmp = compressFound(T, ifound)
     for i in range(T):
         t = tokens[i]
-        if tmp[i] :
+        if tmp[i]:
             t += "* "
         else:
             t += " "
@@ -184,13 +199,13 @@ def showFound( tokens, ifound ):
     return s
 
 
-def filterFile( filename, var ):
-    infile = open(filename,"r")
+def filterFile(filename, var):
+    infile = open(filename, "r")
     for line in infile:
         outstring = ""
-        sentences = line.split('.' )
-        if len(line)>0:
-            print("\n\noriginal:"+ line)
+        sentences = line.split('.')
+        if len(line) > 0:
+            print("\n\noriginal:" + line)
         for sentence in sentences:
             tokens = sentence.split(' ')
             var.clear()
@@ -199,19 +214,19 @@ def filterFile( filename, var ):
                 #print("FOUND" + showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
 
-        if len(outstring)>0:
-            print("FOUND:"+outstring)
+        if len(outstring) > 0:
+            print("FOUND:" + outstring)
 
     infile.close()
 
 
-def readFile( fineame, nar):
-    infile = open(filename,"r")
+def readFile(fineame, nar):
+    infile = open(filename, "r")
     for line in infile:
         outstring = ""
-        sentences = line.split('.' )
-        if len(line)>0:
-            print("\n\noriginal:"+ line)
+        sentences = line.split('.')
+        if len(line) > 0:
+            print("\n\noriginal:" + line)
         for sentence in sentences:
             tokens = sentence.split(' ')
             ifound = []
@@ -220,7 +235,7 @@ def readFile( fineame, nar):
             if F:
                 #print("FOUND"+ showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
-        if len(outstring)>0:
+        if len(outstring) > 0:
             print("FOUND:" + outstring)
 
     infile.close()
@@ -228,9 +243,10 @@ def readFile( fineame, nar):
 
 def shiftFoundIndices(ifound, shift):
     for itok in range(len(ifound)):
-       ifound[itok] = ifound[itok] + shift
+        ifound[itok] = ifound[itok] + shift
     cleanFound(ifound)
     return ifound
+
 
 def cleanAMPM(text):
     L = len(text)
@@ -238,35 +254,35 @@ def cleanAMPM(text):
     i = 0
     while i < L:
         c = text[i]
-        if c=='I' and i<L-3 and text[i+1]==' ' and text[i+2]=='a' and text[i+3]=='m': # test for "I am"
+        # test for "I am"
+        if c == 'I' and i < L - 3 and text[i + 1] == ' ' and text[i + 2] == 'a' and text[i + 3] == 'm':
             newtext += "I_am"
             i += 4
-        elif c.isdigit() and i<L-2:
-            d = text[i+1]
-            e = text[i+2]
+        elif c.isdigit() and i < L - 2:
+            d = text[i + 1]
+            e = text[i + 2]
 
-            if d.lower()=='a' and e.lower()=='m':
+            if d.lower() == 'a' and e.lower() == 'm':
                 newtext += c + ' ' + 'a' + 'm'
                 i += 3
-            elif  d.lower()=='p' and e.lower()=='m':
+            elif d.lower() == 'p' and e.lower() == 'm':
                 newtext += c + ' ' + 'p' + 'm'
                 i += 3
             else:
                 newtext += c
-                i +=1
+                i += 1
         else:
             newtext += c
-            i +=1
+            i += 1
 
     return newtext
 
 
-
 # I was not able to use a recursive definition inside the VAR.__le__()
-def recursiveLE(self,other):
-        if self.knames==other.knames:
+def recursiveLE(self, other):
+    if self.knames == other.knames:
+        return True
+    for child in other.children:
+        if recursiveLE(self, child):
             return True
-        for child in other.children:
-            if recursiveLE(self,child):
-                return True
-        return False
+    return False

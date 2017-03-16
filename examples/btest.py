@@ -17,26 +17,25 @@ NoiseText += "when the deliveries started arriving."
 #ReadSegment(letin, segment)
 #G = gof(segment, letin, 0, len(text))
 #x = 2
-#E.clearImplicits()
+# E.clearImplicits()
 
 #--------- app specific
 from NoiseTree import *
 E = EXPERIENCE
 
 
-problem = attribute( PROBLEM, SOUND )
-sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
-affect  = cause( attribute(SOUND,[TOD]), AFFECT )
-proximity = attribute( LOC, SOURCE, PROX)
-letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
+problem = attribute(PROBLEM, SOUND)
+sound = attribute(attribute(attribute(SOUND, SOURCE), INTENSITY), TOD)
+affect = cause(attribute(SOUND, [TOD]), AFFECT)
+proximity = attribute(LOC, SOURCE, PROX)
+letin = event(attribute(BARRIER, [STATE]), SOUND, LETINOUT)
 
 
 text = "word spoken was heard through the walls"
 #text = "the maiden let in the noise"
 #segment = prepareSegment( E, text)
 #s = showSEG(segment, text)
-#print(s)
-
+# print(s)
 
 
 text = NoiseText
@@ -47,19 +46,18 @@ text = "We did find it a bit noisy with the balcony doors open due to the McDona
 
 
 #nw = NWSReader(E, [proximity] )
-#nw.readText(text)
+# nw.readText(text)
 #s = nw.report(text)
-#print s
+# print s
 #x = 2
 
-nars      = [ problem, sound, affect, proximity, letin]
-calibs    = [ True,    True,  True,   True,      True ]
-thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
-
+nars = [problem, sound, affect, proximity, letin]
+calibs = [True,    True,  True,   True,      True]
+thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
 
 
 nwa = NWApp(E, nars, calibs, thresholds)
 nwa.readText(text)
-s =  nwa.report(text)
+s = nwa.report(text)
 print s
 x = 2
