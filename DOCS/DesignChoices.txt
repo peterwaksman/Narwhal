@@ -3,7 +3,7 @@ Design Choices
 There are plenty of things I had to puzzle over to get into the current form. Especially the gof usage, return values from reading sub narratives, and the whole vaulting business. This file is to record examples of difficult design details.
 
 -----------------------------------------------------------------------------------------
-Trees are part of the definition of a NAR but they are also used dynamically as scratchpads during reading. This would get messy if multiple NARs used the same tree. So the general scheme is that the client sees one tree and makes definitions in terms of it but behind the scenes, different copies of the tree are deployed, one per NAR. 
+Trees are part of the definition of a NAR but they are also used dynamically as scratchpads during reading. This would get messy if multiple NARs used the same tree. So the general scheme is that the client sees one tree and makes definitions in terms of it but behind the scenes, different copies of the tree are deployed, one per NAR.
 
 The tree, even as a scratchpad for one NAR is still confusing. A VAR node stores a 'found' variable which is relatively stable and can remain set after the ifound[] list of token indices is cleared and re-used. When a more permanent moment arrives (eg END_CTRLTYPE) the 'found' can get cleared.
 

@@ -29,12 +29,12 @@ The recursive ReadText(nar, tokens, ifound) sits at the base of the reading conc
 
 ABReader implements a single NAR and its use in ReadText(). Results are converted to NarRecords and stored in a single NarVault.
 
-NWReader implements the same logic as the ABReader but with an array of NarReadData's. This keeps the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'.  
+NWReader implements the same logic as the ABReader but with an array of NarReadData's. This keeps the code in parallel with ABReader, simple operations 'X()' are replaced by 'XMany()'.
 
 
 NWObject - wraps the NWReader, applies final thresholds and summarizes a reading event. The NWObject is a single point of entry to Narwhal
 
------------ 
+-----------
 Readers (V2)
 In version 2 of Narwhal the tokenized text concept is replaced with a segmented text concept. A segment is a sequence of VARs that is filled progressively while stepping through the tokens. This is a fundamental pre-processing allowed, not because of its phiosophical correctness, but for speedups. In V1 the readTex() method was spending all its time looking up the same variables over and over. In V2 the readText() only looks up words once to create the 'segment' and then spends all its time dealing with the nar logic.
 Use printSEG2( seg )
@@ -44,5 +44,5 @@ In V2 the NWReader is replaced by the NWSReader. The NWObject is replaced by the
 
 
 Application
------------ 
-The NoiseApp.py example is a V1 application that consists of an tree, a collection of several narratives and corresponding calibrations and thresholds. These initializers create one NWObject. 
+-----------
+The NoiseApp.py example is a V1 application that consists of an tree, a collection of several narratives and corresponding calibrations and thresholds. These initializers create one NWObject.

@@ -3,23 +3,23 @@ from nwutils import *
 
 # LOGICAL OPERATORS AND PUNCTUATION ARE CONSIDERED "CONTROLS" THAT AFFECT READING
 
-## I complain about how logicians co-opted natural language terms for their own uses. 
+## I complain about how logicians co-opted natural language terms for their own uses.
 ## But Narwhal needs to co-opt the same terms because the terms do, in fact, play a
-## basic role in parsing out separate statements and whether the "value" they 
+## basic role in parsing out separate statements and whether the "value" they
 ## impart is to be blocked or unblocked. Also they help determine when a new statement begins.
 
 ################################## Logic Term Tree
 
 ##  At the moment this is a tree whose groupings are more for convenience
 ## than necessity
-## 
+##
 ##LOGIC_OP()
 ##    AND_OP( andD )
 ##    SO_OP( soD )
 ##    ATTRIB_OP( attribD )
 ##    BLOCK_OP()
 ##         GENNEGATION_OP( gennegD )
-##         GENHEDGE_OP( genhedgeD )   
+##         GENHEDGE_OP( genhedgeD )
 ##    FWDBLOCK_OP
 ##         FWDNEGATION_OP( fornegD )
 ##         FWDHEDGE_OP( forhedgeD )
@@ -30,7 +30,7 @@ from nwutils import *
 
 # the more thoroughly we list "dull" words to ignore, the more effective
 # the word counting, I had "it" listed but choose to put it in the hotel word list.
-kDULL = " a , the , an , did "  
+kDULL = " a , the , an , did "
 dullD = KList("DU",kDULL )
 DULL_OP = dullD.var()
 
@@ -112,7 +112,7 @@ AND_OP = andD.var( )
 fwdCauseD = KList("so", kCAUSESFWD)
 bkdCauseD = KList("as", kCAUSESBKD)
 SO_OP = fwdCauseD.var() | bkdCauseD.var()
- 
+
 
 attribD = KList( "HAS", kATTRIBUTORS )
 ATTRIB_OP = attribD.var()
@@ -164,11 +164,11 @@ LOGIC_OP.sub(BLOCK_OP)
 LOGIC_OP.sub(FWDBLOCK_OP)
 LOGIC_OP.sub(PRECONJ_OP)
 
-########################## 
+##########################
 #SKIP_OP.sub(AND_OP)
 SKIP_OP.sub(SO_OP)
 SKIP_OP.sub(ATTRIB_OP)
-SKIP_OP.sub(DESIGNATOR_OP) 
+SKIP_OP.sub(DESIGNATOR_OP)
 
 
 def findControl(self, tokens, itok):
@@ -181,15 +181,15 @@ def findControl(self, tokens, itok):
             #print( "really found at "+kname)
             self.found = True
             return self
-    
+
     for child in self.children:
         c = findControl(child, tokens, itok)
         if c != NULL_VAR:
            return c
 
-    return NULL_VAR          
-  
-    
+    return NULL_VAR
+
+
 def isLogicControl(tokens, itok):
     return findControl( LOGIC_OP, tokens, itok)
 
@@ -230,7 +230,7 @@ def replacePunctuation( text ):
         else:
             newtext += text[i]
     return newtext
-    
+
 
 kPERIOD = KList("PERIOD" , "_period_")
 kCOMMA = KList("COMMA"     , "_comma_")
@@ -271,22 +271,22 @@ def findPunctuation(self, tokens, itok):
             #print( "really found at "+kname)
             self.found = True
             return self
-    
+
     for child in self.children:
         c = findControl(child, tokens, itok)
         if c != NULL_VAR:
            return c
 
-    return NULL_VAR          
-  
-    
+    return NULL_VAR
+
+
 def isPunctuationControl(tokens, itok):
     return findControl( PUNCTUATION_OP, tokens, itok)
 
 
 
 ############################
-# The ifound is a list of found token indices. The following serves to insert additional 
+# The ifound is a list of found token indices. The following serves to insert additional
 # indices into the list whenever there is a dull or contol token BETWEEN indices of ifound
 # this sort of adds noise to the signal. Punctuations don't .
 def discountControls(tokens, ifound):
@@ -298,86 +298,86 @@ def discountControls(tokens, ifound):
         SKIP_OP.clear()
         LOGIC_OP.clear()
         PUNCTUATION_OP.clear()
- 
+
         if DULL_OP.find(tokens[i]):
             jfound.append(i)
 
         elif LOGIC_OP.find(tokens[i]):
-            jfound.append(i)   
-        
+            jfound.append(i)
+
         elif SKIP_OP.find(tokens[i]):
-            jfound.append(i)   
+            jfound.append(i)
 
         elif PUNCTUATION_OP.findInText(tokens[i]):
             # do NOT append to jfound. So the punctuation token
-            # will not be counted in the numerator of (r/f) in the gof() formula 
-            asd  = 1 #remove "compiler warning" squiggles 
+            # will not be counted in the numerator of (r/f) in the gof() formula
+            asd  = 1 #remove "compiler warning" squiggles
     jfound = cleanFound(jfound)
     ifound.extend(jfound)
     return ifound
 
-# Counts controls in the full range of subtoks, excluding ones  
+# Counts controls in the full range of subtoks, excluding ones
 # in the range where words have been found, which are already discounted.
 def countUnreadControls(tokens, ifound, ictrl, istart):
     count = 0
     imin = minITOK(ifound)
     imax = maxITOK(ifound)
-    for i in range(istart, ictrl): 
+    for i in range(istart, ictrl):
         if imin<= i and i<=imax:
             continue
         DULL_OP.clear()
         SKIP_OP.clear()
         LOGIC_OP.clear()
         PUNCTUATION_OP.clear()
- 
+
         if DULL_OP.find(tokens[i]):
             count += 1
 
         elif LOGIC_OP.find(tokens[i]):
             count += 1
-        
+
         elif SKIP_OP.find(tokens[i]):
-            count += 1  
+            count += 1
 
         elif PUNCTUATION_OP.findInText(tokens[i]):
             count += 1
 
     return count
- 
+
 
 ################## prepareTokens() ###################
 ################## an important method "hiding" here in nwcontrol.py
 ##################
-def prepareTokens( text): 
-        # encode punctuations  
-    text = replacePunctuation(text)    
+def prepareTokens( text):
+        # encode punctuations
+    text = replacePunctuation(text)
 
         # one of several future cleanups
     text = cleanAMPM(text)
-            
-            # lower case tokens 
+
+            # lower case tokens
     tokens = text.split(' ')
     newtokens = []
-    for tok in tokens: 
+    for tok in tokens:
         if len(tok)>0:
             newtokens.append(tok)
 
     for i in range( len(newtokens)):
         tok = newtokens[i].lower()
-        newtokens[i] = tok 
+        newtokens[i] = tok
 
     return newtokens
 
-#######################################################    
-#######################################################    
-### ControlData 
-#######################################################    
-#######################################################    
+#######################################################
+#######################################################
+### ControlData
+#######################################################
+#######################################################
 
 # Control types.
-NO_CTRLTYPE          = 0       
-PUNCTUATION_CTRLTYPE = 1 
-OPERATOR_CTRLTYPE    = 2   
+NO_CTRLTYPE          = 0
+PUNCTUATION_CTRLTYPE = 1
+OPERATOR_CTRLTYPE    = 2
 END_CTRLTYPE         = 3
 SKIP_CTRLTYPE         = 4
 
@@ -391,7 +391,7 @@ class ControlData:
         self.type = type
         self.ctrl = ctrl
         self.ictrl = ictrl
-  
+
 
 ## return with ictrl either the index of the control or
 ## L=len(tokens). Generally read up to <ictrl
@@ -401,7 +401,7 @@ class ControlData:
 #    if istart>L-1:
 #        CD.set(END_CTRLTYPE, NULL_VAR, L)
 #        return CD
-   
+
 #    for itok in range(istart, L):
 #        ctrl = isLogicControl(tokens,itok)
 #        if ctrl!=NULL_VAR:

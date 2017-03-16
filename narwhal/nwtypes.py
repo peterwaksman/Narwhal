@@ -1,18 +1,18 @@
-import nwfind  
+import nwfind
 from nwutils import *
 
 print("Hello")
 
 DEBUG_TXT = ""
-  
+
 # K(ey word)Lists are initialized with comma-separated strings
-# thanks to Stack Exchange for idea of making it into a factory 
+# thanks to Stack Exchange for idea of making it into a factory
 # and repository
 # they have no "state".
 class KList:
     instances={}
     def __init__(self, name, inString):
-        self.name = name;    
+        self.name = name;
         self.list = inString.split(',')
         KList.instances[name] = self    #syntax: klist = KList.instances[ name ]
 
@@ -27,7 +27,7 @@ class KList:
     def findInText(self, tokens, itok, ifound):
          return nwfind._findInText(self, tokens, itok, ifound)
 
-    
+
 NULL_KLIST = KList("nullK","")
 
 # design pattern is a bit strange: relatively concrete containers are used
@@ -39,22 +39,22 @@ NULL_KLIST = KList("nullK","")
 
 class VAR:
     def __init__(self):
-        
+
         # ---these are constant in the VAR
         self.knames = []  # a VAR can always have its own KList
         self.exclusive = False # true means VAR represents a binary choice (I did not implement ternary...)
         self.parent = 0 # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
-        self.explicit = True # When False, this allows nars to be multi purpose. Slots that 
-                             # are neither filled nor explicit are "inactive" and do not enter 
+        self.explicit = True # When False, this allows nars to be multi purpose. Slots that
+                             # are neither filled nor explicit are "inactive" and do not enter
                              # into the GOF formula. Non-explicit VARs are called 'implicit'
-                             # If an implicit is not 'found' then, functionally, the nar just 
-                             # becomes shorter 
+                             # If an implicit is not 'found' then, functionally, the nar just
+                             # becomes shorter
 
         # FOR READING:
-        self.found = False 
+        self.found = False
             # to store indices of tokens in text, with matches words of self's KLists.
-        self.ifound= []   
+        self.ifound= []
             # to record what happened in the children
         self.foundInChildren = False
             # becomes false if kname after 1st is used
@@ -67,7 +67,7 @@ class VAR:
         self.explicit = False
         for child in self.children:
             child.makeImplicit()
-    
+
     def makeExplicit(self):
         if self==NULL_VAR:
             return
@@ -75,19 +75,19 @@ class VAR:
         for child in self.children:
             child.makeExplicit()
 
-       
+
     def clearImplicits(self):
         self.explicit = True
         for child in self.children:
             child.clearImplicits()
 
-                    
+
     def clear(self):
         self.found = False
         self.ifound = []
         self.foundInChildren = False
         self.polarity = True
-        
+
         for child in self.children:
             child.clear()
 
@@ -97,12 +97,12 @@ class VAR:
         self.ifound = []
         for child in self.children:
             child.clearIFound()
-    
+
     def numIFound(self):
         self.ifound = cleanFound(self.ifound)
         return len(self.ifound)
-    
-    def getIFound(self):   
+
+    def getIFound(self):
         return self.ifound
 
     def clearPolarity(self):
@@ -115,7 +115,7 @@ class VAR:
         v.exclusive = self.exclusive
         if self.parent==0 :
             v.parent = 0
-        
+
         v.found = self.found
         v.ifound= self.ifound[:]
         v.foundInChildren = self.foundInChildren
@@ -124,9 +124,9 @@ class VAR:
         for child in self.children:
             newchild = child.copy()
             v.children.append(newchild)
-         
+
         v.explicit = self.explicit
-                     
+
         return v
 
     def copyUsing(self,tree):
@@ -137,7 +137,7 @@ class VAR:
             print(name)
             return
         else:
-            x = tree.lookup(name) # find VAR with same name, in this tree           
+            x = tree.lookup(name) # find VAR with same name, in this tree
         if x != NULL_VAR:
             x.explicit = self.explicit
             return x # x.copy().
@@ -147,41 +147,41 @@ class VAR:
     # returns self, if kname in knames
     # or child with this name, else NULL_VAR
     def lookup(self,name):
-        for kname in self.knames:     
+        for kname in self.knames:
             if name==kname:
-                return self 
-            
+                return self
+
         for child in self.children:
             x = child.lookup(name)
-            if x!=NULL_VAR:      
+            if x!=NULL_VAR:
                 return x
-        return NULL_VAR          
-   
-        # typically a "var<=nar" means the var is a slot or a child of a slot 
+        return NULL_VAR
+
+        # typically a "var<=nar" means the var is a slot or a child of a slot
     def __le__(self,other):
         return recursiveLE(self,other)
-                
- 
+
+
                 # Finds VAR matching at itok. Only visit
                 # children if no direct match is found
-    def findInText2( self, tokens, itok):  
-        ikname = 0 
+    def findInText2( self, tokens, itok):
+        ikname = 0
         wasFound = False
-        for kname in self.knames: # for each name in self's klist         
-            klist = KList.instances[ kname ]                
-            found = klist.findInText(tokens, itok, self.ifound) 
+        for kname in self.knames: # for each name in self's klist
+            klist = KList.instances[ kname ]
+            found = klist.findInText(tokens, itok, self.ifound)
             if found:
                 self.found = True # could have been true already
                 # this can switch frequently and reflects the last found token
                 if self.exclusive and ikname>0:
                     self.polarity = False
                 else:
-                    self.polarity = True   
-                                     
-                wasFound = True   
-                         
-            ikname += 1           
-     
+                    self.polarity = True
+
+                wasFound = True
+
+            ikname += 1
+
         # If nothing was found, search iteratively inside the children
         if wasFound:
             return [self]
@@ -204,10 +204,10 @@ class VAR:
             tab += "  "
 
         x = ""
-        if self.found:                 
+        if self.found:
             x += "*"
         if self.explicit:
-            x += self.knames[0]   
+            x += self.knames[0]
         else:
             x += "["+ self.knames[0] + "]"
         return tab + x
@@ -219,7 +219,7 @@ class VAR:
             tab += "  "
 
         endStr = tab+"knames:"
-        #print(tab+"knames:"), 
+        #print(tab+"knames:"),
         for name in self.knames:
             if not self.exclusive:
                 endStr += (name+" +")
@@ -246,7 +246,7 @@ class VAR:
             print(tab + "chldrn:")
         else:
             print("\n")
-            
+
         if recurs:
             for child in self.children:
                 child.Print(ntabs+1, recurs)
@@ -258,7 +258,7 @@ class VAR:
             tab += "  "
 
         output += tab
-        #print(tab),      
+        #print(tab),
         for name in self.knames:
             if not self.explicit:
                 name = "["+name+"]"
@@ -270,23 +270,23 @@ class VAR:
             output += "*"
         if self.polarity==False:
             output += "-"
-        output += '\n'        
+        output += '\n'
         for child in self.children:
             output += child.PrintSimple(ntabs+1)
         return output
-                    
-    ## operator '+'     # to match text against any Klist            
-    def __add__(self, other ): 
+
+    ## operator '+'     # to match text against any Klist
+    def __add__(self, other ):
         Z = VAR()
         Z.knames += self.knames
         Z.knames += other.knames
         Z.exclusive = False
         return Z
-    
+
     ##  operator '|'    # to match text against just one KList
     ## matching text in more than one is considered a coding error but
     ## it could be a contradiction in the text. We'll see.
-    def __or__(self, other ):    
+    def __or__(self, other ):
         Z = VAR()
         Z.knames += self.knames
         Z.knames += other.knames
@@ -294,9 +294,9 @@ class VAR:
         return Z
 
     ## connect with your children as in "addChild()"
-    def sub(self, other): 
+    def sub(self, other):
         other.parent = self
-        self.children.append(other) 
+        self.children.append(other)
 
     def numSlots(self):
         if self==NULL_VAR:
@@ -315,7 +315,7 @@ class VAR:
     # "Active" means explicit or currently used.
     def numSlotsActive(self):
         if self==NULL_VAR:
-            return 0      
+            return 0
         if self.found or self.foundInChildren or self.explicit:
             return 1
         else:
@@ -324,23 +324,23 @@ class VAR:
     # like a minimal "print". It is used by nar.string()
     def string(self, ntabs=0):
         return self.knames[0]
-    
+
     # KList VARS are used to produce "KList" NARs below of order 0
-    # So VAR become a class factory for NAR. 
+    # So VAR become a class factory for NAR.
     # All NARs built from these KList NARs will be of higher order>0
     def nar(self):
         p = NAR()
         p.order = 1
         p.polarity = True
         p.implicit = False
-        
+
         p.thing = self         # so isinstance(p.thing,VAR) is True
         p.action   = NULL_VAR
         p.relation = NULL_VAR
-        p.value    = NULL_VAR    
+        p.value    = NULL_VAR
         return p
 
-    # note this does not climb up the tree of parents returning true if foundInChildren 
+    # note this does not climb up the tree of parents returning true if foundInChildren
     # This only returns true for the self VAR's knames[0] argument
     # nor does it climb down the tree searching for childern. (Gosh someone should do that)
     def isA(self, name):
@@ -348,7 +348,7 @@ class VAR:
             return True
         else:
             return False
-        
+
 #-----------ZERO for VAR type
 NULL_VAR   = NULL_KLIST.var()
 
@@ -358,20 +358,20 @@ def countVAR(array):
         if array[i]!=NULL_VAR:
             count += 1
     return count
-        
 
 
-############################## 
+
+##############################
 #            NAR             #
 ##############################
-class NAR:   
+class NAR:
     def __init__(self):
         self.order = 0 # the level of pattern-inside-pattern depth. Currently it is informational
         self.explicit = True # don't know if I want this [ANSWER: to implement implicit variables]
 
-        self.polarity = True 
-        
-        self.thing = NULL_VAR 
+        self.polarity = True
+
+        self.thing = NULL_VAR
         self.action = NULL_VAR
         self.relation = NULL_VAR # like "color" (or "with")
         self.value = NULL_VAR    # like "red" (or an other.thing)
@@ -382,17 +382,17 @@ class NAR:
     # don't know if I want this
     def makeImplicit(self):
         self.explicit = False
-        self.thing.makeImplicit() 
-        self.action.makeImplicit() 
-        self.relation.makeImplicit() 
-        self.value.makeImplicit() 
+        self.thing.makeImplicit()
+        self.action.makeImplicit()
+        self.relation.makeImplicit()
+        self.value.makeImplicit()
 
     def makeExplicit(self):
         self.explicit = True
-        self.thing.makeExplicit() 
-        self.action.makeExplicit() 
-        self.relation.makeExplicit() 
-        self.value.makeExplicit() 
+        self.thing.makeExplicit()
+        self.action.makeExplicit()
+        self.relation.makeExplicit()
+        self.value.makeExplicit()
 
 
     # If x is a var, this calls .clear(), otherwise it calls into the sub narratives.
@@ -402,13 +402,13 @@ class NAR:
         self.action.clear()
         self.relation.clear()
         self.value.clear()
-    
+
     def clearPolarity(self):
-        self.polarity = True       
+        self.polarity = True
         self.thing.clearPolarity()
         self.action.clearPolarity()
         self.relation.clearPolarity()
-        self.value.clearPolarity()    
+        self.value.clearPolarity()
 
     def clearIFound(self):
         if ORDER(self)==0:
@@ -437,14 +437,14 @@ class NAR:
 
     ## When this tree is a copy of the one where the NAR is defined,
     ## NAR.copyUsing returns a "copy" of the same name as self, but
-    ## using VARs from a other tree 
+    ## using VARs from a other tree
     def copyUsing(self, tree ):
         if self==NAR_SO or self==NAR_THEN: # these do not get copied
             return self
-        
+
         if self.order==0 and len(self.thing.knames)>0: # so it is a var
-            name = self.thing.knames[0]       
-            x = tree.lookup(name) # find VAR with same name, in this tree           
+            name = self.thing.knames[0]
+            x = tree.lookup(name) # find VAR with same name, in this tree
             if x != NULL_VAR:
                 n = x.nar()
                 return n
@@ -455,32 +455,32 @@ class NAR:
         n.order   = self.order
         n.polarity = self.polarity
         n.explicit = self.explicit
-        
+
         # for the sub NARs
         n.thing   = self.thing.copyUsing(tree)
 
         # This is not really right but I do not want to make
         # copies of these "constant" NARs. It means
-        # we should never rely on the found or ifound of the VARs beneath  
+        # we should never rely on the found or ifound of the VARs beneath
         # these "constants", since different users may also be using them
         if self.action==NAR_SO:
-            n.action = NAR_SO  
+            n.action = NAR_SO
         elif self.action==NAR_THEN:
             n.action = NAR_THEN
         else:
             n.action = self.action.copyUsing(tree)
-            
+
         n.relation= self.relation.copyUsing(tree)
         n.value   = self.value.copyUsing(tree)
-        return n   
-  
+        return n
+
     def numSlots(self):
-        if isinstance(self, VAR):  
+        if isinstance(self, VAR):
            return self.numSlots()
         n = 0
         n += self.thing.numSlots()
-        n += self.action.numSlots() 
-        n += self.relation.numSlots()  
+        n += self.action.numSlots()
+        n += self.relation.numSlots()
         n += self.value.numSlots()
         return n
 
@@ -505,7 +505,7 @@ class NAR:
             n += self.relation.numSlotsActive()
             n += self.value.numSlotsActive()
             return n
-          
+
     def getIFound(self):
         if self==NULL_VAR:
             return []
@@ -526,11 +526,11 @@ class NAR:
 
     def numIFound(self):
         return len( self.getIFound() )
-     
+
     def getType(nar):
         thing    = nar.thing
         action   = nar.action
-        relation = nar.relation  
+        relation = nar.relation
         # nar.value not part of type
 
         if relation!=NULL_VAR:
@@ -559,12 +559,12 @@ class NAR:
 
         x = ""
         if isinstance(nar,VAR):
-            if nar.found:                 
+            if nar.found:
                 x += "*"
             if nar.explicit:
-                x += nar.knames[0]   
+                x += nar.knames[0]
             else:
-                x += "["+ nar.knames[0] + "]"   
+                x += "["+ nar.knames[0] + "]"
         elif isinstance(nar,NAR):
             x += "\n"
             t = nar.thing.str(ntabs+1)
@@ -581,8 +581,8 @@ class NAR:
     def Print(nar, ntabs=0):
         s = nar.str(ntabs)
         print(s)
-#####################################################        
-        
+#####################################################
+
 #------------ZERO for NAR() type
 NULL_NAR = NULL_VAR.nar() # used as a default arg
 
@@ -613,27 +613,27 @@ def ORDER( X ):
 # in another. A VAR copy is needed for that.
 
 # This co-ops the list syntax of Python, to indicate implicit arguments
-# It returns (possibly modified) input  
-def a2n(arg):   
+# It returns (possibly modified) input
+def a2n(arg):
     if type(arg) is list:
-        n = arg[0] 
+        n = arg[0]
         n.explicit = False
-    else:         
+    else:
         n = arg
-    return n    
+    return n
 
 
 #-------implements:  "X_REL_/A" - the adjective relation. X,A, and REL are NARs
-#  ATTN! only use the REL variable if it is defined with A  
+#  ATTN! only use the REL variable if it is defined with A
 ## TODO: put in a check for this
 
 def attribute( x, y, rel=NULL_NAR):
     X = a2n(x)       #interpret args
     Y = a2n(y)
     REL = a2n(rel)
-    
+
     n = NAR()
-    n.thing    = X   #"noise"   
+    n.thing    = X   #"noise"
     n.relation = REL #"outside"
     n.action   = NULL_VAR
     n.value    = Y   #"loud"
@@ -646,19 +646,19 @@ def event( x, y, act):
     X = a2n(x)       #interpret args
     Y = a2n(y)
     ACT = a2n(act)
-    
+
     n = NAR()
     n.thing  = X     #"I"
     n.relation = NULL_VAR
     n.action = ACT   #"see"
     n.value  = Y     #"bird"
-    
+
     n.order = max( ORDER(X), ORDER(ACT), ORDER(Y) ) + 1
     return n
 
 
 # The next two OPERATORS have the same syntax but different text matching rules.
-# They both describe sequential events X and Y but the cause(X,Y) function describes them  
+# They both describe sequential events X and Y but the cause(X,Y) function describes them
 # as causally connected, and the seq(X,Y) function describes them purely as a sequential.
 # Note "SO" is used internally for cause and "THEN" and "AND" for sequence.
 
@@ -675,7 +675,7 @@ NAR_SO  = KList("so","").var().nar() # a dummy to identify the "cause" type of s
 def cause(x,y):
     X = a2n(x)       #interpret args
     Y = a2n(y)
-    
+
     n = NAR()
     n.thing = X      #"we were happy"
 
@@ -697,12 +697,12 @@ NAR_THEN = KList("then","").var().nar() # used to identify the "and"/"then" type
 def sequence(x,y):
     X = a2n(x)         #interpret args
     Y = a2n(y)
-    
+
     n = NAR()
     n.thing = X         #"we ate cookies"
     n.action = NAR_THEN #(encode a "then" operation)
     n.value = Y         #"we ate pie"
-    n.order = max( ORDER(X), ORDER(Y) )+1    
+    n.order = max( ORDER(X), ORDER(Y) )+1
     return n
 
 ##########################################

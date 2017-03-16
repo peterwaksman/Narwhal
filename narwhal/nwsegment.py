@@ -1,6 +1,6 @@
-## nwsegment.py for handling text segmentation utilities. 
+## nwsegment.py for handling text segmentation utilities.
 ## used by the NWSReader. Contains utilities and the inner loop read() methods
-from nwtypes import *  
+from nwtypes import *
 from nwutils import *
 from nwcontrol import *
 
@@ -8,24 +8,24 @@ from nwcontrol import *
 
 #################################
 #################################
- 
-        # convert text to a segment 
+
+        # convert text to a segment
 def prepareSegment( tree, tokens):
     tree.clear()
     GENERAL_OP.clear()
     seg = []
     itok = 0
-    for itok in range(len(tokens)):      
+    for itok in range(len(tokens)):
         if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
             continue
-        vars = tree.findInText2( tokens, itok) 
+        vars = tree.findInText2( tokens, itok)
         # here we had a single returned var, and no loop in the following
         # now we can findInText2() can return a list of all vars matching here.
         if len(vars)>0:
             for var in vars:
                 var.ifound = cleanFound(var.ifound)
                 newvar = var.copy()
-                seg.append(newvar)             
+                seg.append(newvar)
         else:
             vars = GENERAL_OP.findInText2( tokens, itok)
             if len(vars)>0:
@@ -34,7 +34,7 @@ def prepareSegment( tree, tokens):
                     newvar = var.copy()
                     seg.append(newvar)
             else:
-                seg.append(NULL_VAR) 
+                seg.append(NULL_VAR)
     return seg
 
         # a sort of inverse to findInText2()
@@ -71,7 +71,7 @@ def isInLoHi( nar, lo, hi):
     ifound = nar.getIFound()
     for i in ifound:
         if lo<= i and i<= hi:
-            return True 
+            return True
     return False
 ##################################
 def varstring(var):
@@ -116,20 +116,20 @@ def showSEG2(segment, text):
 def ReadSegment( nar, seg ):
     if ORDER(nar)==0:
         return ReadSegment0(nar, seg)
-    
+
     action   = nar.action
-    relation = nar.relation  
+    relation = nar.relation
 
     if relation!=NULL_VAR:
         return ReadSegmentAsAttribute(nar, seg)
 
-            # check encoded operator "events" 
+            # check encoded operator "events"
     if action==NAR_SO:
         return ReadSegmentAsCausal(nar, seg)
-    
+
     elif action==NAR_THEN:
         return ReadSegmentAsSequential(nar, seg)
-    
+
             # check user-defined events
     elif action!=NULL_VAR:
         return ReadSegmentAsAction(nar, seg)
@@ -138,11 +138,11 @@ def ReadSegment( nar, seg ):
 
 # In this implementation the ifound's are stored with the vars in the segment
 # This makes reading cleaner. The nar gets its ifound filled here.
-def ReadSegment0( nar, seg ):   
+def ReadSegment0( nar, seg ):
     if not isinstance(nar, VAR ):
-        return 0    
+        return 0
     if len( seg )==0:
-        return 0 
+        return 0
     foundNow = False
     for var in seg:
         if var<=nar:
@@ -150,7 +150,7 @@ def ReadSegment0( nar, seg ):
             nar.ifound = cleanFound( nar.ifound )
             nar.found = True
             nar.polarity = var.polarity
-            foundNow = True   
+            foundNow = True
     if foundNow:
         return 1
     else:
@@ -163,10 +163,10 @@ def ReadSegmentAsAttribute(nar, seg ):
     # read any client defined relations
     if nar.relation != NULL_NAR:
         r = ReadSegment(nar.relation, seg)
-    else:    
+    else:
         r = ReadSegment0( ATTRIB_OP, seg)
 
-    # a little algorithm to determine polarity of nar. 
+    # a little algorithm to determine polarity of nar.
     T = nar.thing.polarity
     V = nar.value.polarity
     R = nar.relation.polarity
@@ -182,9 +182,9 @@ def ReadSegmentAsAttribute(nar, seg ):
 
     # accumulate the ifounds of children
     #nar.ifound.extend(nar.thing.ifound)
-    #nar.ifound.extend(nar.value.ifound)    
+    #nar.ifound.extend(nar.value.ifound)
     #nar.ifound.extend(nar.relation.ifound)
-    #nar.ifound.cleanFound( nar.ifound)  
+    #nar.ifound.cleanFound( nar.ifound)
 
     return t + v + r
 
@@ -201,20 +201,20 @@ def ReadSegmentAsAction(nar, seg):
         nar.polarity = True
     else:
         nar.polarity = C and A
-    
+
     # require that action be found??? AD HOC
     if a==0:
-        return 0 
+        return 0
     else:
         return t + a + v
 
-      
+
      # maximizes the "inner" score over all possible subdivisions into tokensA,tokensB
      # Unfortunately you have to do it in both directions
 def ReadSegmentAsCausal(nar, seg):
-    if nar.action != NAR_SO: 
-        return 0 
-   
+    if nar.action != NAR_SO:
+        return 0
+
     # check for directionality of the SO_OP token
     doFirstPass = True
     doSecondPass = True
@@ -229,7 +229,7 @@ def ReadSegmentAsCausal(nar, seg):
     # In the "second pass" we check for syntax of effect preceeding cause: "B as A"
     # If a SO_OP token is there, it can save time, otherwise we check both syntaxes
     # in two (slow) passes.
- 
+
     # maximizes the score over all possible subdivisions into tokensA,tokensB
     imax = 0
     maxab=0
@@ -244,7 +244,7 @@ def ReadSegmentAsCausal(nar, seg):
             t  = ReadSegment(m.thing, segA)
             v  = ReadSegment(m.value, segB)
             c  = ReadSegment(SO_OP, seg)
-    
+
             # favors maximum balanced between the t and v
             if maxab<=(t+1)*(v+1):
                 imax = i
@@ -252,7 +252,7 @@ def ReadSegmentAsCausal(nar, seg):
 
     # repeat search in reverse order
     if doSecondPass:
-        for i in range(len(seg)+1):            
+        for i in range(len(seg)+1):
             segA = seg[:i]
             segB = seg[i:]
             m.value.ifound = []
@@ -260,22 +260,22 @@ def ReadSegmentAsCausal(nar, seg):
             v  = ReadSegment(m.value, segA) #(thing and value are swapped)
             t  = ReadSegment(m.thing, segB)
             c  = ReadSegment(SO_OP, seg)
-    
+
             # favors maximum balanced between the t and v
             if maxab<=(t+1)*(v+1):
                 imax = i
-                maxab = (t+1)*(v+1)   
-                firstPass = False    
+                maxab = (t+1)*(v+1)
+                firstPass = False
 
-    # implement the maximization        
-    if firstPass:          
+    # implement the maximization
+    if firstPass:
         segA = seg[:imax]
         segB = seg[imax:]
         t  = ReadSegment(nar.thing, segA)
         v  = ReadSegment(nar.value, segB)
         c  = ReadSegment(SO_OP, seg)
 
-        # polarity algorithm. Unfortunately AD HOC  
+        # polarity algorithm. Unfortunately AD HOC
         T = nar.thing.polarity
         V = nar.value.polarity
         if (T and V) or (not T and not V):
@@ -284,12 +284,12 @@ def ReadSegmentAsCausal(nar, seg):
             nar.polarity = False
     else:
         segA = seg[:imax]
-        segB = seg[imax:]  
+        segB = seg[imax:]
         v  = ReadSegment(nar.value,  segA)
         t  = ReadSegment(nar.thing, segB)
         c  = ReadSegment(SO_OP, seg)
 
-        # polarity algorithm. Unfortunately AD HOC  
+        # polarity algorithm. Unfortunately AD HOC
         T = nar.value.polarity
         V = nar.thing.polarity
         if (T and V) or (not T and not V):
@@ -301,9 +301,9 @@ def ReadSegmentAsCausal(nar, seg):
 
 
 def ReadSegmentAsSequential(nar, seg):
-    if nar.action != NAR_THEN: 
+    if nar.action != NAR_THEN:
         return 0
-   
+
     imax = 0
     maxab = -1
     m = nar.copy()
@@ -316,26 +316,26 @@ def ReadSegmentAsSequential(nar, seg):
         t  = ReadSegment(m.thing, segA)
         v  = ReadSegment(m.value, segB)
         a  = ReadSegment(AND_OP, seg)
-    
+
         if maxab<(t+1)*(v+1) :
             maxab = (t+1)*(v+1)
             imax = i
     # implement the max
     segA = seg[:imax]
     segB = seg[imax:]
-     
+
     t  = ReadSegment(nar.thing,  segA)
-    v  = ReadSegment(nar.value, segB)  
+    v  = ReadSegment(nar.value, segB)
     a  = ReadSegment(AND_OP, seg) #uses full segment
 
-    # polarity algorithm. Unfortunately AD HOC  
+    # polarity algorithm. Unfortunately AD HOC
     if t>0 and v==0:
         nar.polarity = nar.thing.polarity
     elif v>0 and t==0:
         nar.polariy = nar.value.polarity
-    #else nar.polarity remains at default    
+    #else nar.polarity remains at default
 
-    return t + v + a 
+    return t + v + a
 
 ################################
 def scanNextControl2(segment, istart):
@@ -353,7 +353,7 @@ def scanNextControl2(segment, istart):
             CD.set(PUNCTUATION_CTRLTYPE, var, i)
             return CD
     CD.set(END_CTRLTYPE, NULL_VAR, L)
-    return CD 
+    return CD
 
 
 def OpIFound( segment, op, imin, imax):
@@ -378,20 +378,20 @@ def getControlIFound( segment, imin, imax):
     ifound = []
     ifound.extend( dullI )
     ifound.extend( logicI )
-    ifound.extend( skipI ) 
+    ifound.extend( skipI )
     cleanFound( ifound )
-    return ifound       
+    return ifound
 
 def opCount(segment, op, imin, imax ):
-    ifound = OpIFound(segment, op, imin, imax)   
+    ifound = OpIFound(segment, op, imin, imax)
     return len( ifound )
 
 def wordReadCount(segment, ifound, imin, imax):
     #ifound = nar.getIFound()
-    foundMin = max( imin, minITOK(ifound ) )  
+    foundMin = max( imin, minITOK(ifound ) )
     foundMax = min( imax, maxITOK(ifound ) )
 
-    # get all the words read  
+    # get all the words read
     cfound = getControlIFound(segment, foundMin, foundMax )
     ifound.extend( cfound )
     ifound = cleanFound(ifound)
@@ -402,7 +402,7 @@ def wordReadCount(segment, ifound, imin, imax):
         if foundMin<=j and j<=foundMax:
             ifound.append(j)
 
-    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax ) 
+    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax )
 
     #remove any punctuations
     final = len(ifound) - pcount
@@ -413,9 +413,9 @@ def wordReadCount(segment, ifound, imin, imax):
 
 def wordReadRange(segment, ifound, imin, imax):
     #ifound = nar.getIFound()
-    foundMin = max( imin, minITOK(ifound ) )  
+    foundMin = max( imin, minITOK(ifound ) )
     foundMax = min( imax, maxITOK( ifound ) )
-    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax ) 
+    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax )
     final = (foundMax - foundMin + 1) - pcount
     #remove any punctuations
     return max(0,final)
@@ -427,7 +427,7 @@ def wordReadRange(segment, ifound, imin, imax):
 #    av = nar.numSlotsActive()
 #    r = wordReadCount(segment, nar, imin, imax)
 #    f = wordReadRange(segment, nar, imin, imax)
-    
+
 #    n = av         # deploy the 'implicits'
 #    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
 
@@ -435,8 +435,8 @@ def wordReadRange(segment, ifound, imin, imax):
 #        G = 0
 #    else:
 #        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-#        b = float(r)/float(f)         
-#        G = a*b 
+#        b = float(r)/float(f)
+#        G = a*b
 #    return G
 
 #def gof2( segment, nar, ifound, imin, imax):
@@ -455,8 +455,8 @@ def wordReadRange(segment, ifound, imin, imax):
 #        G = 0
 #    else:
 #        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-#        b = float(r)/float(f)         
-#        G = a*b 
+#        b = float(r)/float(f)
+#        G = a*b
 #    return G
 
 

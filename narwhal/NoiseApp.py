@@ -20,7 +20,7 @@ sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
 affect  = cause( attribute(SOUND,[TOD]), AFFECT )
 
 #location _nearfar_/ source
-proximity = attribute( LOC, SOURCE, PROX)        
+proximity = attribute( LOC, SOURCE, PROX)
 
 
 # (barrier_/state)-letInOut->sound
@@ -30,10 +30,10 @@ letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
 class NoiseApp:
     def __init__(self):
         nars      = [ problem, sound, affect, proximity, letin]
-        calibs    = [ True,    True,  True,   True,      True ]     
+        calibs    = [ True,    True,  True,   True,      True ]
         thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
- 
-        self.object = NWApp(EXPERIENCE, nars, calibs, thresholds) 
+
+        self.object = NWApp(EXPERIENCE, nars, calibs, thresholds)
 
     def run(self):
         text = ""

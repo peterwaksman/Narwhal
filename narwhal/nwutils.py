@@ -20,7 +20,7 @@ def sendToFileA( printFn, a):
     sys.stdout = orig_stdout
     f.close()
 
-# to call a function of two variables    
+# to call a function of two variables
 def sendToFileAB( printFn, a, b):
     orig_stdout = sys.stdout
     f = file('out.txt', 'w')
@@ -39,11 +39,11 @@ def TOKS( text ):
 
 
     # T = numTokens. It is assume ifound is list of indices from
-    # in [0, T) 
+    # in [0, T)
 def compressFound( T , ifound ):
     tmp = []
     for i in range( T ):
-        tmp.append(False)       
+        tmp.append(False)
     for j in range( len(ifound) ):
         if ifound[j]< T:
             tmp[ ifound[j] ] = True
@@ -89,7 +89,7 @@ def histo(ifound,i):
         if ifound[j]<=i:
             count += 1
     return count
-        
+
 
 def cleanFound( ifound ):
     max = -1
@@ -100,7 +100,7 @@ def cleanFound( ifound ):
         return []
     tmp = compressFound( max+1, ifound )
     ifound = expandFound(max+1, tmp )
-    return ifound    
+    return ifound
 
 def getMinMax(ifound, thresh, mlo, mhi ):
     mlo = 3
@@ -126,7 +126,7 @@ def maxITOK(ifound):
 
 def getFoundRange(ifound, ithresh):
     if len(ifound)==0 :
-        return 0   
+        return 0
     imin = 3000
     imax = -1
     for j in range( len(ifound) ):
@@ -142,7 +142,7 @@ def getFoundRange(ifound, ithresh):
 def dullCount(ifound, dull, ithresh):
     # same as in getFoundRange()
     if len(ifound)==0 :
-        return 0   
+        return 0
     imin = 3000
     imax = -1
     for j in range( len(ifound) ):
@@ -199,12 +199,12 @@ def filterFile( filename, var ):
                 #print("FOUND" + showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
 
-        if len(outstring)>0:        
+        if len(outstring)>0:
             print("FOUND:"+outstring)
-        
+
     infile.close()
 
- 
+
 def readFile( fineame, nar):
     infile = open(filename,"r")
     for line in infile:
@@ -220,18 +220,18 @@ def readFile( fineame, nar):
             if F:
                 #print("FOUND"+ showFound(tokens, var.ifound))
                 outstring += " " + showFound(tokens, var.ifound)
-        if len(outstring)>0:        
+        if len(outstring)>0:
             print("FOUND:" + outstring)
-        
+
     infile.close()
-    
+
 
 def shiftFoundIndices(ifound, shift):
     for itok in range(len(ifound)):
        ifound[itok] = ifound[itok] + shift
     cleanFound(ifound)
     return ifound
-     
+
 def cleanAMPM(text):
     L = len(text)
     newtext = ""
@@ -239,17 +239,17 @@ def cleanAMPM(text):
     while i < L:
         c = text[i]
         if c=='I' and i<L-3 and text[i+1]==' ' and text[i+2]=='a' and text[i+3]=='m': # test for "I am"
-            newtext += "I_am" 
+            newtext += "I_am"
             i += 4
         elif c.isdigit() and i<L-2:
             d = text[i+1]
             e = text[i+2]
-           
+
             if d.lower()=='a' and e.lower()=='m':
-                newtext += c + ' ' + 'a' + 'm' 
+                newtext += c + ' ' + 'a' + 'm'
                 i += 3
             elif  d.lower()=='p' and e.lower()=='m':
-                newtext += c + ' ' + 'p' + 'm' 
+                newtext += c + ' ' + 'p' + 'm'
                 i += 3
             else:
                 newtext += c
@@ -259,10 +259,10 @@ def cleanAMPM(text):
             i +=1
 
     return newtext
-    
-     
 
-# I was not able to use a recursive definition inside the VAR.__le__() 
+
+
+# I was not able to use a recursive definition inside the VAR.__le__()
 def recursiveLE(self,other):
         if self.knames==other.knames:
             return True

@@ -12,7 +12,7 @@ print("\n\n")
 # an original sample I wanted to handle
 NoiseText = "We did find it a bit noisy with the balcony doors open due "
 NoiseText += "to the McDonalds next door - especially late at night and at 6 am "
-NoiseText += "when the deliveries started arriving." 
+NoiseText += "when the deliveries started arriving."
 
 #ReadSegment(letin, segment)
 #G = gof(segment, letin, 0, len(text))
@@ -27,7 +27,7 @@ E = EXPERIENCE
 problem = attribute( PROBLEM, SOUND )
 sound = attribute( attribute( attribute(SOUND, SOURCE), INTENSITY), TOD)
 affect  = cause( attribute(SOUND,[TOD]), AFFECT )
-proximity = attribute( LOC, SOURCE, PROX)        
+proximity = attribute( LOC, SOURCE, PROX)
 letin = event( attribute(BARRIER,[STATE]), SOUND, LETINOUT )
 
 
@@ -51,13 +51,13 @@ text = "We did find it a bit noisy with the balcony doors open due to the McDona
 #s = nw.report(text)
 #print s
 #x = 2
- 
+
 nars      = [ problem, sound, affect, proximity, letin]
-calibs    = [ True,    True,  True,   True,      True ]     
+calibs    = [ True,    True,  True,   True,      True ]
 thresholds= [ 0.6,     0.6,   0.6,    0.6,  0.6       ]
 
 
- 
+
 nwa = NWApp(E, nars, calibs, thresholds)
 nwa.readText(text)
 s =  nwa.report(text)

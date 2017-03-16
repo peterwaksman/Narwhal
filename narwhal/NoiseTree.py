@@ -31,7 +31,7 @@ kSUPER    = "very pleased,soothing,a gem, love ,home away from home,\
                           immaculate,phenomenal,fantastic,perfect,relax,excellent,\
                           spectacular,peaceful,lovely,beautiful,amazing,impressive,\
                           impressed,heaven,magical,fabulous,serene,paradise,special,\
-                          cozy,oasis" 
+                          cozy,oasis"
 kHORRIBLE = "unacceptable,filthy,dump,mildew,lousy,awful,horrible,\
                           horrid,poison,gross, ick,ss icky,disgusting, hairs,yuck,\
                           ugh ,unhelpful,unpleasant,dissappoint,disappoint,\
@@ -84,7 +84,7 @@ kTRAFFICSOURCES="truck,traffic,busy,busy street,shopping, street, main , market 
 kTRAFFICSOURCES+= "road, alley, city , downtown , center, centre , garage , engine , tram,deliveries"
 
 
-kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering" 
+kCONSTRUCTIONSOURCES="banging,pounding,construction,remodelling,remodeling,maintenance,machinery,hammering"
 
 kOASISSOURCES="ocean"
 
@@ -95,14 +95,14 @@ kNOISELOCSROOM+="bathroom"
 
 kNOISELOCSHOTEL="hotel, high $ floor,building,area, section,location,quiet hotel,"
 kNOISELOCSHOTEL+="lobby,patio,neighborhood,pool"
- 
+
 
 
 
 #-------------OTHER LISTS FROM THE OLD NOISE APP--------
 SLOWSPEED = "slow,we|I $ spent,wait # staff,waiting # to|staff,took time,took * minutes,takes time"
 FASTSPEED = "ready,immediate,convenient,easy,speedy,prompt,quick,quickly,smooth,efficient, fast ,within minutes,no time"
-TIMEUNITS = "0,1,2,3,4,5,6,7,8,9,minutes,hour, mins "  
+TIMEUNITS = "0,1,2,3,4,5,6,7,8,9,minutes,hour, mins "
 
 PROFFESIONAL = "infromative,well run,hard-working,assist,out of their way,out of the way,always remember,"
 PROFFESIONAL += "helpful,gracious,polite,sensitive,accommodating,professional, eager,knowledgeable,"
@@ -121,7 +121,7 @@ UNPROFFESIONAL += "not experienced,inexperienced,over enthusiastic,failed,refuse
 # note: expericence shoule be made as the | of two KList VARs
 # For example "was bad" belongs in a negative KList
 kEXPERIENCE = "experience,we found,I found,we did find"
-experienceD = KList("experience", kEXPERIENCE)  
+experienceD = KList("experience", kEXPERIENCE)
 
 kPROBLEM = "problem,issue,drawback,not for you,unfortunate,disappoint"
 problemD = KList("problem", kPROBLEM)
@@ -152,7 +152,7 @@ qsourceD = KList("oasis",kOASISSOURCES)
 
 roomD = KList("room", kNOISELOCSROOM)
 hotelD = KList("hotel", kNOISELOCSHOTEL)
- 
+
 
 
 kNEAR = "nowhere $ near , near to ,in the heart of, over ,outside,next to, on the ,on our,being on,across from, right on ,overlooked,overlooks, close to,next to, next door,faced"
@@ -167,7 +167,7 @@ insulationD = KList("insul", kINSULATION)
 kWINDOW = " window, balcony,balcony door"
 windowD = KList("window", kWINDOW)
 
- 
+
 kWALL = "walls,my|next $ door,floor"
 wallD = KList("wall", kWALL)
 
@@ -204,21 +204,21 @@ INTENSITY = loudD.var()|softD.var()
 
 
 SOURCE = nsourceD.var() | qsourceD.var()
- 
+
 #SOURCE = (peopleD.var() + partyD.var() + equipmentD.var()+ trafficD.var() + constructionD.var()) | oasisD.var()
 
 
-LOC = KList("loc","").var() #VAR()  
-ROOM = roomD.var()  
+LOC = KList("loc","").var() #VAR()
+ROOM = roomD.var()
 HOTEL =  hotelD.var()
 
 PROX =  nearD.var()|farD.var()  # typically an adjective val
-INSULATION = insulationD.var() 
-BARRIER = windowD.var() + wallD.var() 
+INSULATION = insulationD.var()
+BARRIER = windowD.var() + wallD.var()
 STATE = openD.var()|closedD.var()
 LETINOUT = letinD.var()|keepoutD.var() # typically a verb
-TOD = timeofdayD .var() 
-AFFECT = stressD.var()|relaxD.var() 
+TOD = timeofdayD .var()
+AFFECT = stressD.var()|relaxD.var()
 
 #--------------define the tree built from these VARs
 EXPERIENCE.sub(PROBLEM)
@@ -246,8 +246,8 @@ INSULATION.sub(LETINOUT)
 # TOD - no children
 #
 # AFFECT - no children
- 
-  
+
+
 # Some NARs
 #                       sound->me :: me_/affect
 #                       sound_/intensity_/source_/timeOfDay (use implicits)

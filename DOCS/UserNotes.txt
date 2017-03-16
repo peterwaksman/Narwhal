@@ -44,8 +44,8 @@ experience
 
 
 A good way to set calibrs for .setCalibration( calibs ):
-For each nar in reader, use ">>>>print nar.str()" to see the default settings of the nar. 
-Calibrate appropriately. 
+For each nar in reader, use ">>>>print nar.str()" to see the default settings of the nar.
+Calibrate appropriately.
 For example:
 "problem" is a nar with the str()
 T:problem
@@ -60,4 +60,4 @@ V:noise
 
 
 
- 
+

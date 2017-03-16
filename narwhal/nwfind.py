@@ -1,12 +1,12 @@
-## Searching text for keywords from a KList uses special symbols to help 
+## Searching text for keywords from a KList uses special symbols to help
 ## disambiguate, in terms of what comes before or after the match in the text.
-## 
-## Thus an entry like this from a KList: 
+##
+## Thus an entry like this from a KList:
 ##            abc # X
 ## means text with "abc X" will not be matched by that item from the KList.
 ## Hence abc followed by X is excluded.
 ##
-## Similarly, this notation excludes being preceded by X: 
+## Similarly, this notation excludes being preceded by X:
 ##            X $ abc
 ## means text with "X abc" will not be matched by that item from the KList
 ##
@@ -28,15 +28,15 @@
 ## By the way, space before or after a keyword, means its ending (at the space) must match the ending of the
 ## token. Without the space, different beginnings or endings are allowed in matching a substring of the token.
 
-## Obviously it could all be greatly improved if keywords implemented regular expressions 
-## and matchTOK() knew how to handle it. What is important for Narhwal is to keep track 
+## Obviously it could all be greatly improved if keywords implemented regular expressions
+## and matchTOK() knew how to handle it. What is important for Narhwal is to keep track
 ## of the place in the text where the match occurs.
 
 
 def kwordLen(kword):
     if len(kword)<1:
         return 0
-    
+
     kpart = kword.split("#")
     if len(kpart)>1:
         return 1
@@ -45,7 +45,7 @@ def kwordLen(kword):
     if len(kpart)>1 :
         return 2
     return 1
-    
+
 
 ## Args: the space-tokenized text into the method, along with the index of one token
 ## The keyword is an item from a KList's self.list (or a substring)
@@ -83,37 +83,37 @@ def matchTOK(kword, itok, ifound, tokens):
     # -------------SPACES ARE HARD
     # First, there is a tendency to create '' entries.
     # Next, mult-part tokens should not start or end with space(s).
-    # they get stripped away here. You must RE-PAD the 
+    # they get stripped away here. You must RE-PAD the
     # subparts of the keyword, or else they are falsely detected inside
     # of non-matching words, like "each" inside "reached".
-    prekpart = kword.split(' ') 
-    kpart = [] 
+    prekpart = kword.split(' ')
+    kpart = []
     for part in prekpart:
         if len(part)>0:
-            kpart.append(part) 
-            
+            kpart.append(part)
+
     if len(kpart)>1 : #multi-part token, using spaces
         tmp = []
         dtok = 0 # to count forward from itok
         for part in kpart:
             j = ' ' + part + ' ' # RE-PAD
             if not matchTOK(j, itok+dtok, tmp, tokens):
-                break        
+                break
             dtok += 1
-            
+
         if dtok<len(kpart) : # break occurred before end of loop
              return False
         else:
             ifound.extend(tmp)
             return True
 
-    # Or len(kpart)==1 
+    # Or len(kpart)==1
     # We revert to original kword that could have spaces at start or end
-    # (just for readability, not used below). 
+    # (just for readability, not used below).
 
 
     ##    MAIN TOKEN MATCH
-    ##    tokens[i] cannot include spaces, since they were split from text 
+    ##    tokens[i] cannot include spaces, since they were split from text
     ##    using ' '. But keywords can, so pad tok to allow this matching. No
     ##    harm if the keyword starts/ends without space, this allows
     ##    matching to words with ' ' terminations. We also allow the token
@@ -125,19 +125,19 @@ def matchTOK(kword, itok, ifound, tokens):
         ifound.append(itok)
         #print( "APPEND to ifound with itok="+str(itok)+" and kword="+kword")
         return True
-    
+
     tok = "," + tokens[itok] +  " " # for token glued to a comma
     if tok.find(kword)>=0:
-         ifound.append(itok)     
+         ifound.append(itok)
          return True
-    
-    tok = "." + tokens[itok]+ " "   # for token glued to a period  
+
+    tok = "." + tokens[itok]+ " "   # for token glued to a period
     if tok.find(kword)>=0 :
-        ifound.append(itok)        
+        ifound.append(itok)
         return True
-    
+
     return False
-    
+
 #if this gives a match, it consumes one token
 def matchWordToToken_pound(kpart, itok, ifound, tokens):
     if len(kpart) != 2:
@@ -145,20 +145,20 @@ def matchWordToToken_pound(kpart, itok, ifound, tokens):
 
     # for |-separated exclusions
     word = kpart[0]
-    
+
     exclude = kpart[1].split('|') # list of words to exclude
     for exc in exclude:
         tmp = []
         if matchTOK( exc, itok+1, tmp, tokens ) :  # no change to ifound
             return False
-       
+
     return matchTOK( kpart[0], itok, ifound, tokens)
 
 #if this gives a match, it consumes one token
 def matchWordToToken_dollar(kpart, itok, ifound, tokens):
-    if len(kpart) != 2: 
-        return False   
-    
+    if len(kpart) != 2:
+        return False
+
     if itok==0 :
         return matchTOK(kpart[1], itok, ifound, tokens)
 
@@ -196,10 +196,10 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 ##------------------------------------------------
 def _findInText( klist, tokens, itok, ifound ):
     found = False
-  
+
     for kword in klist.list:
         # look for this kword at itok position in tokens
-        # and return with ifound storing itok and any  
+        # and return with ifound storing itok and any
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
             #print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
@@ -209,11 +209,11 @@ def _findInText( klist, tokens, itok, ifound ):
     else:
         return False
 
-###############################################################      
-###############################################################     
+###############################################################
+###############################################################
 
 
 
-    
-                
-                
+
+
+
