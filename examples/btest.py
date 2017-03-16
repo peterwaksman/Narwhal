@@ -20,7 +20,7 @@ NoiseText += "when the deliveries started arriving."
 # E.clearImplicits()
 
 #--------- app specific
-from NoiseTree import *
+from .NoiseTree import *
 E = EXPERIENCE
 
 

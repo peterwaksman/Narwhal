@@ -3,7 +3,7 @@ from narwhal.nwsreader import *
 from narwhal.nwapp import *
 
 # app specific
-from NoiseTree import *
+from .NoiseTree import *
 
 # here we structure the output variables as desired. Pick a prefix like "N_"
 # and put a polarity field in each one. The total polarity is a formula you, the
