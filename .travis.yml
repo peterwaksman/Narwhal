@@ -2,16 +2,19 @@ sudo: false
 
 language: python
 cache: pip
-python:
-  - 2.7
-  - 3.5
-  - 3.6
-
 
 matrix:
   include:
-    - env: SUITE=test
-    - env: SUITE=lint
+    - python: 3.6
+      env: SUITE=test
+    - python: 3.6
+      env: SUITE=lint
+    - python: 3.5
+      env: SUITE=test
+    - python: 3.4
+      env: SUITE=test
+    - python: 2.7
+      env: SUITE=test
 
 before_install:
   - pip install -r requirements-tests.txt
