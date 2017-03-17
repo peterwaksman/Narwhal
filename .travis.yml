@@ -4,19 +4,27 @@ language: python
 cache: pip
 python:
   - 2.7
-  - 3.3
-  - 3.4
   - 3.5
   - 3.6
 
 
+matrix:
+  include:
+    - env: SUITE=test
+    - env: SUITE=lint
+
 before_install:
-  - pip install -r requirements-test.txt
+  - pip install -r requirements-tests.txt
 
 install:
   - pip install -r requirements.txt
 
-script:
-  - pytest --verbose
-  - pylint narwhal tests examples
-  - flake8 --verbose
+script: |
+  if [ "$SUITE" = "test" ]; then
+    pytest --verbose
+  elif [ "$SUITE" = "lint" ]; then
+    pylint narwhal tests examples &&
+    flake8 --verbose
+  else
+    this will error because we should not be here;
+  fi
