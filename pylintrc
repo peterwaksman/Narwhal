@@ -37,3 +37,8 @@ disable=unused-wildcard-import,invalid-name,missing-docstring
 # (visual studio) and html. You can also give a reporter class, eg
 # mypackage.mymodule.MyReporterClass.
 output-format=colorized
+
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=6
