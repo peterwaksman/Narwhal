@@ -26,7 +26,7 @@ script: |
   if [ "$SUITE" = "test" ]; then
     pytest --verbose
   elif [ "$SUITE" = "lint" ]; then
-    pylint narwhal tests examples &&
+    pylint narwhal narwhal_noise tests &&
     flake8 --verbose
   else
     this will error because we should not be here;
