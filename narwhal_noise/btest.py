@@ -59,5 +59,5 @@ thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
 nwa = NWApp(E, nars, calibs, thresholds)
 nwa.readText(text)
 s = nwa.report(text)
-print s
+print(s)
 x = 2

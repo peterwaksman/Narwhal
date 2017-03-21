@@ -1,9 +1,9 @@
-from narwhal.nwtypes import *
-from narwhal.nwsreader import *
-from narwhal.nwapp import *
+from narwhal.nwtypes import attribute, cause
+from narwhal.nwsreader import event
+from narwhal.nwapp import NWApp
 
 # app specific
-from .NoiseTree import *
+from narwhal_noise.NoiseTree import *
 
 # here we structure the output variables as desired. Pick a prefix like "N_"
 # and put a polarity field in each one. The total polarity is a formula you, the
@@ -29,9 +29,14 @@ letin = event(attribute(BARRIER, [STATE]), SOUND, LETINOUT)
 
 class NoiseApp:
     def __init__(self):
-        nars = [problem, sound, affect, proximity, letin]
-        calibs = [True,    True,  True,   True,      True]
-        thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
+        nars_calibs_thresholds = [
+            (problem, True, 0.6),
+            (sound, True, 0.6),
+            (affect, True, 0.6),
+            (proximity, True, 0.6),
+            (letin, True, 0.6),
+        ]
+        nars, calibs, thresholds = zip(*nars_calibs_thresholds)
 
         self.object = NWApp(EXPERIENCE, nars, calibs, thresholds)
 

@@ -17,7 +17,7 @@
 ##  AFFECT( stressD | relaxD )
 
 
-from narwhal.nwtypes import *
+from narwhal.nwtypes import KList
 
 
 kOTHERTOPICS = "tourist,boulangerie,flight,write,located,neighborhood,feeling, far ,looked,trip, deal,carpet,decor,big,inn,days,month,usd,sauna,mention,stay ,dinner,smell,speak,cheap,gym,remodeled,buffet,decorations,refurbished,seal out,view,safe,apart from,otherwise,central,cost , clean, tidy,towel,sheets, bed, neat"
