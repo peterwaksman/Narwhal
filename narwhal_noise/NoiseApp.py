@@ -1,5 +1,4 @@
-from narwhal.nwtypes import attribute, cause
-from narwhal.nwsreader import event
+from narwhal.nwtypes import attribute, cause, event
 from narwhal.nwapp import NWApp
 
 # app specific
