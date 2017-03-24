@@ -1,0 +1,33 @@
+sudo: false
+
+language: python
+cache: pip
+
+matrix:
+  include:
+    - python: 3.6
+      env: SUITE=test
+    - python: 3.6
+      env: SUITE=lint
+    - python: 3.5
+      env: SUITE=test
+    - python: 3.4
+      env: SUITE=test
+    - python: 2.7
+      env: SUITE=test
+
+before_install:
+  - pip install -r requirements-tests.txt
+
+install:
+  - pip install -r requirements.txt
+
+script: |
+  if [ "$SUITE" = "test" ]; then
+    pytest --verbose
+  elif [ "$SUITE" = "lint" ]; then
+    pylint narwhal narwhal_noise tests &&
+    flake8 --verbose
+  else
+    this will error because we should not be here;
+  fi

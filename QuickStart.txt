@@ -1,27 +1,27 @@
 Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWSReader class.
 
 You initialize an NWSReader with:
- 
+
  - A collection of **keyword lists** (each list defines a "variable" which can be thought of as a dimension.)
- - A collection of **narrative patterns** (each one is a formula defining a relation 
+ - A collection of **narrative patterns** (each one is a formula defining a relation
 between the variables)
 
 
-The syntax for constructing an NWReader is: 
+The syntax for constructing an NWReader is:
 
 	N = NSWReader( variables, formulas )
 
-The syntax for reading text is: 
+The syntax for reading text is:
 
-	N.readText(text)                      
+	N.readText(text)
 
-The class N contains a "vault" of saved instances of the formulas. After a read, the vault 
-inside N will contain records of how the narratives formulas were found in the text, along with a 
-"goodnesss of fit" score between narratives and text. You can act on these records or summarize 
-them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were 
-discovered by examining examples manually or through machine learning, these read operations 
-will be completely transparent and tune-able.] 
- 
+The class N contains a "vault" of saved instances of the formulas. After a read, the vault
+inside N will contain records of how the narratives formulas were found in the text, along with a
+"goodnesss of fit" score between narratives and text. You can act on these records or summarize
+them as entries in a database. [HYPE: Note that whether the keyword lists and narratives were
+discovered by examining examples manually or through machine learning, these read operations
+will be completely transparent and tune-able.]
+
 
 Example: fruit quality
 ----------------------
@@ -34,7 +34,7 @@ Start by creating keyword lists (you will add more words later)
 	kBAD  = {bad, terrible, sucks, low quality}
 
 	kFRUIT = {fruit}
-	kAPPLE = {apple, macintosh, granny smith, gala} 
+	kAPPLE = {apple, macintosh, granny smith, gala}
 	kORANGE= {orange}
 
 
@@ -47,12 +47,12 @@ Create variables from these lists:
 	APPLE = kAPPLE.var()
 	ORANGE = kORANGE.var()
 	FRUIT = kFRUIT.var()   # create one variable with its own word list and 2 children
- 
+
 
 Organize into a tree by grouping, as follows:
 
 	FRUIT.sub(APPLE)
-	FRUIT.sub(ORANGE)       
+	FRUIT.sub(ORANGE)
 
 	FRUITQ = kFRUITQ.var()
 	FRUITQ.sub(FRUIT)
@@ -66,7 +66,7 @@ This creates a tree with keyword lists for nodes and structure like this:
                 APPLE()
                 ORANGE()
             QUALITY(GOOD|BAD)
-		
+
 -----------------------------
 CREATE NARRATIVES ("formuas")
 -----------------------------
@@ -74,10 +74,10 @@ The simplest narrative is 'thing has attribute". In this case:
 
 	fruitqual = attribute(FRUIT,QUALITY)
 
-		
------------------------- 
+
+------------------------
 CREATE A NARWHAL READER
------------------------- 
+------------------------
 You can write:
 
 	N = NWSReader( FRUITQ, [fruitqual])
@@ -90,6 +90,6 @@ will fill a vault in NWReader using:
 To reverse the polarity of the output use
 
 	N.setCalibration([True])
- 
+
 
 For more complicated examples see "btest.py" and "NoiseApp.py".

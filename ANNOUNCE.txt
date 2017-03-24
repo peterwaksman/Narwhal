@@ -10,36 +10,36 @@ will continue in parallel for a bit longer. Speedup is phenomenal.
 
 
 Feb 1
-Narwhal version 2 is running - may need further debugging and 
-definately still needs wrapping  with "App" totality. But there 
-is now, at least, a new stake in the ground. The concept of 
+Narwhal version 2 is running - may need further debugging and
+definately still needs wrapping  with "App" totality. But there
+is now, at least, a new stake in the ground. The concept of
 segmented text, replacing tokenized text, is going well.
 
 -------------------------------------------------------------
-Jan 20: Version 1 uses direct text processing, which leads to the same 
-KList lookups occurring over and over - completely inefficiently. 
-It was my goal for the code to be true to an intuition about the 
-"moving topic", so pre-processing the text wasn't allowed. Now for 
-performance, I must revisit the decision. As we move beyond Version 1, 
-I am afraid I am moving past intuition and needing to conceptualize 
-entities that are not directly intuitive. In particular concepts of 
-'token' need to be replaced with concepts of filled VAR. A sequence of 
-tokens is replaced by a sequence of filled VARs called a "segment". 
-All other operations, up to the NWReader, need to be re-written using 
+Jan 20: Version 1 uses direct text processing, which leads to the same
+KList lookups occurring over and over - completely inefficiently.
+It was my goal for the code to be true to an intuition about the
+"moving topic", so pre-processing the text wasn't allowed. Now for
+performance, I must revisit the decision. As we move beyond Version 1,
+I am afraid I am moving past intuition and needing to conceptualize
+entities that are not directly intuitive. In particular concepts of
+'token' need to be replaced with concepts of filled VAR. A sequence of
+tokens is replaced by a sequence of filled VARs called a "segment".
+All other operations, up to the NWReader, need to be re-written using
 segmented text.
 
-But I have to develop new intuitions for segments. They will be the 
+But I have to develop new intuitions for segments. They will be the
 "spatial curves" to which we fit the moving frames of narrative.
 
 -----------------------------------------------------------
 Jan 15 2017
 Version 1 of Narwhal is Complete
 
-IT HAS SEVERE PERFORMANCE PROBLEMS. I am redesigning it to replace reading 
-of text with conversion of text to "segmented indexing" and reading of the 
-segmented data. That way only one time through the dictionaries will be 
+IT HAS SEVERE PERFORMANCE PROBLEMS. I am redesigning it to replace reading
+of text with conversion of text to "segmented indexing" and reading of the
+segmented data. That way only one time through the dictionaries will be
 needed.
 
-Stay tuned as we try to see what kind of "release label" I can apply here 
+Stay tuned as we try to see what kind of "release label" I can apply here
 on GitHub.
 UPDATE: done, now there is a "release" folder on the main page.
