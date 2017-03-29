@@ -1,8 +1,6 @@
 from narwhal import nwfind
 from narwhal import nwutils
 
-print("Hello")
-
 DEBUG_TXT = ""
 
 # K(ey word)Lists are initialized with comma-separated strings
