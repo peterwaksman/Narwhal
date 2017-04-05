@@ -1,6 +1,7 @@
 from narwhal import nwfind
 from narwhal import nwutils
 
+
 DEBUG_TXT = ""
 
 # K(ey word)Lists are initialized with comma-separated strings
@@ -482,7 +483,7 @@ class NAR:
 
     def numSlotsUsed(self):
         if isinstance(self, VAR) and self.found:
-            return 1
+            return self.numSlotsUsed()
         else:
             n = 0
             n += self.thing.numSlotsUsed()
@@ -683,7 +684,9 @@ def cause(x, y):
     n = NAR()
     n.thing = X  # "we were happy"
 
-    n.action = NAR_SO  # (encode a "so" operation)
+#    n.action = NAR_SO  # (encode a "so" operation)
+    n.action = NAR_SO   # (encode a "so" operation)
+    n.action.implicit = True
     n.value = Y  # "we laughed"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n

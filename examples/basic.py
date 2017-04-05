@@ -10,6 +10,16 @@ EXPERIENCE(KW_EXP)
     AFFECT()
         SAD(KW_SAD)
         | HAPPY(KW_HAPPY)
+
+
+OR
+EXPERIENCE(kEXPERIENCE)
+    FOOD("foodIlike,foodIhate")
+        POSFOOD(kPOSFOOD))
+        NEGFOOD(kNEGFOOD))
+    AFFECT()
+        SAD(kSAD) | HAPPY(kHAPPY)
+
 """
 import os
 import sys
@@ -22,32 +32,58 @@ sys.path.insert(0, narwhal_dir)
 
 from narwhal import nwtypes as nwt
 from narwhal import nwapp as nwa
+from narwhal import nwutils as nwu
+from narwhal import nwsegment as nws
 
-KW_FOOD = 'cheese,cilantro'
-VAR_FOOD = nwt.KList('food', KW_FOOD).var()
+# TODO - revisit whether to use one "food" category or to split into good and 
+# bad food.
+#kFOOD = 'cheese,cilantro'
+#FOOD = nwt.KList('food', kFOOD).var()
 
-KW_SAD = 'sad,unhappy,angry'
-KW_HAPPY = 'gleeful,not $ happy'
-VAR_SAD = nwt.KList('sad', KW_SAD).var()
-VAR_HAPPY = nwt.KList('happy', KW_HAPPY).var()
-VAR_AFFECT = VAR_SAD | VAR_HAPPY
+# ---------------VAR TREE
+kPOSFOOD = 'cheese, hamburger' #NB no traing 's' on hambrugers, OK cuz of termination  
+POSFOOD = nwt.KList( "foodIlike", kPOSFOOD).var()
+kNEGFOOD = 'cilantro,old fish'
+NEGFOOD = nwt.KList("foodIhate", kNEGFOOD).var()
+FOOD = POSFOOD | NEGFOOD
 
-KW_EXPERIENCE = 'experience,we found,I found,we did find'
-VAR_EXPERIENCE = nwt.KList('experience', KW_EXPERIENCE).var()
-VAR_EXPERIENCE.sub(VAR_FOOD)
-VAR_EXPERIENCE.sub(VAR_AFFECT)
+kSAD = 'sad,unhappy,angry,sick'
+SAD = nwt.KList('sad', kSAD).var()
+# Avoid this: "not" is an internally handled logic operator.
+#kHAPPY = 'gleeful,not $ happy'   
+kHAPPY = 'gleeful, happy'
+HAPPY = nwt.KList('happy', kHAPPY).var()
 
-NAR_EATING = nwt.cause(VAR_FOOD, VAR_AFFECT)
+#Avoid this: one wants to put positives before negatives
+#AFFECT = SAD | HAPPY 
+AFFECT = HAPPY | SAD
 
-NARS = [NAR_EATING]
-CALIBS = [True]
-THRESHOLDS = [0.6]
+kEXPERIENCE = 'experience,we found,I found,we did find'
+EXPERIENCE = nwt.KList('experience', kEXPERIENCE).var()
+EXPERIENCE.sub(FOOD)
+EXPERIENCE.sub(AFFECT)
 
-APP_FOOD = nwa.NWApp(VAR_EXPERIENCE, NARS, CALIBS, THRESHOLDS)
+# NARS
+eating = nwt.cause(FOOD, AFFECT)
+n = eating.numSlots()
+#for testing
+tokens = nwu.TOKS('cilantro makes me sad')
+# 
+#EXPERIENCE.findInText2(tokens, 0)    
+#
+segment = nws.prepareSegment(EXPERIENCE, tokens)
+nws.ReadSegment(eating,segment)
+
+# for now, lining up these arrays helps ensure same number of elements
+nars       = [eating]
+calibs     = [False] # no calib, because polarities are correctly arranged
+thresholds = [0.6]
+
+foodApp = nwa.NWApp(EXPERIENCE, nars, calibs, thresholds)
 
 SENTENCES = [
-    'Cheese makes me happy.',
     'Cilantro makes me sad.',
+    'Cheese makes me happy.',
 ]
 
 
@@ -55,8 +91,8 @@ def main():
     """Run the model against some sentences."""
     for sentence in SENTENCES:
         print('Sentence: ' + sentence)
-        APP_FOOD.readText(sentence)
-        report = APP_FOOD.report(sentence)
+        foodApp.readText(sentence)
+        report = foodApp.report(sentence)
         print(report)
 
 

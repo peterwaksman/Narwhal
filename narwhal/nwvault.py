@@ -1,7 +1,6 @@
 from narwhal.nwtypes import *  # brings in nwutils and nwfind
 from narwhal.nwutils import *
 from narwhal.nwcontrol import *
-from math import sqrt
 
 # The "vault" (NarVault below) is a repository for instances of a
 # narrative, encountered in the course of reading a text.
@@ -44,62 +43,8 @@ def getSnippet2(istart, ictrl, ifound, tokens):
 # additive until an event is observed. Events are not additive. In any case,
 # the creation of a record and vaulting are an event. GOF means "goodness of fit"
 # between narrative and text
+# DEPRECATED IN FAVOR OF NarSRecord
 
-class NarRecord:
-    def __init__(self, nar, ifound, tokens, ictrl, istart):
-        self.snippet = getSnippet2(istart, ictrl, ifound, tokens)
-        # num slots used in nar, since nar.clear() erases this info.
-        self.nused = nar.numSlotsUsed()
-        self.nslots = nar.numSlots()      # keep for convenience
-        self.nactive = nar.numSlotsActive()
-        self.ifound = ifound[:]           # indices that have already been read
-        self.block = False
-        self.ictrl = ictrl
-        self.GOF = self.gof(tokens, istart)
-        self.narpolarity = nar.polarity   # nar could change, so save its current polarity
-
-    def block(self):
-        self.block = True
-
-        # "goodness of fit"
-        # the subrange is the length of the subtokens used for this ifound
-        # Not same as tokens
-    def gof(self, tokens, istart):
-        L = len(tokens)
-        jfound = discountControls(tokens, self.ifound)
-        jfound = cleanFound(jfound)
-        # (this r counts words and controls in read word range)
-        r = histo(jfound, L)
-        f = getFoundRange(jfound, L)  # same as len(snippet)
-
-        u = self.nused  # a snapshot of state when the NarRecord is created
-        n = self.nslots
-        av = self.nactive
-        n = av         # deploy the 'implicits'
-        n = max(n, 2)   # but de-emphasize single-VAR narratives
-
-        if f == 0 or n == 0:
-            G = 0
-        else:
-            # de-emphasize 1-word matches, for one slot narratives
-            a = float(u) / float(max(n, 2))
-            b = float(r) / float(f)
-            G = a * b
-        return G
-
-    def finalPolarity(self, calib):
-        p = self.narpolarity
-        if calib:  # flip interpretation
-            p = not p
-
-        b = self.block
-        if b == p:  # it works out as this
-            return False
-        else:
-            return True
-
-# This is currently defined in terms of the above NarRecord.
-# Probably it could be more general.
 
 
 class NarVault:
@@ -173,35 +118,3 @@ class NarVault:
 # It is a nar plus ifound plus Vault
 # It relieves some of the complexity of the NarReader.
 
-
-class NarReadData:
-    def __init__(self, treeroot, nar):
-        self.tree = treeroot.copy()
-        self.tree.clear()
-        self.tree.clearImplicits()
-        self.nar = nar.copyUsing(self.tree)
-        # self.nar.refreshImplicits(False) they are refreshed inadvertenly
-        # while copyUsing()
-        self.calib = False
-
-        self.ifound = []
-        self.V = NarVault()
-
-    def clearIFound(self):
-        self.nar.clearIFound()
-        self.ifound = []
-
-    def clear(self):
-        self.clearIFound()
-        self.nar.clear()
-
-    def finalPolarity(self, r):
-        p = r.narpolarity
-        if self.calib:  # flip interpretation
-            p = not p
-
-        b = r.block
-        if b == p:  # it works out as this
-            return False
-        else:
-            return True

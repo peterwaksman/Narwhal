@@ -1,4 +1,13 @@
 
+import os
+import sys
+
+# Add local narwhal to the module path
+this_file = os.path.abspath(__file__)
+narwhal_dir = os.path.join(os.path.dirname(this_file), '..')
+narwhal_dir = os.path.normpath(narwhal_dir)
+sys.path.insert(0, narwhal_dir)
+
 #--------- some core includes
 from narwhal.nwtypes import *
 from narwhal.nwutils import *
@@ -20,7 +29,7 @@ NoiseText += "when the deliveries started arriving."
 # E.clearImplicits()
 
 #--------- app specific
-from .NoiseTree import *
+from narwhal_noise.NoiseTree import *
 E = EXPERIENCE
 
 
@@ -44,6 +53,13 @@ text = "Although my room was next to the elevator, it was perfectly quiet and da
 text = "it was perfectly quiet and dark at night "
 text = "We did find it a bit noisy with the balcony doors open due to the McDonalds next door."
 
+SENTENCES = [
+    'word spoken was heard through the walls',
+    'My room was far from the elevator and far from the lobby, so it was very quiet.',
+    'Although my room was next to the elevator, it was perfectly quiet and dark at night so I was able to sleep much better than most European cities',
+    'it was perfectly quiet and dark at night',
+    'We did find it a bit noisy with the balcony doors open due to the McDonalds next door.',
+]
 
 #nw = NWSReader(E, [proximity] )
 # nw.readText(text)
@@ -55,9 +71,14 @@ nars = [problem, sound, affect, proximity, letin]
 calibs = [True,    True,  True,   True,      True]
 thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
 
+#nars = [proximity]
+#calibs = [True]
+#thresholds = [0.6]
 
 nwa = NWApp(E, nars, calibs, thresholds)
-nwa.readText(text)
-s = nwa.report(text)
-print(s)
+for sent in SENTENCES:
+    text = sent
+    nwa.readText(text)
+    s = nwa.report(text)
+    print(s)
 x = 2

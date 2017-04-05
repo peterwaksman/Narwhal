@@ -242,6 +242,7 @@ def ReadSegmentAsCausal(nar, seg):
     c = ReadSegment(SO_OP, seg)
     if c > 0:
         if SO_OP.polarity == True:
+            
             doSecondPass = False
         else:
             doFirstPass = False
@@ -298,7 +299,11 @@ def ReadSegmentAsCausal(nar, seg):
         # polarity algorithm. Unfortunately AD HOC
         T = nar.thing.polarity
         V = nar.value.polarity
-        if (T and V) or (not T and not V):
+#        if (T and V) or (not T and not V):
+# I removed this code when a food("cheese,cilantro")
+# went to being a food = good("cheese") | bad("cilantro")
+# This is a connection too deep to explore for now.
+        if (T and V) or (not T and V):
             nar.polarity = True
         else:
             nar.polarity = False
@@ -317,6 +322,7 @@ def ReadSegmentAsCausal(nar, seg):
         else:
             nar.polarity = False
 
+    x = nar.numSlotsUsed()
     return t + v + c
 
 
@@ -446,41 +452,3 @@ def wordReadRange(segment, ifound, imin, imax):
     # remove any punctuations
     return max(0, final)
 
-#        # "goodness of fit"
-# def gof( segment, nar, imin, imax):
-#    u = nar.numSlotsUsed()
-#    n = nar.numSlots()# temp, just to examine in debugger
-#    av = nar.numSlotsActive()
-#    r = wordReadCount(segment, nar, imin, imax)
-#    f = wordReadRange(segment, nar, imin, imax)
-
-#    n = av         # deploy the 'implicits'
-#    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
-
-#    if f==0:
-#        G = 0
-#    else:
-#        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-#        b = float(r)/float(f)
-#        G = a*b
-#    return G
-
-# def gof2( segment, nar, ifound, imin, imax):
-#    u = nar.numSlotsUsed()
-#    n = nar.numSlots()# temp, just to examine in debugger
-#    av = nar.numSlotsActive()
-#    r = wordReadCount(segment, ifound, imin, imax)
-#    f = wordReadRange(segment, ifound, imin, imax)
-#    ifound = cleanFound(ifound)
-#    n = av         # deploy the 'implicits'
-#    n = max(n,2)   # AD HOC? avoid over weighting of single word narratives
-
-#    f = max(f,av)   # AD HOC? Now for segments I want this
-
-#    if f==0:
-#        G = 0
-#    else:
-#        a = float(u)/float(n) # de-emphasize 1-word matches, for one slot narratives
-#        b = float(r)/float(f)
-#        G = a*b
-#    return G

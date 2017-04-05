@@ -128,6 +128,7 @@ class NWSReader:
         for nar in self.nars:
             nar.clear()
             self.vaults[i].clear()
+            i = i+1
         self.tokens = []
 
     def readMany(self, segment):
@@ -263,6 +264,7 @@ class NWSReader:
         elif CTRL.isA("COMMA") or CTRL.isA("SEMICOLON"):
             self.rollUpCanVaultMany(records, 0.5)
             self.removeAllBlocksMany()
+            self.clearMany()
             # self.clearIFoundMany()
 
         # note: no "OPENPAREN" processing yet

@@ -72,7 +72,7 @@ kAMPLIFIERS = " very "
 
 kCAUSES = " so , therefore, therefor , because, hence ,room $ for, due to, dueto, as ,keep the, kept us"
 
-kCAUSESFWD = " so , therefore, therefor , because, hence ,keep the, kept us"
+kCAUSESFWD = " so , therefore, therefor , because, hence ,keep the, kept us, makes me , made me "
 kCAUSESBKD = "room $ for, due to, dueto, as "
 
 
