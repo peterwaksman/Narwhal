@@ -1,3 +1,9 @@
+April 5 Switched over to gwax's more professional style (somewhat) and looking 
+forward to extending "basic.py" example and providing some documentation. While
+gwax is concerned with re-factory and code clarity, pwax (me) is concerned with
+developing automated keyword/keynarrative discovery tools. 
+
+
 Feb25
 V2.0 release created. I now have enough confidence to delete v1.
 
@@ -7,6 +13,17 @@ Version 2 now working pretty much as desired. Questions with AD HOC solutions
 are creeping in in several places: the gof() depends a bit on segment structure
 the vault thresholds on vaulting rather than on setting the pre. Both V1 and V2
 will continue in parallel for a bit longer. Speedup is phenomenal.
+
+April 5 - Narwhal now incoporates some professional python style. gwax has been 
+correcting things, and developing testing methods. The new 
+"\examples\basic.py" is getting worked on. Plans are
+(1) further 'pythonization' of the code and potential for re-factoring
+(2) the urge to create keyword/keynarrative discovery tools. 
+(3) btest.py now supports an array of sentences and is better positioned
+for regresson testing.
+(4) docs
+
+
 
 
 Feb 1
