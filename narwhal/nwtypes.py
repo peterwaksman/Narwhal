@@ -335,7 +335,7 @@ class VAR:
         p = NAR()
         p.order = 1
         p.polarity = True
-        p.implicit = False
+        p.explicit = True
 
         p.thing = self         # so isinstance(p.thing,VAR) is True
         p.action = NULL_VAR
@@ -674,6 +674,7 @@ def event(x, y, act):
 
 # a dummy to identify the "cause" type of statement
 NAR_SO = KList("so", "").var().nar()
+NAR_SO.makeImplicit()
 # the correct word searching is handled by internal lists
 
 
@@ -686,7 +687,7 @@ def cause(x, y):
 
 #    n.action = NAR_SO  # (encode a "so" operation)
     n.action = NAR_SO   # (encode a "so" operation)
-    n.action.implicit = True
+ #   n.action.makeImplicit()
     n.value = Y  # "we laughed"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
@@ -702,7 +703,7 @@ def cause(x, y):
 # design code making them equivalent
 # used to identify the "and"/"then" type of statement
 NAR_THEN = KList("then", "").var().nar()
-
+NAR_THEN.makeImplicit()
 
 def sequence(x, y):
     X = a2n(x)  # interpret args
@@ -711,6 +712,7 @@ def sequence(x, y):
     n = NAR()
     n.thing = X  # "we ate cookies"
     n.action = NAR_THEN  # (encode a "then" operation)
+    n.action.makeImplicit()
     n.value = Y  # "we ate pie"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
