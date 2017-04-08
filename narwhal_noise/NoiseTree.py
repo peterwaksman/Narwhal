@@ -229,7 +229,10 @@ EXPERIENCE.sub(AFFECT)
 #
 SOUND.sub(NOISE)
 SOUND.sub(INTENSITY)
-SOUND.sub(SOURCE)
+
+#SOUND.sub(SOURCE) #ad hoc, can go either way
+EXPERIENCE.sub(SOURCE)
+
 #
 LOC.sub(ROOM)
 LOC.sub(HOTEL)
