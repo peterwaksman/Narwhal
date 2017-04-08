@@ -1,16 +1,26 @@
+"""
+nwtypes.py defines there basic data types involved in "narrative" entities
+KList, VAR, and NAR. 
+The KList is a list of keywords with text matching capabilities
+The VAR is like a "concept" that wraps the KList. VARs are tree nodes
+The NAR is a four part narrative with actor, action, relation, and target
+"""
+
 from narwhal import nwfind
 from narwhal import nwutils
 
-
-DEBUG_TXT = ""
 
 # K(ey word)Lists are initialized with comma-separated strings
 # thanks to Stack Exchange for idea of making it into a factory
 # and repository
 # they have no "state".
 
-
 class KList:
+    """ 
+    KList - a wrapper around a list of keywords, with some regular expression-like 
+    matching behavior defined by KList.findInText(). Note the way KList instances
+    are tracked inside the KList class. This allows retrieving a KList by name.
+    """
     instances = {}
 
     def __init__(self, name, inString):
@@ -41,6 +51,25 @@ NULL_KLIST = KList("nullK", "")
 
 
 class VAR:
+    """
+    VAR - a tree node wrapping a single KList with constant attributes:
+    exclusive - means the VAR represents a binary choice [ternary is possible]
+    By definition, the first alternative means good and second means bad. 
+    (You can change this with calibrations later.)
+
+    explicit   - refers to when the VAR can be missing from a narrative
+    parent, and children. (The VAR tree is fundamental to the app)
+
+    Various volatile sctachpads and summaries used during reading:
+    found - whether this VAR was found in the input text
+    polarity - whether this is a good thing or a bad thing (per "exclusive" above)
+    ifound[] - a list of token indices where VAR matched
+    (Note that with the regular expression-like behavior of the KList,
+    the act of "matching" is done as a sliding window over the tokens,
+    centered on an itok index, searching forward AND backward from itok.)
+
+    foundInChildren - means a child of the VAR node found a match
+    """
     def __init__(self):
 
         # ---these are constant in the VAR
@@ -359,10 +388,33 @@ def countVAR(array):
     return sum(1 for i in array if i != NULL_VAR)
 
 
-##############################
-#            NAR             #
-##############################
+#######################################################################
+#                            NAR                                      #
+#######################################################################
 class NAR:
+    """
+    NAR - the nestable entities that wrap VARs or other NARs. They are 
+    considered to be narrative patterns. Note that nesting of NARs as 
+    subnarratives, is a different hierarchical structure than the tree of VARs.
+
+    A NAR has these constant attributes:
+    order - VARs are order 0 and all narratives built over them have
+    order one greater than the order of any subnarrative. 
+
+    explicit - when false, means it can be missing from the text and not count
+    against matching. (Usually for a subnarrative. An empty narrative that is not
+    explicit can never score more than 0.5)
+
+    The four subnarratives that define a NAR are thing, action, relation, and value
+    See code for their respective roles.
+     
+    Since NARs wrap VARs, all the bookeeping during a "read" done inside those VARs 
+    is inherent within the wrapping NAR. The NAR itself has only one volatile entity:
+    polarity - whether the filled story is good or bad - a formula derived from the 
+    good/bad polarity of the underlying subnarratives (and VARs). 
+    
+    Note that polarity = True, by default. And you may not care about that field.
+    """
     def __init__(self):
         self.order = 0  # the level of pattern-inside-pattern depth. Currently it is informational
         # don't know if I want this [ANSWER: to implement implicit variables]
@@ -677,6 +729,12 @@ NAR_SO = KList("so", "").var().nar()
 NAR_SO.makeImplicit()
 # the correct word searching is handled by internal lists
 
+# Worth mentioning: the internal list searching marks token indices in ifound[]
+# so those indices are not counted in the r/f part of the gof() formula.
+# Ensuring that NAR_SO and also NAR_THEN (below) are implicit, means ensuring they 
+# are NOT counted as slots in the u/n part of the formula.
+
+
 
 def cause(x, y):
     X = a2n(x)  # interpret args
@@ -685,9 +743,7 @@ def cause(x, y):
     n = NAR()
     n.thing = X  # "we were happy"
 
-#    n.action = NAR_SO  # (encode a "so" operation)
     n.action = NAR_SO   # (encode a "so" operation)
- #   n.action.makeImplicit()
     n.value = Y  # "we laughed"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
@@ -703,7 +759,7 @@ def cause(x, y):
 # design code making them equivalent
 # used to identify the "and"/"then" type of statement
 NAR_THEN = KList("then", "").var().nar()
-NAR_THEN.makeImplicit()
+NAR_THEN.makeImplicit() #revisit
 
 def sequence(x, y):
     X = a2n(x)  # interpret args
@@ -712,7 +768,6 @@ def sequence(x, y):
     n = NAR()
     n.thing = X  # "we ate cookies"
     n.action = NAR_THEN  # (encode a "then" operation)
-    n.action.makeImplicit()
     n.value = Y  # "we ate pie"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
