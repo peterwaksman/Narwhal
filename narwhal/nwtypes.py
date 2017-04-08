@@ -10,16 +10,15 @@ from narwhal import nwfind
 from narwhal import nwutils
 
 
-# K(ey word)Lists are initialized with comma-separated strings
-# thanks to Stack Exchange for idea of making it into a factory
-# and repository
-# they have no "state".
-
 class KList:
     """ 
     KList - a wrapper around a list of keywords, with some regular expression-like 
     matching behavior defined by KList.findInText(). Note the way KList instances
     are tracked inside the KList class. This allows retrieving a KList by name.
+
+    K(ey word)Lists are initialized with comma-separated strings thanks to Stack 
+    Exchange for idea of making it into a factory and repository
+    They have no "state".
     """
     instances = {}
 

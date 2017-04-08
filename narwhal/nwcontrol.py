@@ -1,8 +1,45 @@
+""" 
+nwcontrol.py implements the GENERAL_OP tree and the ControlData class.
+
+It is important to note that the GENERAL_OP tree is re-used frequently 
+and its node's (which are VARs) volatile member variables get overwritten 
+frequently.
+
+Logical operators, punctuations, dull words to ignore - all are 
+considered types of "controls" that affect reading and are in the 
+GENERAL_OP tree. This is Narwhal's version of the boolean operators,
+plus other things. It is also Narwhal's version of syntax-n-grammar 
+"elements". See nwreader.NWSReader.applyControl() for how the logic is 
+interpreted. 
+ 
+
+Although not up to date, the tree is something like this:
+
+ GENERAL_OP()
+     LOGIC_OP()
+        AND_OP( andD )
+        SO_OP( soD )
+        ATTRIB_OP( attribD )
+        BLOCK_OP()
+             GENNEGATION_OP( gennegD )
+             GENHEDGE_OP( genhedgeD )
+        FWDBLOCK_OP
+             FWDNEGATION_OP( fornegD )
+             FWDHEDGE_OP( forhedgeD )
+        PRECONJ_OP()
+            IF_OP( ifD )
+            NOTONLY_OP(onlyD )
+    PUNCTUATION_OP()
+    SKIP_OP()
+        DULL_OP()
+
+
+ The ControlData is a way of keeping track of the relation between text 
+ and the operators during reading.
+"""
+
 from narwhal.nwtypes import *
 from narwhal.nwutils import *
-
-# LOGICAL OPERATORS AND PUNCTUATION ARE CONSIDERED "CONTROLS" THAT AFFECT
-# READING
 
 # I complain about how logicians co-opted natural language terms for their own uses.
 # But Narwhal needs to co-opt the same terms because the terms do, in fact, play a

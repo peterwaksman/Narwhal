@@ -1,40 +1,43 @@
-# Searching text for keywords from a KList uses special symbols to help
-# disambiguate, in terms of what comes before or after the match in the text.
-##
-# Thus an entry like this from a KList:
-# abc # X
-# means text with "abc X" will not be matched by that item from the KList.
-# Hence abc followed by X is excluded.
-##
-# Similarly, this notation excludes being preceded by X:
-# X $ abc
-# means text with "X abc" will not be matched by that item from the KList
-##
-# In both those cases, "abc", without the X, DOES match
-##
-##
-# In this context we also use the '|' character as an "or", so that an entry
-# like the following excludes several things at once:
-# abc # X|Y|Z
-# So text with any of X, Y, or Z after abc will not be a match for this
-# item of the KList. You can use '|'  with the '$' and can put as many
-# un-quoted substrings in the exlusion as you like.
-# NOTE: this is a different use of the'|' character than when or'ing VARs
-##
-# Also you are supposed to ignore wildcards so
-# abc * def
-# means match by searcing forward from abc allowing one word in between
-# [could be more complicated] before def.
-##
-# By the way, space before or after a keyword, means its ending (at the space)
-# must match the ending of the
-# token. Without the space, different beginnings or endings are allowed in
-# matching a substring of the token.
+"""
+nwfind.py implements matching keywords to tokens in a window of text.
 
-# Obviously it could all be greatly improved if keywords implemented regular expressions
-# and matchTOK() knew how to handle it. What is important for Narhwal is to keep track
-# of the place in the text where the match occurs.
+Matching keywords from a KList uses special symbols to help disambiguate, 
+in terms of what comes before or after the match in the text. This is 
+primitive type of , built-in regular expression matching.
+ 
+Thus an entry like this from a KList:
+    abc # X
+means text with "abc X" will not be matched by that item from the KList.
+Hence abc followed by X is excluded.
+ 
+Similarly, this notation excludes being preceded by X:
+    X $ abc
+means text with "X abc" will not be matched by that item from the KList
+ 
+In both those cases, "abc", without the X, DOES match
+ 
+In this context we also use the '|' character as an "or", so that an entry
+like the following excludes several things at once:
+    abc # X|Y|Z
+So text with any of X, Y, or Z after abc will not be a match for this
+item of the KList. You can use '|'  with the '$' and can put as many
+un-quoted substrings in the exlusion as you like.
+NOTE: this is a different use of the'|' character than when or'ing VARs
+ 
+Also you are supposed to ignore wildcards so
+    abc * def
+means match by searcing forward from abc allowing one word in between
+[could be more complicated] before def.
+ 
+By the way, space before or after a keyword, means its ending (at the space)
+must match the ending of the
+token. Without the space, different beginnings or endings are allowed in
+matching a substring of the token.
 
+Obviously it could all be greatly improved if keywords implemented regular expressions
+and matchTOK() knew how to handle it. What is important for Narhwal is to keep track
+of the place in the text where the match occurs.
+"""
 
 def kwordLen(kword):
     if len(kword) < 1:
@@ -50,20 +53,21 @@ def kwordLen(kword):
     return 1
 
 
-# Args: the space-tokenized text into the method, along with the index of one token
-# The keyword is an item from a KList's self.list (or a substring)
-# Per above, the keyword can encode alternatives
-
-# here we match an entry from a keyword list to a space-delimeted token
-# after putting the space back into the token
-
-# I have convinced myself that the use of indexed arrays of tokens is helpful
-# when text matching involves not just one token but the other tokens on either
-# side. The client is also interested in which indices are involved as they
-# will want to know the number of words between matches. So itok is useful
-
 
 def matchTOK(kword, itok, ifound, tokens):
+    """
+    Args: the space-tokenized text into the method, along with the index of one token
+    The keyword is an item from a KList's self.list (or a substring)
+    Per above, the keyword can encode alternatives
+
+    here we match an entry from a keyword list to a space-delimeted token
+    after putting the space back into the token
+
+    I have convinced myself that the use of indexed arrays of tokens is helpful
+    when text matching involves not just one token but the other tokens on either
+    side. The client is also interested in which indices are involved as they
+    will want to know the number of words between matches. So itok is useful
+    """
     if itok > len(tokens) - 1:
         return False
 

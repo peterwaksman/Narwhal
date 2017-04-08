@@ -1,3 +1,15 @@
+"""
+nwsegment.py implements utilities associated with a "segment" which is
+just a plain lists of VARs, without any wrapping. The most important are
+    PrepareSegement() -  to convert text-to-tokens-VARs 
+    ReadSegment() - the "inner loop" which reads all the text, recursively
+    per the hierarchy inside each nar.
+
+The relation between indices in the original tokens of text and indices in
+the new "segmented text" is an unhappy one. Various methods try to 
+coordinate them: getHi(), getLo(), wordReadRange
+
+"""
 # nwsegment.py for handling text segmentation utilities.
 # used by the NWSReader. Contains utilities and the inner loop read() methods
 from narwhal.nwtypes import *
@@ -9,7 +21,7 @@ from narwhal.nwcontrol import *
 #################################
 
 # convert text to a segment
-def prepareSegment(tree, tokens):
+def PrepareSegment(tree, tokens):
     tree.clear()
     GENERAL_OP.clear()
     seg = []
@@ -48,7 +60,7 @@ def findInSegment(segment, itok):
     return NULL_VAR
 
   ####################################################
-    # these  try to use the "latest" result in the vars of a segment
+    
 
 
 def getLo(segment):

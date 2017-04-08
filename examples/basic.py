@@ -11,7 +11,6 @@ EXPERIENCE(KW_EXP)
         SAD(KW_SAD)
         | HAPPY(KW_HAPPY)
 
-
 OR
 EXPERIENCE(kEXPERIENCE)
     FOOD("foodIlike,foodIhate")
@@ -72,7 +71,7 @@ tokens = nwu.TOKS('cilantro makes me sad')
 # 
 #EXPERIENCE.findInText2(tokens, 0)    
 #
-segment = nws.prepareSegment(EXPERIENCE, tokens)
+segment = nws.PrepareSegment(EXPERIENCE, tokens)
 nws.ReadSegment(eating,segment)
 
 # for now, lining up these arrays helps ensure same number of elements

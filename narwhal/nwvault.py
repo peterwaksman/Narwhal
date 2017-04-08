@@ -1,53 +1,124 @@
+"""
+nwvault.py implents the NarRecord and the NarVault for storing them.
+
+A key aspect of this is scoring the goodness-of-fit between a nar and
+a segement of text. This is the gof() function.   
+"""
+
 from narwhal.nwtypes import *  # brings in nwutils and nwfind
 from narwhal.nwutils import *
+from narwhal.nwsegment import *
 from narwhal.nwcontrol import *
 
-# The "vault" (NarVault below) is a repository for instances of a
-# narrative, encountered in the course of reading a text.
-# It consists of an array of NarRecords.
 
-# for convenience, the nar record includes the relevant snippet of
-# original text
+def gof(segment, nar, ifound, imin, imax):
+    """
+    goodness of fit between nar and segment. Uses the indexing
+    of tokens from original text, and the imin and imax index in the
+    segment.
+    """
+    u = nar.numSlotsUsed()
+    n = nar.numSlots()  # temp, just to examine in debugger
+    av = nar.numSlotsActive()
+    r = wordReadCount(segment, ifound, imin, imax)
+    f = wordReadRange(segment, ifound, imin, imax)
+    ifound = cleanFound(ifound)
+    n = av         # deploy the 'implicits'
+    n = max(n, 2)   # AD HOC? avoid over weighting of single word narratives
+
+    f = max(f,av)   # AD HOC? Now for segments I want this
+
+    if f == 0:
+        G = 0
+    else:
+        # de-emphasize 1-word matches, for one slot narratives
+        a = float(u) / float(n)
+        b = float(r) / float(f)
+        G = a * b
+    return G
 
 
-def getSnippet(istart, ictrl, tokens):
-    if ictrl <= istart:
+def getSnippet3(tokens, ifound):
+    L = len(tokens)
+    if L == 0:
         return ""
-    snippet = tokens[istart:ictrl]
-    return snippet
+    ilo = 0
+    ihi = 0
+    for i in ifound:
+        if ilo > i and i < L:
+            ilo = i
+        if ihi < i and i < L:
+            ihi = i
+    out = ""
+    for i in range(ilo, ihi + 1):
+        out += tokens[i] + " "
 
-# for convenience, the nar record includes the relevant snippet of original text
-# plus some embelishments
+    return out
 
+####################################################################
 
-def getSnippet2(istart, ictrl, ifound, tokens):
-    if ictrl <= istart:
-        return ""
+class NarSRecord:
+    """
+     The NarSRecord reflects a collapsing of the data that has been kept
+     as separate count of numSlotsUsed() and ifound (the indices of found tokens)
+     during the reading process. These get scored and perhaps saved or "vaulted".
+     There is a poetic analogy with how superposition of waves is
+     additive until an event is observed. Events are not additive. In this case,
+     the creation of a record and vaulting are an event. GOF means "goodness of fit"
+     between narrative and text
+    """
+    def __init__(self, nar, segment, imin, imax, tokens):
+        # imin and imax are segment indices and need translating for use
+        # in accessing the tokens array, which is here for informational
+        # purposes
+        s = nar.getIFound()
+        ifound = []
+        for i in nar.getIFound():
+            if imin <= i and i <= imax:
+                ifound.append(i)
+        self.ifound = ifound
+        self.snippet = getSnippet3(tokens, self.ifound)
 
-    newtokens = tokens[:]
-    for j in range(len(ifound)):
-        i = ifound[j]
-        newtokens[i] = newtokens[i] + "*"
+        self.nar = nar.copy()
+        self.imin = imin
+        self.imax = imax
+        self.block = False
+        self.ictrl = imax
+        self.GOF = gof(segment, nar, self.ifound, imin, imax)
+        self.ifound = cleanFound(self.ifound)
+        self.narpolarity = nar.polarity
 
-    snippet = ""
-    for i in range(istart, ictrl):
-        snippet += newtokens[i] + " "
+    def block(self):
+        self.block = True
 
-    return snippet
+    def finalPolarity(self, calib):
+        p = self.narpolarity
+        if calib:  # flip interpretation
+            p = not p
 
+        b = self.block
+        if b == p:  # it works out as this
+            return False
+        else:
+            return True
 
-# The NarRecord reflects a collapsing of the data that has been kept
-# as separate count of numSlotsUsed() and ifound (the indices of found tokens)
-# during the reading process. These get scored and perhaps saved or "vaulted".
-# There is a poetic analogy with how superposition of waves is
-# additive until an event is observed. Events are not additive. In any case,
-# the creation of a record and vaulting are an event. GOF means "goodness of fit"
-# between narrative and text
-# DEPRECATED IN FAVOR OF NarSRecord
-
-
+#####################################################
 
 class NarVault:
+    """
+    The "vault" (NarVault below) is a repository for records of a
+    narrative, encountered in the course of reading a text.
+    It consists of an array of finalized NarRecords. It also contains
+    a preliminary NarRecord called "pre". The "pre" NarRecord is regarded
+    as a staging area. This record can still be modified (eg negated) or
+    abandoned. At some point, triggered by the client of this code, a 
+    "vaulting" event may occur, taking the "pre" and putting into a finalized 
+    array where it can no longer be modified.
+
+    For convenience, the nar record includes the relevant snippet of
+    original text. So later the vault can be evaluated by the client.  
+    """
+
     def __init__(self):
         self._vault = []
         self.pre = 0

@@ -242,11 +242,3 @@ INSULATION.sub(BARRIER)
 INSULATION.sub(STATE)
 INSULATION.sub(LETINOUT)
  
-# try this
-#NOISE.polarity = False
-#INTENSITY.polarity = False
-#SOURCE.polarity = False
-#PROX.polarity = False
-#STATE.polarity = False
-#LETINOUT.polarity = False
-#AFFECT.polarity = False

@@ -1,89 +1,35 @@
-# nwsegment.py for handling text semgentation
-#from narwhal.nwtypes import *
-#from narwhal.nwutils import *
-#from narwhal.nwcontrol import *
+"""
+nwreader.py contains the NWSReader object, the highest level reader. 
+
+Members include:
+     - app specific tree
+     - app specific array of nars
+     - array of vaults, one per nar, for storing NarSRecords
+Implements two key algorithms, readText() and applyControl().
+    readText() implements the "outer loop" for reading
+        - convert text-to-tokens
+        - convert tokens-to-VARs (the resulting sequence of VARs is called 
+        a "segment".
+        - for each subsegment between controls it calls "inner loop" 
+        ReadSegment() 
+        - at each control it pauses and tries to store things (in "vaults"), and 
+        resets ("clears") more or less of the tree and the nars. This is
+        the done in the following:
+
+   applyControl() is where Narwhal's does its version of logical operations. 
+        There is a delicate (and probably imperfect) balance between clearing 
+        the information inside the VARs of the tree and clearing the 
+        information inside the NARs during these control operations. Two key 
+        activities are saving  read nar info in the vaults, and clearing 
+        parts of the tree and parts of the nar array.
+
+    Note use of "Many" indicates looping through the array of nars and 
+    doing the same thing to each one. There is NO cross-talk between the
+    nars for now.
+
+"""
 from narwhal.nwvault import *
 from narwhal.nwsegment import *
-
-
-def gof(segment, nar, ifound, imin, imax):
-    u = nar.numSlotsUsed()
-    n = nar.numSlots()  # temp, just to examine in debugger
-    av = nar.numSlotsActive()
-    r = wordReadCount(segment, ifound, imin, imax)
-    f = wordReadRange(segment, ifound, imin, imax)
-    ifound = cleanFound(ifound)
-    n = av         # deploy the 'implicits'
-    n = max(n, 2)   # AD HOC? avoid over weighting of single word narratives
-
-    f = max(f,av)   # AD HOC? Now for segments I want this
-
-    if f == 0:
-        G = 0
-    else:
-        # de-emphasize 1-word matches, for one slot narratives
-        a = float(u) / float(n)
-        b = float(r) / float(f)
-        G = a * b
-    return G
-
-
-def getSnippet3(tokens, ifound):
-    L = len(tokens)
-    if L == 0:
-        return ""
-    ilo = 0
-    ihi = 0
-    for i in ifound:
-        if ilo > i and i < L:
-            ilo = i
-        if ihi < i and i < L:
-            ihi = i
-    out = ""
-    for i in range(ilo, ihi + 1):
-        out += tokens[i] + " "
-
-    return out
-
-####################################################################
-# compatible with NarRecord. Either type can be stored in the vault
-
-
-class NarSRecord:
-    def __init__(self, nar, segment, imin, imax, tokens):
-        # imin and imax are segment indices and need translating for use
-        # in accessing the tokens array, which is here for informational
-        # purposes
-        s = nar.getIFound()
-        ifound = []
-        for i in nar.getIFound():
-            if imin <= i and i <= imax:
-                ifound.append(i)
-        self.ifound = ifound
-        self.snippet = getSnippet3(tokens, self.ifound)
-
-        self.nar = nar.copy()
-        self.imin = imin
-        self.imax = imax
-        self.block = False
-        self.ictrl = imax
-        self.GOF = gof(segment, nar, self.ifound, imin, imax)
-        self.ifound = cleanFound(self.ifound)
-        self.narpolarity = nar.polarity
-
-    def block(self):
-        self.block = True
-
-    def finalPolarity(self, calib):
-        p = self.narpolarity
-        if calib:  # flip interpretation
-            p = not p
-
-        b = self.block
-        if b == p:  # it works out as this
-            return False
-        else:
-            return True
 
 
 ##########################################################################
@@ -98,8 +44,6 @@ class NWSReader:
         self.tree.clearImplicits()
 
         self.nars = nars  # [:]
-
-        nar = nars[0]
 
         self.calibs = []
         # later you can call set calibs with some 'True' entries
@@ -207,7 +151,7 @@ class NWSReader:
         self.clearAll()
         self.tokens = prepareTokens(text)
 
-        segment = prepareSegment(self.tree, self.tokens)
+        segment = PrepareSegment(self.tree, self.tokens)
 
         if len(segment) == 0:
             return
