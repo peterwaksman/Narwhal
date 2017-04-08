@@ -1,3 +1,7 @@
+"""
+nwapp.py contans the NWApp object. This is the (new) official narwhal 
+application object. 
+"""
 from narwhal.nwutils import *
 from narwhal.nwtypes import *
 from narwhal.nwcontrol import *
@@ -10,15 +14,13 @@ UNDEFINED_POLARITY = 10
 POSITIVE_POLARITY = 1
 NEGATIVE_POLARITY = -1
 
-##########################################################
-#  The (new) official narwhal application object
-#  It is built as a wrapper for NWSReader, and  manages
-#  final polarity interpretation, final "was said" thresholds
-#  and structures the "found" data. Currently, few details
-#  are summarized, mainly max GOF and polarity per nar
-
 
 class NWApp:
+    """
+    The NWApp is built as a wrapper for NWSReader, and  manages final polarity 
+    interpretation, final "was said" thresholds and structures the "found" data. 
+    Currently, few details are summarized, mainly max GOF and polarity per nar.
+    """
     def __init__(self, treeroot, nars, calibs, thresholds):
         self.numNars = len(nars)
         if not(self.numNars == len(calibs) and self.numNars == len(thresholds)):
