@@ -241,16 +241,12 @@ LOC.sub(HOTEL)
 INSULATION.sub(BARRIER)
 INSULATION.sub(STATE)
 INSULATION.sub(LETINOUT)
-#
-# TOD - no children
-#
-# AFFECT - no children
-
-
-# Some NARs
-#                       sound->me :: me_/affect
-#                       sound_/intensity_/source_/timeOfDay (use implicits)
-#                       problem_/sound
-#                       (barrier_/state)-letInOut->sound
-#                       location _nearfar_/ source
-#                       X_/Y :: sound
+ 
+# try this
+#NOISE.polarity = False
+#INTENSITY.polarity = False
+#SOURCE.polarity = False
+#PROX.polarity = False
+#STATE.polarity = False
+#LETINOUT.polarity = False
+#AFFECT.polarity = False

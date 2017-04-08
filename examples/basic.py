@@ -49,6 +49,7 @@ FOOD = POSFOOD | NEGFOOD
 
 kSAD = 'sad,unhappy,angry,sick'
 SAD = nwt.KList('sad', kSAD).var()
+
 # Avoid this: "not" is an internally handled logic operator.
 #kHAPPY = 'gleeful,not $ happy'   
 kHAPPY = 'gleeful, happy'

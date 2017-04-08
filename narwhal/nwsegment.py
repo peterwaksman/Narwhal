@@ -153,8 +153,6 @@ def ReadSegment(nar, seg):
 
 # In this implementation the ifound's are stored with the vars in the segment
 # This makes reading cleaner. The nar gets its ifound filled here.
-
-
 def ReadSegment0(nar, seg):
     if not isinstance(nar, VAR):
         return 0

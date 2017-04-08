@@ -6,7 +6,7 @@ from narwhal.nwvault import *
 from narwhal.nwsegment import *
 
 
-def gof2(segment, nar, ifound, imin, imax):
+def gof(segment, nar, ifound, imin, imax):
     u = nar.numSlotsUsed()
     n = nar.numSlots()  # temp, just to examine in debugger
     av = nar.numSlotsActive()
@@ -16,7 +16,7 @@ def gof2(segment, nar, ifound, imin, imax):
     n = av         # deploy the 'implicits'
     n = max(n, 2)   # AD HOC? avoid over weighting of single word narratives
 
-    # f = max(f,av)   # AD HOC? Now for segments I want this
+    f = max(f,av)   # AD HOC? Now for segments I want this
 
     if f == 0:
         G = 0
@@ -67,7 +67,7 @@ class NarSRecord:
         self.imax = imax
         self.block = False
         self.ictrl = imax
-        self.GOF = gof2(segment, nar, self.ifound, imin, imax)
+        self.GOF = gof(segment, nar, self.ifound, imin, imax)
         self.ifound = cleanFound(self.ifound)
         self.narpolarity = nar.polarity
 
