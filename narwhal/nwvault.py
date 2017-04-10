@@ -162,15 +162,25 @@ class NarVault:
     def rollUp(self, record, Threshold, block=False):
         self.vault(Threshold)
 
-        if block:
-            self.addBlock()
+        #if block:
+        #    self.addBlock()
+
+        #if record != None:
+        #    self.vault(Threshold)  # saves old pre, as needed
+        #    self.pre = record
+        #    return True
+        #else:
+        #    return False
 
         if record != None:
-            self.vault(Threshold)  # saves old pre, as needed
+            #self.vault(Threshold)  # saves old pre, as needed
+            record.block = block
             self.pre = record
             return True
         else:
+            self.addBlock()
             return False
+
 
         # Retrieve a record with specified ictrl.
         # Given way vault is created, at most one is possible
