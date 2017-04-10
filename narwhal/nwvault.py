@@ -42,15 +42,10 @@ def getSnippet3(tokens, ifound):
     L = len(tokens)
     if L == 0:
         return ""
-    ilo = 0
-    ihi = 0
-    for i in ifound:
-        if ilo > i and i < L:
-            ilo = i
-        if ihi < i and i < L:
-            ihi = i
+    A = min(ifound)
+    B = max(ifound)
     out = ""
-    for i in range(ilo, ihi + 1):
+    for i in range(A,B+1):
         out += tokens[i] + " "
 
     return out
@@ -76,7 +71,7 @@ class NarSRecord:
         for i in nar.getIFound():
             if imin <= i and i <= imax:
                 ifound.append(i)
-        self.ifound = ifound
+        self.ifound = ifound[:]
         self.snippet = getSnippet3(tokens, self.ifound)
 
         self.nar = nar.copy()
@@ -178,7 +173,8 @@ class NarVault:
             self.pre = record
             return True
         else:
-            self.addBlock()
+            if block:
+                self.addBlock()
             return False
 
 

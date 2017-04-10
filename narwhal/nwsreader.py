@@ -80,6 +80,10 @@ class NWSReader:
             ReadSegment(nar, segment)
             x = 2
 
+    def unblockNars(self):
+        for nar in self.nars:
+            nar.polarity = not nar.polarity
+
     def recordMany(self, segment, imin, imax):
         records = []
         for nar in self.nars:
@@ -162,7 +166,9 @@ class NWSReader:
         N = self.nars
         while CD.type != END_CTRLTYPE:
             subseg = segment[istart: CD.ictrl]
+
             self.readMany(subseg)
+
             istart = self.applyControl(CD, istart, segment)
 
             CD = scanNextControl2(segment, istart)
@@ -198,6 +204,7 @@ class NWSReader:
         elif CTRL.isA("NEG") or CTRL.isA("HEDGE"):
             BLOCK = True  # block backward
             self.rollUpCanVaultOrAbandonMany(records, 0.5, BLOCK)
+            self.unblockNars()
             # self.clearIFoundMany()
 
         elif CTRL.isA("FNEG") or CTRL.isA("FHEDGE"):

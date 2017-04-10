@@ -208,12 +208,6 @@ def ReadSegmentAsAttribute(nar, seg):
     elif v == 0 and T == False:  # handling for partial matches
         nar.polarity = False
 
-    # accumulate the ifounds of children
-    # nar.ifound.extend(nar.thing.ifound)
-    # nar.ifound.extend(nar.value.ifound)
-    # nar.ifound.extend(nar.relation.ifound)
-    #nar.ifound.cleanFound( nar.ifound)
-
     return t + v + r
 
 
@@ -310,11 +304,14 @@ def ReadSegmentAsCausal(nar, seg):
         T = nar.thing.polarity
         V = nar.value.polarity
 #        if (T and V) or (not T and not V):
-# I removed this code when a food("cheese,cilantro")
+# Note, I removed the "not" on V
+# I did this when a food("cheese,cilantro")
 # went to being a food = good("cheese") | bad("cilantro")
 # This is a connection too deep to explore for now.
         if (T and V) or (not T and V):
             nar.polarity = True
+        elif c==0:
+            nar.polarity = T
         else:
             nar.polarity = False
     else:
@@ -327,8 +324,10 @@ def ReadSegmentAsCausal(nar, seg):
         # polarity algorithm. Unfortunately AD HOC
         T = nar.value.polarity
         V = nar.thing.polarity
-        if (T and V) or (not T and not V):
+        if (T and V) or (not T and V):
             nar.polarity = True
+        elif t==0:
+            nar.polarity = V
         else:
             nar.polarity = False
 
