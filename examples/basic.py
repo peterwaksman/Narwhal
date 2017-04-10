@@ -107,11 +107,6 @@ nars       = [foodaffect,eating]
 calibs     = [False,False] # (f) no calib needed, polarities are correctly arranged
 thresholds = [0.6,0.6]   # (g) slightly higher than 0.5
 
-#nars       = [eating]
-#calibs     = [False] # (f) no calib needed, polarities are correctly arranged
-#thresholds = [0.6]   # (g) slightly higher than 0.5
-
-
 
 FoodApp = nwa.NWApp(EXPERIENCE, nars, calibs, thresholds)
 
