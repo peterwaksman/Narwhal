@@ -310,7 +310,7 @@ def ReadSegmentAsCausal(nar, seg):
 # This is a connection too deep to explore for now.
         if (T and V) or (not T and V):
             nar.polarity = True
-        elif c==0:
+        elif v==0:
             nar.polarity = T
         else:
             nar.polarity = False
