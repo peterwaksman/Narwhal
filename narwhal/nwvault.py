@@ -140,6 +140,8 @@ class NarVault:
                 self.pre.block = True
                 self.nblocks = 0
             self._vault.append(self.pre)
+        elif self.pre!=0:
+            self._vault.append(self.pre)
         self.pre = 0
         # resetting nblocks is someone else's job
 

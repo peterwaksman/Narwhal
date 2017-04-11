@@ -104,6 +104,17 @@ class NWSReader:
         for i in range(len(self.nars)):
             V = self.vaults[i]
             V.rollUp(records[i], Threshold, block)
+            
+
+    def rollUpCanVaultOrAbandonMany(self, records, Threshold, block=False):
+        for i in range(len(self.nars)):
+            V = self.vaults[i]
+            rOK = V.rollUp(records[i], Threshold, block)
+            if rOK:
+                V.vault(Threshold)
+            else:
+                V.abandonPre()
+                nar[i].clearPolarity()
 
     def rollUpAndVaultMany(self, records, Threshold, block=False):
         for i in range(len(self.nars)):
@@ -117,16 +128,6 @@ class NWSReader:
             rOK = V.rollUp(records[i], Threshold, block)
             if rOK:
                 V.vault(Threshold)
-
-    def rollUpCanVaultOrAbandonMany(self, records, Threshold, block=False):
-        for i in range(len(self.nars)):
-            V = self.vaults[i]
-            rOK = V.rollUp(records[i], Threshold, block)
-            if rOK:
-                V.vault(Threshold)
-            else:
-                V.abandonPre()
-                nar[i].clearPolarity()
 
     def addBlockMany(self):
         for V in self.vaults:
