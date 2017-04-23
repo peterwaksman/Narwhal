@@ -1,3 +1,6 @@
+April 23: Modified basic.py and created basic2.py. Both are heavily documented
+examples of simple Narwhal apps.
+
 April 5 Switched over to gwax's more professional style (somewhat) and looking 
 forward to extending "basic.py" example and providing some documentation. While
 gwax is concerned with re-factory and code clarity, pwax (me) is concerned with
