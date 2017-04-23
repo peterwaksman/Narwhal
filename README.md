@@ -2,7 +2,7 @@
 
 
  - See "QuickStart.txt" for tutorial sketch 
- - See examples and Noise_App for more complete examples of Narwhal applications.
+ - See "examples" and "narhwal_noise" for more complete examples of Narwhal applications.
  - See DOCS\* for Narwhal specification, hints for debugging, etc.
 
 
