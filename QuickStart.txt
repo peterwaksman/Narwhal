@@ -1,4 +1,5 @@
-Narhwal is for reading topic specific text. The tutorial below covers some of the main points of the NWSReader class.
+Narhwal is for reading topic specific text. The sketch below covers some of the main points of the NWSReader class.
+For actual working code, see \examples\basic.py and \examples\basic2.py and \examples\noise_app
 
 You initialize an NWSReader with:
 
@@ -7,7 +8,7 @@ You initialize an NWSReader with:
 between the variables)
 
 
-The syntax for constructing an NWReader is:
+The syntax for constructing an NWSReader is:
 
 	N = NSWReader( variables, formulas )
 
