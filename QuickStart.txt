@@ -84,7 +84,7 @@ You can write:
 	N = NWSReader( FRUITQ, [fruitqual])
 
 Then read sentences of 'text' like "we had a short breakfast because the oranges were bad". This
-will fill a vault in NWReader using:
+will fill a vault in NWSReader using:
 
 	N.readText(text)
 
