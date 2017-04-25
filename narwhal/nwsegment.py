@@ -30,8 +30,7 @@ def PrepareSegment(tree, tokens):
         if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
             continue
         vars = tree.findInText2(tokens, itok)
-        # here we had a single returned var, and no loop in the following
-        # now we can findInText2() can return a list of all vars matching here.
+        # findInText2() can return a list of all vars matching here.
         if len(vars) > 0:
             for var in vars:
                 var.ifound = cleanFound(var.ifound)
