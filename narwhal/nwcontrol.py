@@ -1,8 +1,10 @@
 """ 
 nwcontrol.py implements the GENERAL_OP tree and the ControlData class.
+The VARs in this tree are called "contols". The ones under LOGIC_OP
+are called "operators".
 
 It is important to note that the GENERAL_OP tree is re-used frequently 
-and its node's (which are VARs) volatile member variables get overwritten 
+and volatile member variables of its node's (which are VARs) get overwritten 
 frequently.
 
 Logical operators, punctuations, dull words to ignore - all are 
@@ -34,41 +36,21 @@ Although not up to date, the tree is something like this:
         DULL_OP()
 
 
- The ControlData is a way of keeping track of the relation between text 
- and the operators during reading.
+ I complain about how logicians co-opted natural language terms for their own uses.
+ But Narwhal needs to co-opt the same terms because the terms do, in fact, play a
+ basic role in parsing out separate statements and whether the "value" they
+ impart is to be blocked or unblocked. Also they help determine when a
+ new statement begins - which is never easy to decide.
+
 """
 
 from narwhal.nwtypes import *
 from narwhal.nwutils import *
 
-# I complain about how logicians co-opted natural language terms for their own uses.
-# But Narwhal needs to co-opt the same terms because the terms do, in fact, play a
-# basic role in parsing out separate statements and whether the "value" they
-# impart is to be blocked or unblocked. Also they help determine when a
-# new statement begins.
 
-# Logic Term Tree
 
-# At the moment this is a tree whose groupings are more for convenience
-# than necessity
-##
-## LOGIC_OP()
-##    AND_OP( andD )
-##    SO_OP( soD )
-##    ATTRIB_OP( attribD )
-##    BLOCK_OP()
-##         GENNEGATION_OP( gennegD )
-##         GENHEDGE_OP( genhedgeD )
-##    FWDBLOCK_OP
-##         FWDNEGATION_OP( fornegD )
-##         FWDHEDGE_OP( forhedgeD )
-##    PRECONJ_OP()
-##        IF_OP( ifD )
-##        NOTONLY_OP(onlyD )
-##
-
-# the more thoroughly we list "dull" words to ignore, the more effective
-# the word counting, I had "it" listed but choose to put it in the hotel
+# Note: the more thoroughly we list "dull" words to ignore, the more effective
+# the word counting. I had "it" listed but choose to put it in the hotel
 # word list.
 kDULL = " a , the , an , did "
 dullD = KList("DU", kDULL)
@@ -181,7 +163,8 @@ LOGIC_OP = logicD.var()
 
 skipD = KList("SKIP", "")
 SKIP_OP = skipD.var()
-####################### Tree of VARs ################
+
+####################### Tree of VARs ##################
 #
 BLOCK_OP.sub(GENNEGATION_OP)
 BLOCK_OP.sub(GENHEDGE_OP)
@@ -201,50 +184,18 @@ LOGIC_OP.sub(BLOCK_OP)
 LOGIC_OP.sub(FWDBLOCK_OP)
 LOGIC_OP.sub(PRECONJ_OP)
 
-##########################
+
+#######################################################
 # SKIP_OP.sub(AND_OP)
 SKIP_OP.sub(SO_OP)
 SKIP_OP.sub(ATTRIB_OP)
 SKIP_OP.sub(DESIGNATOR_OP)
 
 
-def findControl(self, tokens, itok):
-    self.ifound = []
-    for kname in self.knames:
-        klist = KList.instances[kname]
-        self.ifound = []
-        found = klist.findInText(tokens, itok, self.ifound)
-        if found:
-            #print( "really found at "+kname)
-            self.found = True
-            return self
-
-    for child in self.children:
-        c = findControl(child, tokens, itok)
-        if c != NULL_VAR:
-            return c
-
-    return NULL_VAR
-
-
-def isLogicControl(tokens, itok):
-    return findControl(LOGIC_OP, tokens, itok)
-
-
-def isDull(tokens, itok):
-    DULL_OP.clear()
-    tmp = []
-    tmp.append(tokens[itok])
-    if DULL_OP.findInText(tmp):
-        return True
-    else:
-        return False
-
-######################################################
+#######################################################
 # PUNCTUATION
 # pre process the text, replacing punctuations with unique text "encodings"
 # Later these encodings are matched as tokens using the PUNCTUATION var tree
-
 
 def replacePunctuation(text):
     begin = 0
@@ -302,95 +253,52 @@ PUNCTUATION_OP.sub(CPAREN_OP)
 #PUNCTUATION_OP.sub(DASH_OP )
 
 
-def findPunctuation(self, tokens, itok):
-    self.ifound = []
-    for kname in self.knames:
-        klist = KList.instances[kname]
-        found = klist.findInText(tokens, itok, self.ifound)
-        if found:
-            #print( "really found at "+kname)
-            self.found = True
-            return self
-
-    for child in self.children:
-        c = findControl(child, tokens, itok)
-        if c != NULL_VAR:
-            return c
-
-    return NULL_VAR
 
 
-def isPunctuationControl(tokens, itok):
-    return findControl(PUNCTUATION_OP, tokens, itok)
+
+#######################################################
+# put it together
+
+kGENERAL = KList("GENERAL", " GEN ")
+
+GENERAL_OP = kGENERAL.var()
+GENERAL_OP.sub(LOGIC_OP)
+GENERAL_OP.sub(DULL_OP)
+GENERAL_OP.sub(SKIP_OP)
+GENERAL_OP.sub(PUNCTUATION_OP)
 
 
-############################
-# The ifound is a list of found token indices. The following serves to insert additional
-# indices into the list whenever there is a dull or contol token BETWEEN indices of ifound
-# this sort of adds noise to the signal. Punctuations don't .
-def discountControls(tokens, ifound):
-    jfound = []
-    imin = minITOK(ifound)
-    imax = maxITOK(ifound)
-    for i in range(imin, imax + 1):
-        DULL_OP.clear()
-        SKIP_OP.clear()
-        LOGIC_OP.clear()
-        PUNCTUATION_OP.clear()
-
-        if DULL_OP.find(tokens[i]):
-            jfound.append(i)
-
-        elif LOGIC_OP.find(tokens[i]):
-            jfound.append(i)
-
-        elif SKIP_OP.find(tokens[i]):
-            jfound.append(i)
-
-        elif PUNCTUATION_OP.findInText(tokens[i]):
-            # do NOT append to jfound. So the punctuation token
-            # will not be counted in the numerator of (r/f) in the gof()
-            # formula
-            asd = 1  # remove "compiler warning" squiggles
-    jfound = cleanFound(jfound)
-    ifound.extend(jfound)
-    return ifound
-
-# Counts controls in the full range of subtoks, excluding ones
-# in the range where words have been found, which are already discounted.
+#######################################################
+# Control types.
+NO_CTRLTYPE = 0
+PUNCTUATION_CTRLTYPE = 1
+OPERATOR_CTRLTYPE = 2
+END_CTRLTYPE = 3
+SKIP_CTRLTYPE = 4
 
 
-def countUnreadControls(tokens, ifound, ictrl, istart):
-    count = 0
-    imin = minITOK(ifound)
-    imax = maxITOK(ifound)
-    for i in range(istart, ictrl):
-        if imin <= i and i <= imax:
-            continue
-        DULL_OP.clear()
-        SKIP_OP.clear()
-        LOGIC_OP.clear()
-        PUNCTUATION_OP.clear()
+class ControlData:
+    """
+    The ControlData class keeps track of the relation between token indices
+    and the operators during reading.
+    """
+    def __init__(self):
+        self.type = NO_CTRLTYPE
+        self.ctrl = NULL_VAR
+        self.ictrl = -1
 
-        if DULL_OP.find(tokens[i]):
-            count += 1
+    def set(self, type, ctrl, ictrl):
+        self.type = type
+        self.ctrl = ctrl
+        self.ictrl = ictrl
 
-        elif LOGIC_OP.find(tokens[i]):
-            count += 1
-
-        elif SKIP_OP.find(tokens[i]):
-            count += 1
-
-        elif PUNCTUATION_OP.findInText(tokens[i]):
-            count += 1
-
-    return count
-
-
-################## prepareTokens() ###################
-# an important method "hiding" here in nwcontrol.py
-##################
+#######################################################
 def prepareTokens(text):
+    """
+    An important method "hiding" here in nwcontrol.py. This is
+    the opportunity for "pre-processing".
+    """
+
         # encode punctuations
     text = replacePunctuation(text)
 
@@ -410,76 +318,3 @@ def prepareTokens(text):
 
     return newtokens
 
-#######################################################
-#######################################################
-# ControlData
-#######################################################
-#######################################################
-
-
-# Control types.
-NO_CTRLTYPE = 0
-PUNCTUATION_CTRLTYPE = 1
-OPERATOR_CTRLTYPE = 2
-END_CTRLTYPE = 3
-SKIP_CTRLTYPE = 4
-
-
-class ControlData:
-    def __init__(self):
-        self.type = NO_CTRLTYPE
-        self.ctrl = NULL_VAR
-        self.ictrl = -1
-
-    def set(self, type, ctrl, ictrl):
-        self.type = type
-        self.ctrl = ctrl
-        self.ictrl = ictrl
-
-
-# return with ictrl either the index of the control or
-# L=len(tokens). Generally read up to <ictrl
-# def scanNextControl0(tokens, istart):
-#    CD = ControlData()
-#    L = len(tokens);
-#    if istart>L-1:
-#        CD.set(END_CTRLTYPE, NULL_VAR, L)
-#        return CD
-
-#    for itok in range(istart, L):
-#        ctrl = isLogicControl(tokens,itok)
-#        if ctrl!=NULL_VAR:
-#            CD.set(OPERATOR_CTRLTYPE, ctrl, itok)
-#            return CD
-#        ctrl = isPunctuationControl(tokens, itok)
-#        if ctrl!=NULL_VAR:
-#            CD.set(PUNCTUATION_CTRLTYPE, ctrl, itok)
-#            return CD
-
-#    CD.set(END_CTRLTYPE, NULL_VAR, L)
-#    return CD
-
-# def scanNextControl(vtopic, tokens, istart):
-#    CD = scanNextControl0(tokens,istart)
-#    if CD.type==END_CTRLTYPE :
-#        return CD
-#    vtopic.clear()
-#    if not vtopic.detectInText(tokens):
-#        CD.type = SKIP_CTRLTYPE
-
-#    return CD
-
-# put it together
-kGENERAL = KList("GENERAL", " GEN ")
-
-GENERAL_OP = kGENERAL.var()
-GENERAL_OP.sub(LOGIC_OP)
-GENERAL_OP.sub(DULL_OP)
-GENERAL_OP.sub(SKIP_OP)
-GENERAL_OP.sub(PUNCTUATION_OP)
-
-#kCONTROL = KList("CONTROL", " CTRL ")
-#CONTROL_OP = kCONTROL.var()
-# CONTROL_OP.sub(LOGIC_OP)
-# CONTROL_OP.sub(DULL_OP)
-# CONTROL_OP.sub(SKIP_OP)
