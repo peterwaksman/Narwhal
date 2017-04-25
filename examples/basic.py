@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 """Basic example.
 
-Shows how to construct narratives and apply them to a sentence. The lower case 
-letters ((a),(b), etc.) refer to notes at the end of this file. Here the prefix
-"k" means list of keywords.
+Keywords exist in a tree, not a flat structure. The example below shows
+how to define a topic-specific tree and how to define "narrative"
+relationships between the nodes of the tree. Once defined, this tree and the
+relationships initialize an application object that can read arbitrary 
+sentences. The output is a sequence of values in [-1,1]. With negative
+values being "bad" and positive values being "good".
 
-This example uses this narrative tree:
+The example is about liking cheese and disliking cilantro and it uses a tree 
+of topic keywords arranged like this:
 
         EXPERIENCE(kEXPERIENCE)
             FOOD("foodIlike, foodIhate")
@@ -15,7 +19,7 @@ This example uses this narrative tree:
                 SAD(kSAD) | HAPPY(kHAPPY)
             EAT(kEAT)
 
-(a) That is preferable to this tree: 
+That is preferable to the tree: 
 
         EXPERIENCE(kEXPERIENCE)
             FOOD(kPOSFOOD + kNEGFOOD)
@@ -23,9 +27,18 @@ This example uses this narrative tree:
                 SAD(kSAD)| HAPPY(kHAPPY)
             EAT(kEAT)
  
+Since cheese is "good" and cilantro is "bad", it is better to make 
+a good/bad distinction in the arrangement of these VARs in the tree - 
+separately from the good bad arrangement of AFFECT. If they are 
+grouped (as in the second tree format) then sentences lacking the 
+additional "affect" values remain neutral, which reduces the flexibility.
+
+For more details, please see end notes indicated by lower case letters 
+like #(b), #(c), etc.
+
 """
 
-import os
+import os 
 import sys
 
 # Add local narwhal to the module path
@@ -39,14 +52,11 @@ from narwhal import nwapp as nwa
 from narwhal import nwutils as nwu
 from narwhal import nwsegment as nws
 
-##############################################
-#              VAR TREE 
-##############################################
-#(a)
-#kFOOD = 'cheese,cilantro'
-#FOOD = nwt.KList('food', kFOOD).var()
+ 
+# VAR tree --------------------------------------
+#(b)
 
-kPOSFOOD = 'cheese, hamburger' #(b) No trailing 's' on hamburger  
+kPOSFOOD = 'cheese, hamburger' 
 POSFOOD = nwt.KList( "foodIlike", kPOSFOOD).var()
 kNEGFOOD = 'cilantro,old fish'
 NEGFOOD = nwt.KList("foodIhate", kNEGFOOD).var()
@@ -56,13 +66,11 @@ FOOD = POSFOOD | NEGFOOD
 kSAD = 'sad,unhappy,angry,sick'
 SAD = nwt.KList('sad', kSAD).var()
 
-# (c) "not" is an internally handled logic operator.
-#kHAPPY = 'gleeful,not $ happy'   
+#(c) 
 kHAPPY = 'gleeful, happy'
 HAPPY = nwt.KList('happy', kHAPPY).var()
 
-# (d) It is better to put positives before negatives
-#AFFECT = SAD | HAPPY 
+#(d) 
 AFFECT = HAPPY | SAD
 
 kEAT = ' eat,ate,consum,feed'
@@ -79,36 +87,24 @@ EXPERIENCE.sub(AFFECT)
 EXPERIENCE.sub(EAT)
 EXPERIENCE.sub(SELF)
 
-# (e) for testing the tree:
-#tokens = nwu.TOKS('cilantro makes me sad')
-#EXPERIENCE.findInText2(tokens, 0)    
-#segment = nws.PrepareSegment(EXPERIENCE, tokens)
 
-
-#####################################################
-#              NARs narratives formulas in the VARs
-#####################################################
+# NARs: formulas in the VARs --------------
 
 foodaffect = nwt.cause(FOOD, AFFECT) # "What I eat affects how I feel"
-
-eating = nwt.event(SELF,FOOD,EAT)  #we ate food
-
-#(e) for testing the nar:
-#nws.ReadSegment(foodaffect,segment)
-#print foodaffect.str()
+eating = nwt.event(SELF,FOOD,EAT)    # "we ate food"
 
 
-#####################################################
-#              NWApp - the application object
-#####################################################
 
-# Prepare initializers - line up arrays, to ensure same number of elements
+# NWApp: the application object ---------------
+# (e),(f)
+
 nars       = [foodaffect,eating]
-calibs     = [False,False] # (f) no calib needed, polarities are correctly arranged
-thresholds = [0.6,0.6]   # (g) slightly higher than 0.5
+calibs     = [False,False]  
+thresholds = [0.6,0.6]    
 
 
 FoodApp = nwa.NWApp(EXPERIENCE, nars, calibs, thresholds)
+
 
 SENTENCES = [
     'Cilantro makes me sad.',
@@ -120,8 +116,6 @@ SENTENCES = [
     'Although the place smelled of cilantro, we ate good cheese',
     'The place smelled of cilantro but we ate cheese'
 ]
-
-
 
 def main():
     """Run the model against some sentences."""
@@ -136,17 +130,12 @@ if __name__ == '__main__':
     main()
 
 
+
 """ ENDNOTES
 
-(a) Since conceptually Cheese is "good" and Cilantro is "bad", it is better 
-to make a good/bad distinction in the arrangement of these VARs in the 
-tree - separately from the good bad affect. If they are grouped (as in the second 
-tree format) then sentences lacking the additional "affect" values remain neutral, 
-which reduces the scope of understanding.
-
-
-(b) 'hamburger,' and 'hamburger ,' have different matching behavior. The
-former matches "hamburger" or "hamburgers". The second only matches "hamburger"
+(b) No trailing 's' on hamburger : 'hamburger,' and 'hamburger ,' have different
+matching behavior. The former matches "hamburger" or "hamburgers". The second 
+only matches "hamburger"
 
 
 (c) Narwhal handles a number of "logical connectors" such as 'not' and 'and'. 
@@ -159,10 +148,11 @@ would need to put 'not happy' into the list for kSAD in order to understand
 the second sentence. Let Narwhal take care of that.
 
 
-(d) Narwhal can interpret good/bad value statements. These values are encoded
-at the lowest level in VARs, in definitions of the form 
+(d) Use "AFFECT = HAPPY | SAD" instead of "AFFECT = SAD | HAPPY"
+Narwhal can interpret good/bad value statements. These values are encoded
+at the lowest level in VARs, called "exclusive VARs", defined in this form 
             V = V1 | V2. 
-A VAR defined this was is called "exclusive". 
+It is better to put positives before negatives
   
 By convention V1 is considered 'good' and V2 as 'bad'. If you set it up 
 backwards, it can be corrected later with calibrations. But a well designed    
@@ -170,24 +160,33 @@ VAR tree encodes the 'good' as the first of two alternatives. For reference
 good/bad handling is done with the "polarity" member variable in the Narwhal 
 classes.
 
-
-(e) If you comment-in this code and examine the EXPERIENCE variable before and
+(e) If you insert this code and examine the EXPERIENCE variable before and
 after, it shows how the tokens are being prcessed. This can help in designing 
 a tree or just to see how the code works. 
-    Continuing: you can examine the process of building a segement, where
-most of the work happens, then step into the ReadSegment( ) code to see the
-reading "inner loop". 
-    Finally the eating.str() shows the form of the 'eating' narrative, with
-asterisks marking slots whose VARs were found in the read operation.
 
+    tokens = nwu.TOKS('cilantro makes me sad')
+    EXPERIENCE.findInText2(tokens, 0)    
+    segment = nws.PrepareSegment(EXPERIENCE, tokens)
+
+Also, you can examine the process of building a segement, where
+most of the work happens, then step into the ReadSegment( ) code to see the
+reading "inner loop". Finally the eating.str() shows the form of the 
+'eating' narrative, with asterisks marking slots whose VARs were found 
+in the read operation.
+
+    nws.ReadSegment(foodaffect,segment)
+    print foodaffect.str()
+ 
 
 (f) The "calibration" is simply a way of sticking a minus sign in the front
 of the final result. It is a fudge factor but often masks problems with
 tree design or bugs in Narhwal.
 
+Thresholds are applied only at the level of final reporting, so the initializing
+values have little affect on actualy processing. Generally a "threshold" 
+is a lower limit on the goodness-of-fit ("gof") score between the nar and 
+the input text. A score of 0.5 is possible with only one out of two words
+matching. Setting the threshold slightly higher at 0.6 means that will 
+not be considered as "something read". 
 
-(g) The "threshold" is a lower limit on the goodness-of-fit ("gof") score 
-between the nar and the input text. A score of 0.5 is possible with 
-only one out of two words matching. Setting the threshold slightly higher 
-at 0.6 means that will not be considered as "something read".
 """
