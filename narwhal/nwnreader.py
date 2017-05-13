@@ -6,9 +6,10 @@ from narwhal.nwvault import *
 from narwhal.nwsegment import *
 
 class NWNReader:
-    def __init__(self, nar):
+    def __init__(self, nar, flipPolarity):
         self.nar = nar
         self.vault = NarVault()
+        self.cal = flipPolarity
  
     def clearAll(self):
         self.nar.clear() 
@@ -117,7 +118,9 @@ class NWNReader:
             
         record = self.makeRecord(segment, istart, CD.ictrl,tokens)
         if record == None :
-            return istart + 1
+            # For now, really just istart = istart+1
+            istart = istart + 1 
+            return istart
 
         if CD.type == END_CTRLTYPE:
             self.rollUpAndVault(record, 0.1)
@@ -176,7 +179,7 @@ class NWNReader:
 
         return istart
 
-    def report(self, text,cal):
+    def report(self, text):
         tokens = prepareTokens(text)
         out = ""
         L = len(tokens)
@@ -193,7 +196,7 @@ class NWNReader:
             if r == None:
                 out += " .      "
             else:
-                P = r.finalPolarity(cal)
+                P = r.finalPolarity(self.cal)
                 if P:
                     sign = "+"
                 else:

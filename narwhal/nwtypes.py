@@ -227,7 +227,8 @@ class VAR:
                 if not wasFound:
                     self.polarity = child.polarity
                 vars.extend(foundC)
-        return vars  # empty list if none found in children
+        else:
+            return vars  # empty list if none found in children
 
     def str(self, ntabs):
         tab = ""
@@ -361,7 +362,7 @@ class VAR:
     # All NARs built from these KList NARs will be of higher order>0
     def nar(self):
         p = NAR()
-        p.order = 1
+        p.order = 0 #1
         p.polarity = True
         p.explicit = True
 
@@ -489,7 +490,7 @@ class NAR:
         if self == NAR_SO or self == NAR_THEN:  # these do not get copied
             return self
 
-        if self.order == 0 and len(self.thing.knames) > 0:  # so it is a var
+        if isinstance(self, VAR):  # so it is a var
             name = self.thing.knames[0]
             x = tree.lookup(name)  # find VAR with same name, in this tree
             if x != NULL_VAR:

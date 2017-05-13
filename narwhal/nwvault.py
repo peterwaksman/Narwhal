@@ -159,18 +159,11 @@ class NarVault:
     def rollUp(self, record, Threshold, block=False):
         self.vault(Threshold)
 
-        #if block:
-        #    self.addBlock()
-
-        #if record != None:
-        #    self.vault(Threshold)  # saves old pre, as needed
-        #    self.pre = record
-        #    return True
-        #else:
-        #    return False
-
         if record != None:
-            #self.vault(Threshold)  # saves old pre, as needed
+            if self.nblocks>0:
+                block = not block
+                self.nblocks = self.nblocks-1
+
             record.block = block
             self.pre = record
             return True

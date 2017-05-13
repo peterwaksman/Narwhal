@@ -185,7 +185,11 @@ class NWSReader:
 
             # prepare records for all nars (some can be  "None")
         records = self.recordMany(segment, istart, CD.ictrl)
+
+        # I think the next may be wrong, needs istart+1
+        # but it never executes cuz records=[None]
         if records == None or len(records) == 0:
+            istart = self.newStart(CD,istart)
             return istart
 
         if CD.type == END_CTRLTYPE:
@@ -229,6 +233,10 @@ class NWSReader:
             self.removeAllBlocksMany()
 
         elif CTRL.isA("PERIOD") or CTRL.isA("EXCLAIM") or CTRL.isA("DASH"):
+            if CTRL.isA("PERIOD"):
+                x=2
+            if CTRL.isA("DULL"):
+                x=2
             self.rollUpCanVaultMany(records, 0.1)
             self.removeAllBlocksMany()
 
@@ -241,8 +249,8 @@ class NWSReader:
             return istart + max(1, len(CD.ctrl.ifound))
 
         # self.clearIFoundMany()
-
-        istart = self.newStart(CD, istart)
+        # a control occupies only one index in the segment
+        istart = self.newStart(CD,istart)
 
         return istart
 

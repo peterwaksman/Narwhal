@@ -99,6 +99,13 @@ def varstring(var):
     else:
         return var.string(0)
 
+def showList(ifound):
+    out = '['
+    for i in ifound:
+        out += str(i) + ','
+    out += ']'
+    return out
+        
 
 def showSEG(segment, text):
     tokens = prepareTokens(text)
@@ -106,8 +113,8 @@ def showSEG(segment, text):
     for itok in range(len(tokens)):
         out += tokens[itok].rjust(10) + " "
         var = findInSegment(segment, itok)
-        out += varstring(var) + "\n"
-        #out += " "
+        out += varstring(var) 
+        out += "\n"
     return out
 
 
@@ -131,7 +138,8 @@ def showSEG2(segment, text):
     for var in segment:
         h = ""
         h = varstring(var).rjust(10) + " " + \
-            getWords(tokens, var.ifound) + "\n"
+            getWords(tokens, var.ifound) + " " + \
+            showList(var.ifound) + "\n"
         out += h
     return out
 
@@ -244,8 +252,7 @@ def ReadSegmentAsCausal(nar, seg):
     kfound = []
     c = ReadSegment(SO_OP, seg)
     if c > 0:
-        if SO_OP.polarity == True:
-            
+        if SO_OP.polarity == True:        
             doSecondPass = False
         else:
             doFirstPass = False
