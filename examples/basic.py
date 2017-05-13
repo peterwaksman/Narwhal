@@ -98,23 +98,25 @@ eating = nwt.event(SELF,FOOD,EAT)    # "we ate food"
 # NWApp: the application object ---------------
 # (e),(f)
 
-nars       = [foodaffect,eating]
-calibs     = [False,False]  
-thresholds = [0.6,0.6]    
-
+#nars       = [foodaffect,eating]
+#calibs     = [False,False]  
+#thresholds = [0.6,0.6]    
+nars = [foodaffect]
+calibs = [False]
+thresholds = [0.6]
 
 FoodApp = nwa.NWApp(EXPERIENCE, nars, calibs, thresholds)
 
 
 SENTENCES = [
-    'Cilantro makes me sad.',
-    'Cheese makes me happy.',
-    'We ate good cheese',
-    'We ate French cheese with cilantro',
-    'We ate French cheese and we ate cilantro',
-    'We did not eat Cilantro',
+    #'Cilantro makes me sad.',
+    #'Cheese makes me happy.',
+    #'We ate good cheese',
+    #'We ate French cheese with cilantro',
+    #'We ate French cheese and we ate cilantro',
+    #'We did not eat Cilantro',
     'Although the place smelled of cilantro, we ate good cheese',
-    'The place smelled of cilantro but we ate cheese'
+    #'The place smelled of cilantro but we ate cheese'
 ]
 
 def main():

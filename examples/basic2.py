@@ -1,7 +1,11 @@
 #!/usr/bin/env python
-"""Basic2 elaborates onBasic with other topics
+"""Basic2 elaborates on more advanced topics.
 
-The tree is extended to
+ - Implicit narratives
+ - GOF score
+ - Thresholds
+
+The tree is extended with VALUE() as follows:
 
         EXPERIENCE(kEXPERIENCE)
             FOOD("foodIlike, foodIhate")
@@ -118,10 +122,10 @@ SENTENCES = [
     'Cheese makes me happy.',
     'We ate good cheese',
     'We ate French cheese with cilantro',
-    'We ate French cheese and we ate cilantro',
+    'We ate French cheese and we ate cilantro.',
     'We did not eat Cilantro',
     'Although the place smelled of cilantro, we ate good cheese',
-    'The place smelled of cilantro but we ate cheese'
+    'The place smelled of cilantro but we ate cheese'     
 ]
 
 
@@ -133,11 +137,18 @@ def main():
         FoodApp.readText(sentence)
         report = FoodApp.report(sentence)
         print(report)
-
+        summary = FoodApp.summarize(sentence)
+  
 
 if __name__ == '__main__':
     main()
 
 
 """ ENDNOTES
+Number the sentences 0-7.
+
+Compare the result for sentences #4 and #6.
+Both of these have a mid segment control event:  "and" in #4 and "but"
+in #6. In #4 a gof score of occurs at "and"
+
 """
