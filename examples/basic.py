@@ -98,12 +98,9 @@ eating = nwt.event(SELF,FOOD,EAT)    # "we ate food"
 # NWApp: the application object ---------------
 # (e),(f)
 
-#nars       = [foodaffect,eating]
-#calibs     = [False,False]  
-#thresholds = [0.6,0.6]    
-nars = [foodaffect]
-calibs = [False]
-thresholds = [0.6]
+nars       = [foodaffect,eating]
+calibs     = [False,False]  
+thresholds = [0.6,0.6]    
 
 FoodApp = nwa.NWApp(EXPERIENCE, nars, calibs, thresholds)
 
