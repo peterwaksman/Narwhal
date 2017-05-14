@@ -117,10 +117,10 @@ class NWNReader:
 
             
         record = self.makeRecord(segment, istart, CD.ictrl,tokens)
-        if record == None :
-            # For now, really just istart = istart+1
-            istart = istart + 1 
-            return istart
+        #if record == None :
+        #    # For now, really just istart = istart+1
+        #    istart = istart + 1 
+        #    return istart
 
         if CD.type == END_CTRLTYPE:
             self.rollUpAndVault(record, 0.1)
