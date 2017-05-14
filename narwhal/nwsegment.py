@@ -314,10 +314,12 @@ def ReadSegmentAsCausal(nar, seg):
 # I did this when a food("cheese,cilantro")
 # went to being a food = good("cheese") | bad("cilantro")
 # This is a connection too deep to explore for now.
-        if (T and V) or (not T and V):
-            nar.polarity = True
-        elif v==0:
+        if v==0 and t>0 :
             nar.polarity = T
+        elif t==0 and v>0:
+            nar.polarity = V
+        elif (T and V) or (not T and V):
+            nar.polarity = True
         else:
             nar.polarity = False
     else:
@@ -328,12 +330,14 @@ def ReadSegmentAsCausal(nar, seg):
         c = ReadSegment(SO_OP, seg)
 
         # polarity algorithm. Unfortunately AD HOC
-        T = nar.value.polarity
-        V = nar.thing.polarity
-        if (T and V) or (not T and V):
-            nar.polarity = True
-        elif t==0:
+        V = nar.value.polarity
+        T = nar.thing.polarity
+        if v==0 and t>0 :
+            nar.polarity = T
+        elif t==0 and v>0:
             nar.polarity = V
+        elif (T and V) or (not T and V):
+            nar.polarity = True
         else:
             nar.polarity = False
 
@@ -389,7 +393,7 @@ def scanNextControl2(segment, istart):
         return CD
     for i in range(istart, L):
         var = segment[i]
-        if var <= LOGIC_OP:
+        if var <= LOGIC_OP and not var<=DULL_OP:
             CD.set(OPERATOR_CTRLTYPE, var, i)
             return CD
         elif var <= PUNCTUATION_OP:
