@@ -46,25 +46,23 @@ letin = event(attribute(BARRIER, [STATE]), SOUND, LETINOUT)
 
 
 SENTENCES = [
-    'every word spoken was heard through the walls',
+    #'every word spoken was heard through the walls',
     'My room was far from the elevator and far from the lobby, so it was very quiet.',
-    'Although my room was next to the elevator, it was perfectly quiet and dark at night so I was able to sleep much better than most European cities',
-    'it was perfectly quiet and dark at night',
-    'We did find it a bit noisy with the balcony doors open due to the McDonalds next door.',
+    #'Although my room was next to the elevator, it was perfectly quiet and dark at night so I was able to sleep much better than most European cities',
+    #'it was perfectly quiet and dark at night',
+    #'We did find it a bit noisy with the balcony doors open due to the McDonalds next door.',
 ]
 
-
-
-nars = [problem, sound, affect, proximity, letin]
-calibs = [True,  True,  True,   True,      True]
-thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
-
-nwa = NWApp(E, nars, calibs, thresholds)
+G = NWNReader(affect, True) # True means reverse the final polarity
 for sent in SENTENCES:
+    E.clear()
     text = sent
-    nwa.readText(text)
-    s = nwa.report(text)
+    tokens = prepareTokens(text)
+    segment = PrepareSegment(E,tokens)
+    G.readText(segment,tokens)
+     
+    tabulateSEG2(segment,tokens) 
+    s = G.report(tokens ) 
     print(s)
-
-#a = nwa.reader.nars[2]
-#q = a.getIFound()
+x = 2
+  
