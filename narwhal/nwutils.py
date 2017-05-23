@@ -86,6 +86,12 @@ def cleanFound(ifound):
     ifound = expandFound(imax + 1, tmp)
     return ifound
 
+def lastIFound(ifound):
+    max = -1
+    for i in ifound: 
+        if max<i :
+            max = i
+    return max
 
 def minITOK(ifound):
     if not ifound:

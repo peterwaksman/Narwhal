@@ -97,6 +97,7 @@ class NarSRecord:
         else:
             return True
 
+ 
 #####################################################
 
 class NarVault:
@@ -109,6 +110,11 @@ class NarVault:
     abandoned. At some point, triggered by the client of this code, a 
     "vaulting" event may occur, taking the "pre" and putting into a finalized 
     array where it can no longer be modified.
+    
+    To "roll up" the vault means to push something new (perhaps a NULL_VAR) 
+    into the "pre" staging area, while also pushing what was already in
+    the "pre" into the final repository (unless it is NULL_VAR).
+
 
     For convenience, the nar record includes the relevant snippet of
     original text. So later the vault can be evaluated by the client.  
@@ -189,4 +195,18 @@ class NarVault:
 # This is a class manages nar and related "found" information after a read
 # It is a nar plus ifound plus Vault
 # It relieves some of the complexity of the NarReader.
+
+    def tabulate(self, numTokens,cal):
+        x = []
+        for i in range(numTokens):
+            x.append('.')
+        for r in self._vault:
+            if r.finalPolarity(cal):
+                sign = "+"
+            else:
+                sign = "-"
+            i = lastIFound( r.ifound )
+            if 0 <= i and i < numTokens:
+                x[i] =  sign + ("{0:.4g}".format(r.GOF)).ljust(6)
+        return x
 

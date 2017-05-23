@@ -6,7 +6,7 @@ from narwhal.nwvault import *
 from narwhal.nwsegment import *
 
 class NWNReader:
-    def __init__(self, nar, flipPolarity):
+    def __init__(self, nar, flipPolarity = False):
         self.nar = nar
         self.vault = NarVault()
         self.cal = flipPolarity
@@ -179,8 +179,7 @@ class NWNReader:
 
         return istart
 
-    def report(self, text):
-        tokens = prepareTokens(text)
+    def report(self, tokens):
         out = ""
         L = len(tokens)
         for i in range(len(tokens) + 1):
@@ -207,3 +206,5 @@ class NWNReader:
             out += "\n"
         out += "\n"
         return out
+
+ 

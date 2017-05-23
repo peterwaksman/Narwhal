@@ -28,6 +28,7 @@ def PrepareSegment(tree, tokens):
     itok = 0
     for itok in range(len(tokens)):
         if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
+            seg.append(NULL_VAR)
             continue
         vars = tree.findInText2(tokens, itok)
         # findInText2() can return a list of all vars matching here.
@@ -143,6 +144,29 @@ def showSEG2(segment, text):
         out += h
     return out
 
+def tabulateSEG(segment, numTokens):
+    x = []
+    for i in range(numTokens):
+        x.append('.')
+    for var in segment:
+        # saves the *last* var in segment with this i
+        i = var.lastIFound()
+        if 0 <= i and i < numTokens:
+            x[i] = var.knames[0]
+            if var.polarity==True:
+                x[i] += '+'
+            else:
+                x[i] += '-'
+    return x
+
+def tabulateSEG2( segment, tokens):
+    numTokens = len(tokens)
+    x = tabulateSEG(segment,numTokens)
+    out = ""
+    for i in range(numTokens):
+        out += tokens[i].rjust(8) + " " + x[i].rjust(8) + "\n"
+    print out
+    return out
 ################################################
 ################### inner read loop ############
 

@@ -1,5 +1,5 @@
 """
-nwtypes.py defines there basic data types involved in "narrative" entities
+nwtypes.py defines the basic data types involved in "narrative" entities
 KList, VAR, and NAR. 
 The KList is a list of keywords with text matching capabilities
 The VAR is like a "concept" that wraps the KList. VARs are tree nodes
@@ -140,6 +140,13 @@ class VAR:
     def clearPolarity(self):
         self.polarity = True
 
+    def lastIFound(self):
+        max = -1
+        for i in self.ifound: 
+            if max<i :
+                max = i
+        return max
+
     # call this once, usually on the root node of the tree
     def copy(self):
         v = VAR()
@@ -227,8 +234,7 @@ class VAR:
                 if not wasFound:
                     self.polarity = child.polarity
                 vars.extend(foundC)
-        else:
-            return vars  # empty list if none found in children
+        return vars  # empty list if none found in children
 
     def str(self, ntabs):
         tab = ""
@@ -357,12 +363,12 @@ class VAR:
     def string(self, ntabs=0):
         return self.knames[0]
 
-    # KList VARS are used to produce "KList" NARs below of order 0
+    # KList VARS are used to produce "KList" NARs of order 0
     # So VAR become a class factory for NAR.
     # All NARs built from these KList NARs will be of higher order>0
     def nar(self):
         p = NAR()
-        p.order = 0 #1
+        p.order = 0 
         p.polarity = True
         p.explicit = True
 
@@ -397,11 +403,15 @@ class NAR:
     considered to be narrative patterns. Note that nesting of NARs as 
     subnarratives, is a different hierarchical structure than the tree of VARs.
 
-    A NAR has these constant attributes:
-    order - VARs are order 0 and all narratives built over them have
-    order one greater than the order of any subnarrative. 
+    A NAR has these constant attributes:  
 
-    explicit - when false, means it can be missing from the text and not count
+    order
+    VARs are order 0 and all narratives built over them have
+    order one greater [For the moment NARs built from VARs are also order 0]
+    than the order of any subnarrative. 
+
+    explicit
+    When false, means it can be missing from the text and not count
     against matching. (Usually for a subnarrative. An empty narrative that is not
     explicit can never score more than 0.5)
 
@@ -411,9 +421,8 @@ class NAR:
     Since NARs wrap VARs, all the bookeeping during a "read" done inside those VARs 
     is inherent within the wrapping NAR. The NAR itself has only one volatile entity:
     polarity - whether the filled story is good or bad - a formula derived from the 
-    good/bad polarity of the underlying subnarratives (and VARs). 
-    
-    Note that polarity = True, by default. And you may not care about that field.
+    good/bad polarity of the underlying subnarratives (and VARs). Note that polarity
+    is 'True' by default. And you may not care about that field.
     """
     def __init__(self):
         self.order = 0  # the level of pattern-inside-pattern depth. Currently it is informational
@@ -760,6 +769,7 @@ def cause(x, y):
 # used to identify the "and"/"then" type of statement
 NAR_THEN = KList("then", "").var().nar()
 NAR_THEN.makeImplicit() #revisit
+
 
 def sequence(x, y):
     X = a2n(x)  # interpret args
