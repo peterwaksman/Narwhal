@@ -35,8 +35,8 @@ kTWENTYSEVEN = ' twenty seven , 27 '
 kTWENTYEIGHT = ' twenty eight , 28 '
 kTWENTYNINE = ' twenty none , 29 '
 kTHIRTY = ' thirty # one|two, 30 '
-kTHIRTYONE = ' thirty one , 30 '
-kTHIRTYTWO = ' thirty two , 30 '
+kTHIRTYONE = ' thirty one , 31 '
+kTHIRTYTWO = ' thirty two , 32 '
 
 kQUANTITY = ' quantity '
 QUANTITY = KList( "quantity", kQUANTITY).var()
