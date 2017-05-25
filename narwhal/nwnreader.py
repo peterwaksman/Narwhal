@@ -207,4 +207,9 @@ class NWNReader:
         out += "\n"
         return out
 
- 
+    def tabulate(self,numTokens):
+        x = self.vault.tabulate(numTokens, self.cal)
+        return x
+
+    def tabulate2(self, numTokens):
+        x = self.tabulate(numTokens)

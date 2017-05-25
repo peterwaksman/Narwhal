@@ -144,7 +144,8 @@ def showSEG2(segment, text):
         out += h
     return out
 
-def tabulateSEG(segment, numTokens):
+def tabulateSEG(segment, tokens):
+    numTokens = len(tokens)
     x = []
     for i in range(numTokens):
         x.append('.')
@@ -159,9 +160,9 @@ def tabulateSEG(segment, numTokens):
                 x[i] += '-'
     return x
 
-def tabulateSEG2( segment, tokens):
+def tabulateSEG2( segment, tokens):  
     numTokens = len(tokens)
-    x = tabulateSEG(segment,numTokens)
+    x = tabulateSEG(segment,tokens)
     out = ""
     for i in range(numTokens):
         out += tokens[i].rjust(8) + " " + x[i].rjust(8) + "\n"
@@ -172,6 +173,8 @@ def tabulateSEG2( segment, tokens):
 
 
 def ReadSegment(nar, seg):
+    nar.lastConst = "" # may get set in a sub ReadXXX
+    
     if ORDER(nar) == 0:
         return ReadSegment0(nar, seg)
 
@@ -208,7 +211,9 @@ def ReadSegment0(nar, seg):
             nar.ifound = cleanFound(nar.ifound)
             nar.found = True
             nar.polarity = var.polarity
+            nar.lastConst = var.knames[0]
             foundNow = True
+
     if foundNow:
         return 1
     else:
@@ -239,6 +244,8 @@ def ReadSegmentAsAttribute(nar, seg):
     elif v == 0 and T == False:  # handling for partial matches
         nar.polarity = False
 
+    nar.generateLastConst()
+
     return t + v + r
 
 
@@ -255,6 +262,8 @@ def ReadSegmentAsAction(nar, seg):
         nar.polarity = True
     else:
         nar.polarity = C and A
+
+    nar.generateLastConst()
 
     # require that action be found??? AD HOC
     if a == 0:
@@ -365,6 +374,8 @@ def ReadSegmentAsCausal(nar, seg):
         else:
             nar.polarity = False
 
+    nar.generateLastConst()
+
     x = nar.numSlotsUsed()
     return t + v + c
 
@@ -403,6 +414,8 @@ def ReadSegmentAsSequential(nar, seg):
     elif v > 0 and t == 0:
         nar.polariy = nar.value.polarity
     # else nar.polarity remains at default
+
+    nar.generateLastConst()
 
     return t + v + a
 

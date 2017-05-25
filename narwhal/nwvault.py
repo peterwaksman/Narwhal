@@ -196,7 +196,21 @@ class NarVault:
 # It is a nar plus ifound plus Vault
 # It relieves some of the complexity of the NarReader.
 
-    def tabulate(self, numTokens,cal):
+    #def tabulate2(self, numTokens,cal):
+    #    x = []
+    #    for i in range(numTokens):
+    #        x.append('.')
+    #    for r in self._vault:
+    #        if r.finalPolarity(cal):
+    #            sign = "+"
+    #        else:
+    #            sign = "-"
+    #        i = lastIFound( r.ifound )
+    #        if 0 <= i and i < numTokens:
+    #            x[i] =  sign + ("{0:.4g}".format(r.GOF)).ljust(6)
+    #    return x
+
+    def tabulate(self, numTokens, cal):
         x = []
         for i in range(numTokens):
             x.append('.')
@@ -207,6 +221,7 @@ class NarVault:
                 sign = "-"
             i = lastIFound( r.ifound )
             if 0 <= i and i < numTokens:
-                x[i] =  sign + ("{0:.4g}".format(r.GOF)).ljust(6)
+                x[i] =  "{0:.4g}".format(r.GOF) + sign
         return x
+
 

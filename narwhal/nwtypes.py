@@ -27,10 +27,12 @@ class KList:
         self.list = inString.split(',')
         KList.instances[name] = self  # syntax: klist = KList.instances[ name ]
 
+
     def var(self):  # turn a KList into a VAR. Known as a "KList VAR"
         Z = VAR()
         Z.knames.append(self.name)
         return Z
+
 
         # the KList does not keep track of its last search result
         # it is the responsibility to the client to pass in ifound
@@ -94,6 +96,15 @@ class VAR:
         # becomes false if kname after 1st is used
         self.polarity = True
 
+        #become set to last read var<=this
+        self.lastConst = "" 
+
+      
+    def __le__(self, other):
+        """ typically a "var<=nar" means the var is a child or itself"""
+        return nwutils.recursiveLE(self, other)
+
+
     # All children become implicit when their parent does
     def makeImplicit(self):
         if self == NULL_VAR:
@@ -102,6 +113,7 @@ class VAR:
         for child in self.children:
             child.makeImplicit()
 
+
     def makeExplicit(self):
         if self == NULL_VAR:
             return
@@ -109,16 +121,20 @@ class VAR:
         for child in self.children:
             child.makeExplicit()
 
+
     def clearImplicits(self):
         self.explicit = True
         for child in self.children:
             child.clearImplicits()
+
 
     def clear(self):
         self.found = False
         self.ifound = []
         self.foundInChildren = False
         self.polarity = True
+
+        self.lastConst = ""
 
         for child in self.children:
             child.clear()
@@ -130,15 +146,19 @@ class VAR:
         for child in self.children:
             child.clearIFound()
 
+
     def numIFound(self):
         self.ifound = nwutils.cleanFound(self.ifound)
         return len(self.ifound)
 
+
     def getIFound(self):
         return self.ifound
 
+
     def clearPolarity(self):
         self.polarity = True
+
 
     def lastIFound(self):
         max = -1
@@ -146,6 +166,7 @@ class VAR:
             if max<i :
                 max = i
         return max
+
 
     # call this once, usually on the root node of the tree
     def copy(self):
@@ -160,6 +181,8 @@ class VAR:
         v.foundInChildren = self.foundInChildren
         v.polarity = self.polarity
 
+        v.lastConst = self.lastConst 
+
         for child in self.children:
             newchild = child.copy()
             v.children.append(newchild)
@@ -167,6 +190,7 @@ class VAR:
         v.explicit = self.explicit
 
         return v
+
 
     def copyUsing(self, tree):
         name = self.knames[0]
@@ -183,6 +207,7 @@ class VAR:
         else:
             return NULL_VAR
 
+
     # returns self, if kname in knames
     # or child with this name, else NULL_VAR
     def lookup(self, name):
@@ -196,15 +221,14 @@ class VAR:
                 return x
         return NULL_VAR
 
-        # typically a "var<=nar" means the var is a slot or a child of a slot
-    def __le__(self, other):
-        return nwutils.recursiveLE(self, other)
-
+  
         # Finds VAR matching at itok. Only visit
         # children if no direct match is found
     def findInText2(self, tokens, itok):
+        self.lastConst = ""
+
         ikname = 0
-        wasFound = False
+        alreadyFound = False
         for kname in self.knames:  # for each name in self's klist
             klist = KList.instances[kname]
             found = klist.findInText(tokens, itok, self.ifound)
@@ -216,12 +240,13 @@ class VAR:
                 else:
                     self.polarity = True
 
-                wasFound = True
+                alreadyFound = True
 
             ikname += 1
 
         # If nothing was found, search iteratively inside the children
-        if wasFound:
+        if alreadyFound:
+            self.lastConst = self.knames[0]
             return [self]
 
         vars = []
@@ -231,10 +256,14 @@ class VAR:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
                 self.ifound = nwutils.cleanFound(self.ifound)
-                if not wasFound:
+
+                self.lastConst = child.knames[0]
+
+                if not alreadyFound: # (non functional)
                     self.polarity = child.polarity
                 vars.extend(foundC)
         return vars  # empty list if none found in children
+
 
     def str(self, ntabs):
         tab = ""
@@ -249,6 +278,7 @@ class VAR:
         else:
             x += "[" + self.knames[0] + "]"
         return tab + x
+
 
     # use Print() for recursive print, or Print(0,False) for non-recursive
     def Print(self, ntabs=0, recurs=True):
@@ -289,6 +319,7 @@ class VAR:
             for child in self.children:
                 child.Print(ntabs + 1, recurs)
 
+
     def PrintSimple(self, ntabs=0):
         output = ""
         tab = ""
@@ -313,6 +344,7 @@ class VAR:
             output += child.PrintSimple(ntabs + 1)
         return output
 
+  
     # operator '+'     # to match text against any Klist
     def __add__(self, other):
         Z = VAR()
@@ -320,6 +352,7 @@ class VAR:
         Z.knames += other.knames
         Z.exclusive = False
         return Z
+
 
     # operator '|'    # to match text against just one KList
     # matching text in more than one is considered a coding error but
@@ -331,16 +364,19 @@ class VAR:
         Z.exclusive = True
         return Z
 
+
     # connect with your children as in "addChild()"
     def sub(self, other):
         other.parent = self
         self.children.append(other)
+
 
     def numSlots(self):
         if self == NULL_VAR:
             return 0
         else:
             return 1
+
 
     def numSlotsUsed(self):
         if self == NULL_VAR:
@@ -349,6 +385,7 @@ class VAR:
             return 1
         else:
             return 0
+
 
     # "Active" means explicit or currently used.
     def numSlotsActive(self):
@@ -359,9 +396,11 @@ class VAR:
         else:
             return 0
 
+
     # like a minimal "print". It is used by nar.string()
     def string(self, ntabs=0):
         return self.knames[0]
+
 
     # KList VARS are used to produce "KList" NARs of order 0
     # So VAR become a class factory for NAR.
@@ -376,6 +415,8 @@ class VAR:
         p.action = NULL_VAR
         p.relation = NULL_VAR
         p.value = NULL_VAR
+
+        p.lastConst = "" # not self.knames[0] to avoid fake read event
         return p
 
     # note this does not climb up the tree of parents returning true if foundInChildren
@@ -390,9 +431,6 @@ class VAR:
 NULL_VAR = NULL_KLIST.var()
 
 
-def countVAR(array):
-    return sum(1 for i in array if i != NULL_VAR)
-
 
 #######################################################################
 #                            NAR                                      #
@@ -401,7 +439,8 @@ class NAR:
     """
     NAR - the nestable entities that wrap VARs or other NARs. They are 
     considered to be narrative patterns. Note that nesting of NARs as 
-    subnarratives, is a different hierarchical structure than the tree of VARs.
+    subnarratives, is a different hierarchical structure than the tree of 
+    VARs.
 
     A NAR has these constant attributes:  
 
@@ -439,6 +478,8 @@ class NAR:
         # by a lack of programming ability. "value" works as an adjective,
         # or as an object, or as whatever
 
+        self.lastConst = "" # should hold records of most slot events
+
     # don't know if I want this
     def makeImplicit(self):
         self.explicit = False
@@ -447,12 +488,14 @@ class NAR:
         self.relation.makeImplicit()
         self.value.makeImplicit()
 
+
     def makeExplicit(self):
         self.explicit = True
         self.thing.makeExplicit()
         self.action.makeExplicit()
         self.relation.makeExplicit()
         self.value.makeExplicit()
+
 
     # If x is a var, this calls .clear(), otherwise it calls into the sub
     # narratives.
@@ -462,6 +505,8 @@ class NAR:
         self.action.clear()
         self.relation.clear()
         self.value.clear()
+        self.lastConst = ""
+
 
     def clearPolarity(self):
         self.polarity = True
@@ -469,6 +514,7 @@ class NAR:
         self.action.clearPolarity()
         self.relation.clearPolarity()
         self.value.clearPolarity()
+
 
     def clearIFound(self):
         if ORDER(self) == 0:
@@ -478,6 +524,20 @@ class NAR:
         self.action.clearIFound()
         self.relation.clearIFound()
         self.value.clearIFound()
+
+
+    def lastIFound(self):
+        max = -1
+        if max<self.thing.lastIFound():
+            max = self.thing.lastIFound()
+        if max<self.action.lastIFound():
+            max = self.action.lastIFound()
+        if max<self.relation.lastIFound():
+            max = self.relation.lastIFound()
+        if max<self.value.lastIFound():
+            max = self.value.lastIFound()
+        return max  
+
 
     # this copy uses the same VARs in the same tree as the original
     def copy(self):
@@ -490,7 +550,40 @@ class NAR:
         n.action = self.action.copy()
         n.relation = self.relation.copy()
         n.value = self.value.copy()
+
+        n.lastConst = self.lastConst
+
         return n
+
+    def generateLastConst(self):
+        lastC = self.thing.lastConst + ":"
+        lastC += self.action.lastConst + ":"
+        lastC += self.relation.lastConst + ":"
+        lastC += self.value.lastConst
+        temp = lastC.split(':')
+        self.lastConst = lastC
+
+    def Thing(self):
+        temp = self.lastConst.split(':')
+        if len(temp)<4 :
+            return ''
+        return temp[0]
+    def Action(self):
+        temp = self.lastConst.split(':')
+        if len(temp)<4 :
+            return ''
+        return temp[1]
+    def Relation(self):
+        temp = self.lastConst.split(':')
+        if len(temp)<4 :
+            return ''
+        return temp[2]
+    def Value(self):
+        temp = self.lastConst.split(':')
+        if len(temp)<4 :
+            return ''
+        return temp[3]
+
 
     # When this tree is a copy of the one where the NAR is defined,
     # NAR.copyUsing returns a "copy" of the same name as self, but
@@ -532,6 +625,7 @@ class NAR:
         n.value = self.value.copyUsing(tree)
         return n
 
+
     def numSlots(self):
         if isinstance(self, VAR):
             return self.numSlots()
@@ -541,6 +635,7 @@ class NAR:
         n += self.relation.numSlots()
         n += self.value.numSlots()
         return n
+
 
     def numSlotsUsed(self):
         if isinstance(self, VAR) and self.found:
@@ -553,6 +648,7 @@ class NAR:
             n += self.value.numSlotsUsed()
             return n
 
+
     def numSlotsActive(self):
         if isinstance(self, VAR):
             return self.numSlotsActive()
@@ -563,6 +659,7 @@ class NAR:
             n += self.relation.numSlotsActive()
             n += self.value.numSlotsActive()
             return n
+
 
     def getIFound(self):
         if self == NULL_VAR:
@@ -582,8 +679,10 @@ class NAR:
         all = nwutils.cleanFound(all)
         return all
 
+
     def numIFound(self):
         return len(self.getIFound())
+
 
     def getType(nar):
         thing = nar.thing
@@ -604,8 +703,10 @@ class NAR:
         else:
             return NULL_NARTYPE
 
+
     def printType(self):
         print(strNarType(self.getType()))
+
 
     def str(nar, ntabs=0):
         tab = ""
@@ -635,6 +736,7 @@ class NAR:
             x += tab + "A:" + a + "\n"
             x += tab + "V:" + v + "\n"
         return x
+
 
     def Print(nar, ntabs=0):
         s = nar.str(ntabs)
