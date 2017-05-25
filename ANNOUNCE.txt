@@ -1,3 +1,10 @@
+May 25 Now supports querying a narrative. At least for
+lower order NARs you can ask for Thing(),Action(),Relation()
+or Value() and it will tell you a ':' separated string of VAR names. It has a ways to go but it implements context for what
+has been read, that is stored in the NAR.lastConst value.
+
+
+
 April 23: Modified basic.py and created basic2.py. Both are heavily documented
 examples of simple Narwhal apps.
 
