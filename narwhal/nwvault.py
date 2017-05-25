@@ -82,6 +82,7 @@ class NarSRecord:
         self.GOF = gof(segment, nar, self.ifound, imin, imax)
         self.ifound = cleanFound(self.ifound)
         self.narpolarity = nar.polarity
+        self.lastConst = nar.lastConst
 
     def block(self):
         self.block = True
