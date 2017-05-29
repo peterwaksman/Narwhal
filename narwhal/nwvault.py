@@ -193,23 +193,26 @@ class NarVault:
             if len(r.ifound) > 0 and max(r.ifound) == itok:
                 return r
         return None
-# This is a class manages nar and related "found" information after a read
+
+    def maxGOF( self ):
+        max = 0.0
+        for r in self._vault:
+            if max < r.GOF :
+                max = r.GOF
+        return max
+
+    def lastConst( self ):
+        maxlen = 0
+        ret = ""
+        for r in self._vault:
+            if maxlen < len(r.lastConst):
+                maxlen = len(r.lastConst)
+                ret = r.lastConst
+        return ret
+# This class manages nar and related "found" information after a read
 # It is a nar plus ifound plus Vault
 # It relieves some of the complexity of the NarReader.
 
-    #def tabulate2(self, numTokens,cal):
-    #    x = []
-    #    for i in range(numTokens):
-    #        x.append('.')
-    #    for r in self._vault:
-    #        if r.finalPolarity(cal):
-    #            sign = "+"
-    #        else:
-    #            sign = "-"
-    #        i = lastIFound( r.ifound )
-    #        if 0 <= i and i < numTokens:
-    #            x[i] =  sign + ("{0:.4g}".format(r.GOF)).ljust(6)
-    #    return x
 
     def tabulate(self, numTokens, cal):
         x = []
@@ -222,7 +225,9 @@ class NarVault:
                 sign = "-"
             i = lastIFound( r.ifound )
             if 0 <= i and i < numTokens:
-                x[i] =  "{0:.4g}".format(r.GOF) + sign
+                #x[i] =  "{0:.4g}".format(r.GOF) + sign
+                x[i] =  sign + "{0:.4g}".format(r.GOF) 
+                #x[i] +=  " " + r.lastConst
         return x
 
 

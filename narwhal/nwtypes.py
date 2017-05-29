@@ -426,6 +426,30 @@ class VAR:
     def isA(self, name):
         return name == self.knames[0]
 
+    #def __eq__(a,b):
+    #    return a.knames[0]== b.knames[0]
+
+
+    def isCommonParent(self,a,b):
+        return a<=self and b<=self
+
+    def LCP(self, v, w ):
+        """The least common parent of a and b, beneath self"""
+        if not self.isCommonParent(a,b):
+            return None
+        L = []
+        for child in self.children:
+            p = child.LCP(a,b)
+            if p:
+                L.append(p)
+
+        if len(L) == 0 : # none found in children (but isCommonParent()==True
+            return self
+        elif len(L)>1 :  # found in several different children
+            return self
+        else:            # found in child or beneath it 
+            return L[0]
+
 
 # -----------ZERO for VAR type
 NULL_VAR = NULL_KLIST.var()

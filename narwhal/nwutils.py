@@ -191,6 +191,15 @@ def shiftFoundIndices(ifound, shift):
     cleanFound(ifound)
     return ifound
 
+def replaceCharacter(text, char , replacement):
+    newtext = ""
+    for i in range(len(text)):
+        if text[i] == char:
+            newtext += replacement
+        else:
+            newtext += text[i]
+    return newtext
+
 
 def cleanAMPM(text):
     L = len(text)

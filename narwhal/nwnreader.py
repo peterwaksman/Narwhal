@@ -79,8 +79,19 @@ class NWNReader:
         self.nar.clear()
 
     def newStart(self, CD, istart):
-        # a control occupies only one index in the segment
+        # a control occupies only one index in the segment (wrong!)
         return CD.ictrl + 1
+
+    def lastConst(self):
+        return self.nar.lastConst
+    def Thing(self):
+        return self.nar.Thing()
+    def Action(self):
+        return self.nar.Action()
+    def Relation(self):
+        return self.nar.Relation()
+    def Value(self):
+        return self.nar.Value()
 
   #####################################################
     ##################### outer read loop ###############
@@ -162,11 +173,11 @@ class NWNReader:
             self.rollUpCanVault(record, 0.5)
             self.removeAllBlocks()
 
-        elif control.isA("PERIOD") or control.isA("EXCLAIM") or control.isA("DASH"):
+        elif control.isA("PERIOD") or control.isA("EXCLAIM") or control.isA("DASH") or control.isA("QUERY"):
             self.rollUpCanVault(record, 0.1)
             self.removeAllBlocks()
 
-            self.clear()  # a clean start
+            self.clear()   
 
         else:
             print("did not apply contol: " + CTRL.knames[0])
@@ -211,5 +222,4 @@ class NWNReader:
         x = self.vault.tabulate(numTokens, self.cal)
         return x
 
-    def tabulate2(self, numTokens):
-        x = self.tabulate(numTokens)
+   

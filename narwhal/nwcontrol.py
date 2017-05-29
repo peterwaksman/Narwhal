@@ -305,6 +305,9 @@ def prepareTokens(text):
     # one of several future cleanups
     text = cleanAMPM(text)
 
+    # another
+    text = replaceCharacter(text,'#', " _#_ ")
+
     # lower case tokens
     tokens = text.split(' ')
     newtokens = []
