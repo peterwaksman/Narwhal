@@ -98,7 +98,6 @@ class NarSRecord:
         else:
             return True
 
- 
 #####################################################
 
 class NarVault:

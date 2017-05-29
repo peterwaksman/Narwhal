@@ -239,3 +239,24 @@ def recursiveLE(self, other):
         if recursiveLE(self, child):
             return True
     return False
+
+def Thing(lastConst):
+    temp = lastConst.split(':')
+    if len(temp)<4 :
+        return ''
+    return temp[0]
+def Action(lastConst):
+    temp = lastConst.split(':')
+    if len(temp)<4 :
+        return ''
+    return temp[1]
+def Relation(lastConst):
+    temp = lastConst.split(':')
+    if len(temp)<4 :
+        return ''
+    return temp[2]
+def Value(lastConst):
+    temp = lastConst.split(':')
+    if len(temp)<4 :
+        return ''
+    return temp[3]
