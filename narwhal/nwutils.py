@@ -240,23 +240,66 @@ def recursiveLE(self, other):
             return True
     return False
 
+
+################ Thing(),Action(),Relation(), and Value() ##############
+def separateTARV( str ):
+    L = len(str)
+    pcount = 0
+    splits = []
+    if str[0]=='(' and str[L-1]==')':
+        tmp = str[1 : L-1]
+    else:
+        tmp = str
+    for i in range( len(tmp) ):
+        c = tmp[i]
+        if c=='(':
+            pcount += 1
+        elif c==')':
+            pcount -= 1
+
+        # at the separator
+        if c == ':' and pcount==0: 
+            splits.append( i )
+
+    temp = []
+    if len(splits)==3 : # it resolved correctly into 4 pieces
+        temp.append( tmp[ 0 : splits[0]] )
+        temp.append( tmp[ splits[0]+1 : splits[1]] )
+        temp.append( tmp[ splits[1]+1 : splits[2]] )
+        temp.append( tmp[ splits[2]+1 : ] )
+    return temp
+    #else:
+    #    return tmp
+
+
+def hasSeparator( lastC ):
+        if lastC.find(':') > -1 :
+            return True
+        else:
+            return False
+
 def Thing(lastConst):
-    temp = lastConst.split(':')
+    temp = separateTARV(lastConst)
+    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
-    return temp[0]
+    else: 
+        return temp[0]
 def Action(lastConst):
-    temp = lastConst.split(':')
+    temp = separateTARV(lastConst)
+#    temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[1]
 def Relation(lastConst):
-    temp = lastConst.split(':')
+    temp = separateTARV(lastConst)
+    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[2]
 def Value(lastConst):
-    temp = lastConst.split(':')
+    temp = separateTARV(lastConst)
+    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[3]

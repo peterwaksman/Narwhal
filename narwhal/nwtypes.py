@@ -579,34 +579,65 @@ class NAR:
 
         return n
 
+  
     def generateLastConst(self):
-        lastC = self.thing.lastConst + ":"
-        lastC += self.action.lastConst + ":"
-        lastC += self.relation.lastConst + ":"
-        lastC += self.value.lastConst
-        temp = lastC.split(':')
+        lastC = ""
+
+        t = self.thing.lastConst
+        if nwutils.hasSeparator(t):
+            lastC += '(' + t + ')' + ':'
+        else:
+            lastC += t + ':'
+
+        a = self.action.lastConst
+        if nwutils.hasSeparator(a):
+            lastC += '(' + a + ')' + ':'
+        else:
+            lastC += a + ':'
+        
+        r = self.relation.lastConst
+        if nwutils.hasSeparator(r):
+            lastC += '(' + r + ')' + ':'
+        else:
+            lastC += r + ':'
+  
+        v = self.value.lastConst
+        if nwutils.hasSeparator(v):
+            lastC += '(' + v + ')'  
+        else:
+            lastC += v  
+  
+        #lastC = self.thing.lastConst + ":"
+        #lastC += self.action.lastConst + ":"
+        #lastC += self.relation.lastConst + ":"
+        #lastC += self.value.lastConst
+        #temp = lastC.split(':')
         self.lastConst = lastC
 
     def Thing(self):
-        temp = self.lastConst.split(':')
-        if len(temp)<4 :
-            return ''
-        return temp[0]
+        return nwutils.Thing(self.lastConst)
+        #temp = self.lastConst.split(':')
+        #if len(temp)<4 :
+        #    return ''
+        #return temp[0]
     def Action(self):
-        temp = self.lastConst.split(':')
-        if len(temp)<4 :
-            return ''
-        return temp[1]
+        return nwutils.Action(self.lastConst)
+        #temp = self.lastConst.split(':')
+        #if len(temp)<4 :
+        #    return ''
+        #return temp[1]
     def Relation(self):
-        temp = self.lastConst.split(':')
-        if len(temp)<4 :
-            return ''
-        return temp[2]
+        return nwutils.Relation(self.lastConst)
+        #temp = self.lastConst.split(':')
+        #if len(temp)<4 :
+        #    return ''
+        #return temp[2]
     def Value(self):
-        temp = self.lastConst.split(':')
-        if len(temp)<4 :
-            return ''
-        return temp[3]
+        return nwutils.Value(self.lastConst)
+        #temp = self.lastConst.split(':')
+        #if len(temp)<4 :
+        #    return ''
+        #return temp[3]
 
 
     # When this tree is a copy of the one where the NAR is defined,
