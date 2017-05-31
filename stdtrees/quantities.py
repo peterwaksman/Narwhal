@@ -113,3 +113,6 @@ QUANTITY.sub(THIRTY)
 QUANTITY.sub(THIRTYONE)
 QUANTITY.sub(THIRTYTWO)
 
+def getValue( kname ):
+    return int(kname)
+    

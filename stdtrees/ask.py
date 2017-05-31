@@ -11,7 +11,7 @@ kQUESTION = " ? , ask # about, question , question about , problem , need to kno
 
 kWHO = " who , who are" #asking for a person
 kHOW = " how # much|often, not sure how , do I " #asking for instructions
-kWHEN = " when " #asking for a time
+kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
 kWHAT = " what , what are, status , check , to check , verify ,\
@@ -48,6 +48,8 @@ QUESTION.sub(AMOUNT)
 
 ########################################
 ########################################
-kREQUEST = ' please , use , build , fabricate , make , make me , to make , my|the|an $ order , to order , want , want to, want you to, need , need to , need you to, give me '
+kREQUEST = ' please , use , build , sell me , fabricate , make , make me ,\
+ to make , my|the|an $ order , to order , want , want to, want you to, need ,\
+ need to , need you to, give me  '
 REQUEST = KList( "request", kREQUEST ).var()
 
