@@ -241,6 +241,8 @@ def recursiveLE(self, other):
     return False
 
 
+
+
 ################ Thing(),Action(),Relation(), and Value() ##############
 def separateTARV( str ):
     L = len(str)
@@ -279,6 +281,8 @@ def hasSeparator( lastC ):
             return False
 
 def Thing(lastConst):
+    if lastConst=='':
+        return ''
     temp = separateTARV(lastConst)
     #temp = lastConst.split(':')
     if len(temp)<4 :
@@ -286,18 +290,24 @@ def Thing(lastConst):
     else: 
         return temp[0]
 def Action(lastConst):
+    if lastConst=='':
+        return ''
     temp = separateTARV(lastConst)
 #    temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[1]
 def Relation(lastConst):
+    if lastConst=='':
+        return ''
     temp = separateTARV(lastConst)
     #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[2]
 def Value(lastConst):
+    if lastConst=='':
+        return ''
     temp = separateTARV(lastConst)
     #temp = lastConst.split(':')
     if len(temp)<4 :

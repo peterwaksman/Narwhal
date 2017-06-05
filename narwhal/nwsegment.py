@@ -17,6 +17,7 @@ from narwhal.nwutils import *
 from narwhal.nwcontrol import *
 
 
+
 #################################
 #################################
 
@@ -174,6 +175,7 @@ def tabulateSEG2( segment, tokens):
 
 def ReadSegment(nar, seg):
     nar.lastConst = "" # may get set in a sub ReadXXX
+                       # redundant in the current code
     
     if ORDER(nar) == 0:
         return ReadSegment0(nar, seg)
@@ -225,7 +227,7 @@ def ReadSegmentAsAttribute(nar, seg):
     v = ReadSegment(nar.value, seg)
 
     # read any client defined relations
-    if nar.relation != NULL_NAR:
+    if nar.relation != NULL_VAR:
         r = ReadSegment(nar.relation, seg)
     else:
         r = ReadSegment0(ATTRIB_OP, seg)

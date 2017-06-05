@@ -229,7 +229,9 @@ class VAR:
 
         ikname = 0
         alreadyFound = False
+        j=0
         for kname in self.knames:  # for each name in self's klist
+            j+=1
             klist = KList.instances[kname]
             found = klist.findInText(tokens, itok, self.ifound)
             if found:

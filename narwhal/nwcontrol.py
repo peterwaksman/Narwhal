@@ -218,6 +218,8 @@ def replacePunctuation(text):
             newtext += " _)_ "
         elif text[i] == "-":
             newtext += " - "  # for now
+        elif text[i] == "#":
+            newtext += " _hash_ " #not making this a punction
         else:
             newtext += text[i]
     return newtext

@@ -10,7 +10,6 @@ from narwhal.nwutils import *
 from narwhal.nwsegment import *
 from narwhal.nwcontrol import *
 
-
 def gof(segment, nar, ifound, imin, imax):
     """
     goodness of fit between nar and segment. Uses the indexing
@@ -229,4 +228,125 @@ class NarVault:
                 #x[i] +=  " " + r.lastConst
         return x
 
+
+
+    ##############################################################
+    # recordSlotEvents() is a substitute for vaulting. A step towards
+    # the "golden" algorithm but lacking polarity and lacking higher order nar support
+    ###############################################################
+
+def delBelow(ifound,istart):
+    newfound = []
+    for i in ifound:
+        if i>=istart:
+            newfound.append(i)
+    newfound = cleanFound(newfound)
+    return newfound
+           
+def recordSlotEvents0( nar, segment):
+    if not isinstance(nar, VAR):
+        return None
+    r = []
+    for var in segment:
+        if var<=nar: 
+            nar.ifound.extend(var.ifound)
+            nar.ifound = cleanFound(nar.ifound)
+            nar.found = True
+            nar.polarity = var.polarity
+            nar.lastConst = var.knames[0]
+            r.append( nar.lastConst )
+    return r
+
+def recordSlotEvents1(nar, segment):
+    r = []
+    if ORDER(nar)!=1:
+        return r
+
+    nar.clear()
+    i = 0
+    istart = 0
+    T = nar.thing
+    A = nar.action
+    R = nar.relation
+    V = nar.value
+    prevConst = nar.lastConst  
+    #event = False
+    ifound = []
+    for var in segment:
+        event = False
+        if var==NULL_VAR:
+            i = i+1
+            continue            
+          
+        if T != NULL_VAR and var<=T:
+            event = True
+            T.ifound.extend(var.ifound)
+            T.ifound = cleanFound(T.ifound)
+            T.found = True
+            T.lastConst = var.knames[0]
+ 
+        if A != NULL_VAR and var<=A:
+            event = True
+            A.ifound.extend(var.ifound)
+            A.ifound = cleanFound(A.ifound)
+            A.Found = True
+            A.lastConst = var.knames[0]
+ 
+        if R != NULL_VAR and R != NULL_NAR and var<=R:
+            event = True
+            R.ifound.extend(var.ifound)
+            R.ifound = cleanFound(R.ifound)
+            R.found = True
+            R.lastConst = var.knames[0]
+ 
+        if V != NULL_VAR and var<=V:
+            event = True
+            V.ifound.extend(var.ifound)
+            V.ifound = cleanFound(V.ifound)
+            V.found = True
+            V.lastConst = var.knames[0]
+      
+ 
+        ifound.extend( T.ifound )
+        ifound.extend( A.ifound )
+        if R!=NULL_NAR:
+            ifound.extend( R.ifound )
+        ifound.extend( V.ifound )
+        ifound = delBelow( ifound, istart)
+ 
+        ######## SLOT EVENT #########
+        if event:
+            nar.generateLastConst() 
+
+        if event and prevConst != nar.lastConst: #(for now require a change) 
+            prevConst = nar.lastConst      
+            u = nar.numSlotsUsed()
+            a = nar.numSlotsActive()    
+            GOF = gof(segment, nar, ifound, istart, i)
+            if u == a :   # here, could test GOF vs a threshold    
+                r.append( [ GOF, nar.lastConst] )
+
+                nar.clear()  
+                ifound = []
+                istart = i         
+
+        # here put AND and COMMA processing
+                               
+        i += 1
+    return r       
+
+# I am going to try to write this so it works when nar is of order 1
+def recordSlotEvents(nar,segment):
+
+    r = [] # record to be created
+    if nar.order==0 or isinstance( nar, VAR ):
+        return recordSlotEvents0(nar,segment)
+
+    elif nar.order==1:
+        return recordSlotEvents1(nar,segment)
+    
+    else:
+        print "UNDER CONSTRUCTION"
+        # here can compose a slot event for subnar into a single event
+        # for higher order.
 
