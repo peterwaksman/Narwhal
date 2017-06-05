@@ -283,28 +283,40 @@ def recordSlotEvents1(nar, segment):
             T.ifound.extend(var.ifound)
             T.ifound = cleanFound(T.ifound)
             T.found = True
-            T.lastConst = var.knames[0]
+            if var.knames[0]=='int':
+                T.lastConst = var.lastConst
+            else:
+                T.lastConst = var.knames[0]
  
         if A != NULL_VAR and var<=A:
             event = True
             A.ifound.extend(var.ifound)
             A.ifound = cleanFound(A.ifound)
             A.Found = True
-            A.lastConst = var.knames[0]
+            if var.knames[0]=='int':
+                A.lastConst = var.lastConst
+            else:
+                A.lastConst = var.knames[0]
  
         if R != NULL_VAR and R != NULL_NAR and var<=R:
             event = True
             R.ifound.extend(var.ifound)
             R.ifound = cleanFound(R.ifound)
             R.found = True
-            R.lastConst = var.knames[0]
+            if var.knames[0]=='int':
+                R.lastConst = var.lastConst
+            else:
+                R.lastConst = var.knames[0]
  
         if V != NULL_VAR and var<=V:
             event = True
             V.ifound.extend(var.ifound)
             V.ifound = cleanFound(V.ifound)
             V.found = True
-            V.lastConst = var.knames[0]
+            if var.knames[0]=='int':
+                V.lastConst = var.lastConst
+            else:
+                V.lastConst = var.knames[0]
       
  
         ifound.extend( T.ifound )

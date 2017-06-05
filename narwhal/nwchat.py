@@ -26,7 +26,6 @@ class ChatNode():
         self.response = ""
 
     def readSlotEvents(nar, segment):
-#        return nwsl.recordSlotEvents(nar,segment) 
         return recordSlotEvents(nar,segment) 
 
     def getIBest(self):

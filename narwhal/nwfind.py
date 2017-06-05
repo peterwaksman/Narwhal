@@ -39,6 +39,8 @@ and matchTOK() knew how to handle it. What is important for Narhwal is to keep t
 of the place in the text where the match occurs.
 """
 
+from narwhal.nwutils import *
+
 def kwordLen(kword):
     if len(kword) < 1:
         return 0
@@ -206,16 +208,22 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
 # ------------------------------------------------
 def findInText(klist, tokens, itok, ifound):
-    found = False
+    ret = ''
 
     for kword in klist.list:
+        if kword==' __d__ ':
+            a = asInt(tokens[itok])
+            if len(a)>0 :
+                ifound.append(itok)
+            return a
+
         # look for this kword at itok position in tokens
         # and return with ifound storing itok and any
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
             # print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
-            found = True
-    return found
+            ret = tokens[itok]
+    return ret
 
 ###############################################################
 ###############################################################

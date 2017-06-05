@@ -144,46 +144,6 @@ def showFound(tokens, ifound):
     return s
 
 
-def filterFile(filename, var):
-    infile = open(filename, "r")
-    for line in infile:
-        outstring = ""
-        sentences = line.split('.')
-        if len(line) > 0:
-            print("\n\noriginal:" + line)
-        for sentence in sentences:
-            tokens = sentence.split(' ')
-            var.clear()
-            F = var.findInText(tokens)
-            if F:
-                outstring += " " + showFound(tokens, var.ifound)
-
-        if len(outstring) > 0:
-            print("FOUND:" + outstring)
-
-    infile.close()
-
-
-def readFile(fineame, nar):
-    infile = open(filename, "r")
-    for line in infile:
-        outstring = ""
-        sentences = line.split('.')
-        if len(line) > 0:
-            print("\n\noriginal:" + line)
-        for sentence in sentences:
-            tokens = sentence.split(' ')
-            ifound = []
-            E.clear()
-            F = var.findInText(tokens)
-            if F:
-                #print("FOUND"+ showFound(tokens, var.ifound))
-                outstring += " " + showFound(tokens, var.ifound)
-        if len(outstring) > 0:
-            print("FOUND:" + outstring)
-
-    infile.close()
-
 
 def shiftFoundIndices(ifound, shift):
     for itok in range(len(ifound)):
@@ -241,6 +201,23 @@ def recursiveLE(self, other):
     return False
 
 
+#related to int unknowns
+def asInt(token):
+    """ if token is digits, optionally preceeded with a '+' or '-' """
+
+    if len(token)<1 :
+        return ''
+    if token[0]=='-' or token[0]=='+':
+        tmp = token[1:]
+        if tmp.isdigit():
+            if token[0] == '-':
+                return token # preserve the minus
+            else:
+                return tmp   # strip off the plus
+    elif token.isdigit():
+        return token
+    else:
+        return ''
 
 
 ################ Thing(),Action(),Relation(), and Value() ##############

@@ -230,11 +230,12 @@ class VAR:
         ikname = 0
         alreadyFound = False
         j=0
+        f =''# the returned token that was matched
         for kname in self.knames:  # for each name in self's klist
             j+=1
             klist = KList.instances[kname]
-            found = klist.findInText(tokens, itok, self.ifound)
-            if found:
+            f = klist.findInText(tokens, itok, self.ifound)
+            if len(f)>0:
                 self.found = True  # could have been true already
                 # this can switch frequently and reflects the last found token
                 if self.exclusive and ikname > 0:
@@ -248,7 +249,10 @@ class VAR:
 
         # If nothing was found, search iteratively inside the children
         if alreadyFound:
-            self.lastConst = self.knames[0]
+            if self.knames[0]=='int':#just for unknowns
+                self.lastConst = f
+            else:
+                self.lastConst = self.knames[0]
             return [self]
 
         vars = []
@@ -258,8 +262,10 @@ class VAR:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
                 self.ifound = nwutils.cleanFound(self.ifound)
-
-                self.lastConst = child.knames[0]
+                if child.knames[0]=='int':
+                    self.lastConst = foundC
+                else:
+                    self.lastConst = child.knames[0]
 
                 if not alreadyFound: # (non functional)
                     self.polarity = child.polarity

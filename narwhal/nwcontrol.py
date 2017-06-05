@@ -217,9 +217,12 @@ def replacePunctuation(text):
         elif text[i] == ")":
             newtext += " _)_ "
         elif text[i] == "-":
-            newtext += " - "  # for now
+            if i<len(text)-1 and text[i+1].isdigit():
+                newtext += "-" # leave it alone
+            else:
+                newtext += " - "  # for now
         elif text[i] == "#":
-            newtext += " _hash_ " #not making this a punction
+            newtext += " _hash_ " #(not really a punctionation)
         else:
             newtext += text[i]
     return newtext
@@ -297,7 +300,7 @@ class ControlData:
 #######################################################
 def prepareTokens(text):
     """
-    An important method "hiding" here in nwcontrol.py. This is
+    An important method. It is "hiding" here in nwcontrol.py. This is
     the opportunity for "pre-processing".
     """
 
@@ -307,8 +310,8 @@ def prepareTokens(text):
     # one of several future cleanups
     text = cleanAMPM(text)
 
-    # another
-    text = replaceCharacter(text,'#', " _#_ ")
+    ## another
+    #text = replaceCharacter(text,'#', " _#_ ")
 
     # lower case tokens
     tokens = text.split(' ')
