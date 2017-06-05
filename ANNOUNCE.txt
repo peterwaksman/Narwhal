@@ -1,3 +1,14 @@
+June 6
+Major additions: 
+ - New form of vaulting called recordSlotEvents()
+ - Added unknown ints in INTx VAR using " __d__ "
+   and all kinds of special handling of var.knames[0] as lastConst
+or replaced by var.lastConst use when it is an "unknown" type of VAR. 
+HAd introduced "QUANTITY" but am backing off and using INTx instead for tooth numbers and case numbers. Still have to get signs working and floating point. 
+
+
+
+
 May 30
 Introduced stdtrees subdirectory, containing two files for now.
 "ask'py" is a keyword tree for questions and "quantities.py" is
