@@ -80,32 +80,4 @@ class ChatNode():
         self.respond( segment, tokens )
         return self.response
 
-    def gof( self ):
-        if self.ibest == -1 :
-            return 0.0
-        N = self.nreaders[ibest]
-        return N.vault.maxGOF()
-
-
-class ChatManager():
-    """ To manage multiple nodes and whatever generic data 
-    that goes along with them, and gets shared outward"""
-
-    def __init__(self):
-        self.nodes = dict()
-        self.node = None
-    def addNode( self, name, chatnode ):# we'll name the chatnodes
-        self.nodes[name] = chatnode
-        self.node = chatnode #(might as well set it asap)
-    def respondText(self,text):
-        if self.node:
-            return self.node.respondText(text)
-    def setNode(self, name):
-        if self.nodes[name]:
-            self.node = self.nodes[name]
-
-    def readAll(self,text):
-        ad
-
-
-        
+ 
