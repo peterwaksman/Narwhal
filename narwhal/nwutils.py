@@ -214,10 +214,42 @@ def asInt(token):
                 return token # preserve the minus
             else:
                 return tmp   # strip off the plus
+        return ''
     elif token.isdigit():
         return token
     else:
         return ''
+
+# assume utoken has no sign prefix
+def isdigitFL(token):
+    pcount = 0 #count periods
+    for i in range( len(token) ) :
+        if token[i]=='.':
+            pcount += 1
+        elif not token[i].isdigit():
+            return False
+    if pcount<2:
+        return True
+    else:
+        return False
+
+
+def asFloat(token):
+        """ Same as asInt() except we allow one decimal before the
+        last digit """
+        if len(token)<1 :
+            return ''
+        if token[0]=='-' or token[0]=='+':
+            tmp = token[1:]
+            if isdigitFL(tmp):
+                if token[0] == '-':
+                    return token # preserve the minus  
+                else:
+                    return tmp   # strip off the plus
+        elif isdigitFL(token):
+            return token
+        else:
+            return ''
 
 
 ################ Thing(),Action(),Relation(), and Value() ##############

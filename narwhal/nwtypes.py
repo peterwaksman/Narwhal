@@ -249,7 +249,7 @@ class VAR:
 
         # If nothing was found, search iteratively inside the children
         if alreadyFound:
-            if self.knames[0]=='int':#just for unknowns
+            if self.knames[0]=='int' or self.knames[0]=='float':#just for unknowns
                 self.lastConst = f
             else:
                 self.lastConst = self.knames[0]
@@ -262,7 +262,7 @@ class VAR:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
                 self.ifound = nwutils.cleanFound(self.ifound)
-                if child.knames[0]=='int':
+                if child.knames[0]=='int' or child.knames[0]=='float':
                     self.lastConst = foundC
                 else:
                     self.lastConst = child.knames[0]

@@ -283,7 +283,7 @@ def recordSlotEvents1(nar, segment):
             T.ifound.extend(var.ifound)
             T.ifound = cleanFound(T.ifound)
             T.found = True
-            if var.knames[0]=='int':
+            if var.knames[0]=='int' or var.knames[0]=='float':
                 T.lastConst = var.lastConst
             else:
                 T.lastConst = var.knames[0]
@@ -293,7 +293,7 @@ def recordSlotEvents1(nar, segment):
             A.ifound.extend(var.ifound)
             A.ifound = cleanFound(A.ifound)
             A.Found = True
-            if var.knames[0]=='int':
+            if var.knames[0]=='int' or var.knames[0]=='float':
                 A.lastConst = var.lastConst
             else:
                 A.lastConst = var.knames[0]
@@ -303,7 +303,7 @@ def recordSlotEvents1(nar, segment):
             R.ifound.extend(var.ifound)
             R.ifound = cleanFound(R.ifound)
             R.found = True
-            if var.knames[0]=='int':
+            if var.knames[0]=='int' or var.knames[0]=='float':
                 R.lastConst = var.lastConst
             else:
                 R.lastConst = var.knames[0]
@@ -313,7 +313,7 @@ def recordSlotEvents1(nar, segment):
             V.ifound.extend(var.ifound)
             V.ifound = cleanFound(V.ifound)
             V.found = True
-            if var.knames[0]=='int':
+            if var.knames[0]=='int' or var.knames[0]=='float':
                 V.lastConst = var.lastConst
             else:
                 V.lastConst = var.knames[0]

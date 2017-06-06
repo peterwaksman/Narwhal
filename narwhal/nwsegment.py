@@ -213,7 +213,7 @@ def ReadSegment0(nar, seg):
             nar.ifound = cleanFound(nar.ifound)
             nar.found = True
             nar.polarity = var.polarity
-            if var.knames[0]=='int':
+            if var.knames[0]=='int' or var.knames[0]=='float':
                 nar.lastConst = var.lastConst
             else:
                 nar.lastConst = var.knames[0]  

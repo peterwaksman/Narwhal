@@ -209,14 +209,17 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 # ------------------------------------------------
 def findInText(klist, tokens, itok, ifound):
     ret = ''
-
     for kword in klist.list:
-        if kword==' __d__ ':
+        if kword == ' __d__ ':
             a = asInt(tokens[itok])
             if len(a)>0 :
                 ifound.append(itok)
             return a
-
+        elif kword == ' __fl__ ':
+            a = asFloat(tokens[itok])
+            if len(a)>0:
+                ifound.append(itok)
+            return a
         # look for this kword at itok position in tokens
         # and return with ifound storing itok and any
         # adjacent indices used during the matching

@@ -193,17 +193,20 @@ SKIP_OP.sub(DESIGNATOR_OP)
 
 
 #######################################################
-# PUNCTUATION
+# PUNCTUATION (and other)
 # pre process the text, replacing punctuations with unique text "encodings"
 # Later these encodings are matched as tokens using the PUNCTUATION var tree
+# (or other)
 
-def replacePunctuation(text):
+def replaceSpecialChars(text):
     begin = 0
     newtext = ""
     for i in range(len(text)):
         if text[i] == '.':
-            newtext += " _period_ "
-            noEnd = False
+            if i < len(text)-1 and text[i+1].isdigit():
+                newtext += '.'
+            else:
+                newtext += " _period_ "
         elif text[i] == ',':
             newtext += " _comma_ "
         elif text[i] == ';':
@@ -222,7 +225,7 @@ def replacePunctuation(text):
             else:
                 newtext += " - "  # for now
         elif text[i] == "#":
-            newtext += " _hash_ " #(not really a punctionation)
+            newtext += " _hash_ " #(not a punctionation)
         else:
             newtext += text[i]
     return newtext
@@ -304,8 +307,8 @@ def prepareTokens(text):
     the opportunity for "pre-processing".
     """
 
-        # encode punctuations
-    text = replacePunctuation(text)
+        # encode special chars
+    text = replaceSpecialChars(text)
 
     # one of several future cleanups
     text = cleanAMPM(text)
