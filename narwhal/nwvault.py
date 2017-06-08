@@ -340,7 +340,7 @@ def recordSlotEvents1(nar, segment):
 
                 nar.clear()  
                 ifound = []
-                istart = i         
+                istart = i + 1        
 
         # here put AND and COMMA processing
                                
