@@ -7,7 +7,7 @@ can re-arrange it or sub divide it if you like.
 from narwhal.nwtypes import KList
 
 # in spoken language this can be an inflection 
-kQUESTION = " ? , ask # about, question , question about , problem , need to know , want to know, help with " 
+kQUESTION = " ? , ask # about, question, question about , questions about , problem , problem with, need to know , want to know, help with , information " 
 
 kWHO = " who , who are" #asking for a person
 kHOW = " how # much|often, not sure how , do I " #asking for instructions
@@ -48,8 +48,21 @@ QUESTION.sub(AMOUNT)
 
 ########################################
 ########################################
-kREQUEST = ' please , use , build , sell me , fabricate , make , make me ,\
- to make , my|the|an $ order , to order , want , want to, want you to, need ,\
- need to , need you to, give me  '
+kREQUEST = ' please , use , build , sell me , fabricate , produce , provide ,\
+ provide me , make , make me , to make , my|the|an $ order , to order ,\
+ want , want to , want you to, need ,need to , need you to, give me ,  '
 REQUEST = KList( "request", kREQUEST ).var()
+
+#########################################
+# not really quantities but what the heck
+kYES = ' yes , ok '
+YES = KList("YES",kYES).var()
+kNO = ' no '
+NO = KList("NO",kNO).var()
+YES_NO = KList("YES",kYES).var() | KList("NO",kNO).var()
+
+kYOU = ' you , dentsply '
+YOU =  KList( "you", kYOU ).var()
+
+
 

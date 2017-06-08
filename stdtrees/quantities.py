@@ -1,12 +1,19 @@
 """
 quantities.py lists numbers in various forms, as VARs
+
+This defines QUANTITY and its children ZERO through THIRTYTWO
+For other ints, like negatives or > 32, make up your own names.
+
+It is a chore to write out these numbers and you could do it automatically
+for most of them. 
+
 """
 
 from narwhal.nwtypes import KList
 
 kZERO = ' none , zero , 0 '
-kONE  = ' one , an, a , 1 '
-kTWO = ' two , 2 '
+kONE  = ' one , an , a , 1 ' #introduces a small bug, since 'a'  is also DULL
+kTWO = ' two , couple , 2 '
 kTHREE = ' three , 3 '
 kFOUR  = ' four , 4 '
 kFIVE = ' five , 5 '
@@ -113,6 +120,23 @@ QUANTITY.sub(THIRTY)
 QUANTITY.sub(THIRTYONE)
 QUANTITY.sub(THIRTYTWO)
 
-def getValue( kname ):
-    return int(kname)
-    
+kTOOTH = " tooth , _hash_ "
+TOOTH = KList("tooth",kTOOTH).var()
+
+############################################
+""" introduces unknowns, in this case: unknown int
+VARs are usually "variable" with range limited to 
+sepecific sub VARs. Here we deal with knowns to be
+read from the input.
+
+I am using 'x' to indicate "unknown"
+"""
+
+kINT = " __d__ "
+INTx = KList("int", kINT).var()
+# See the connection to the asInt() method in nwutils.pw
+
+kFLOAT = " __fl__ "
+FLOATx = KList("float", kFLOAT).var()
+# See the connection to the asFloat() method in nwutils.pw
+
