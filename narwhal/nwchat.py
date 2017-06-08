@@ -4,13 +4,13 @@ from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
 
-
+strAPOLOGY = "Sorry, I did not understand that."
 """
-This defines the ChatNode base class and the ChatManager that
-manages a system of multiple ChatNodes.
+This defines the NWChatnode base class and the ChatManager that
+manages a system of multiple NWChatnodes.
 """
 
-class ChatNode():
+class NWChatnode():
     def __init__(self,treeroot, nars, cals = []):
         self.tree = treeroot.copy()
         self.nreaders = []
@@ -24,11 +24,10 @@ class ChatNode():
     
         self.ibest = -1
         self.response = ""
+        self.maxGOF = 0.0
 
-    def readSlotEvents(nar, segment):
-        return recordSlotEvents(nar,segment) 
 
-    def getIBest(self):
+    def bestFitI(self):
         ibest = -1
         max = 0.0
         for i in range(len(self.nreaders)):
@@ -37,31 +36,32 @@ class ChatNode():
             if max < v:
                 max = v
                 ibest = i
+
+        self.maxGOF = max
+
         return ibest
 
   
-    def read( self, segment, tokens ):
+    def readAll( self, segment, tokens ):
         """basic read method, do not call directly. Use respond() """
         for N in self.nreaders:
             N.readText(segment,tokens)
-        ibest = self.getIBest()
-        return ibest
+   
 
-
-    #----Typically the next two methods get overriden in derived classes
-
+    #----Typically the next two methods get overriden in derived classe
     def getContext(self):
         ibest = self.ibest
         return str(ibest)
   
-    def respond(self, segment, tokens):
+    def read(self, segment, tokens):
+ 
+        self.readAll( segment, tokens)# does the read
+ 
+        self.ibest = self.bestFitI() # collects the GOFs
 
-        ibest = self.read( segment, tokens)
-           
-        self.ibest = ibest # set, but also the return value
-
+        ibest = self.ibest
         if ibest<0:
-            self.response = "Sorry, I did not understand."
+            self.response = strAPOLOGY
             return ibest
     
         # For debug
@@ -69,15 +69,13 @@ class ChatNode():
         s = N.vault.lastConst() 
         h = self.getContext()
         print(h + " " + s)
-        #print s
         print("\n")
-
         return ibest
 
     def respondText(self, text):
         tokens = prepareTokens(text)
         segment = PrepareSegment(self.tree,tokens)
-        self.respond( segment, tokens )
+        self.read( segment, tokens )
         return self.response
 
  
