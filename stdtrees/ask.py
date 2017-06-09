@@ -5,6 +5,8 @@ can re-arrange it or sub divide it if you like.
 
 """
 from narwhal.nwtypes import KList
+from narwhal.nwchat import NWChatnode
+
 
 # in spoken language this can be an inflection 
 kQUESTION = " ? , ask # about, question, question about , questions about , problem , problem with, need to know , want to know, help with , information " 
@@ -15,7 +17,7 @@ kWHEN = " when , how long , how long until , how long will it take " #asking for
 kWHERE = " where , where from , where to , where are " #asking for a place
 
 kWHAT = " what , what are, status , check , to check , verify ,\
- ask about, ask if, to ask about " #asking for information
+ ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
 kDOES = " do you , does it , can it " #asking about possibility
@@ -55,14 +57,32 @@ REQUEST = KList( "request", kREQUEST ).var()
 
 #########################################
 # not really quantities but what the heck
+
+kYOU = ' you , dentsply '
+YOU =  KList( "you", kYOU ).var()
+#########################################
 kYES = ' yes , ok '
 YES = KList("YES",kYES).var()
 kNO = ' no '
 NO = KList("NO",kNO).var()
 YES_NO = KList("YES",kYES).var() | KList("NO",kNO).var()
+yesno = YES_NO.nar()
 
-kYOU = ' you , dentsply '
-YOU =  KList( "you", kYOU ).var()
+#YESCONTEXT = 0
+#NOCONTEXT = 1
+#class YesNoChat( NWChatnode ):
+#    def __init__(self):
+#        self.yes = True
+#        yesno = YES_NO.nar()
+#        A = [ yesno ]
+#        NWChatnode.__init__(self, YES_NO , A)
 
+#    def getContext(self):
+#        if self.yes:
+#            return "YES"
+#        else:
+#            return  "NO"
 
+#    def read(self, segment, tokens ):
+#        readAll(self,segment,tokens)
 
