@@ -252,7 +252,7 @@ class VAR:
             if self.knames[0]=='int' or self.knames[0]=='float':#just for unknowns
                 self.lastConst = f
             else:
-                self.lastConst = self.knames[0]
+                self.lastConst = f #self.knames[0]
             return [self]
 
         vars = []

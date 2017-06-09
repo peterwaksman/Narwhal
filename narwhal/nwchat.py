@@ -22,10 +22,10 @@ class NWChatnode():
                 self.nreaders.append( NWNReader( nar, cals[i] ))
                 i += 1
     
-        self.ibest = -1
-        self.response = ""
-        self.maxGOF = 0.0
-
+        self.ibest = -1    # index of bet fit narrative
+        self.maxGOF = 0.0  # goodness of fit
+        self.response = "" # what chatbot says back
+        #self.Responder = self # who currently answers questions
 
     def bestFitI(self):
         ibest = -1
@@ -41,12 +41,10 @@ class NWChatnode():
 
         return ibest
 
-  
     def readAll( self, segment, tokens ):
         """basic read method, do not call directly. Use respond() """
         for N in self.nreaders:
             N.readText(segment,tokens)
-   
 
     #----Typically the next two methods get overriden in derived classe
     def getContext(self):
@@ -78,4 +76,6 @@ class NWChatnode():
         self.read( segment, tokens )
         return self.response
 
+    #def getResponder(self):
+    #    return self.Responder
  

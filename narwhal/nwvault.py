@@ -244,18 +244,54 @@ def delBelow(ifound,istart):
     return newfound
            
 def recordSlotEvents0( nar, segment):
-    if not isinstance(nar, VAR):
+    if not nar.order==0:
         return None
     r = []
+    i = 0
+    istart = 0
+    T = nar.thing 
+    prevConst = nar.lastConst  
+    ifound = []
     for var in segment:
-        if var<=nar: 
-            nar.ifound.extend(var.ifound)
-            nar.ifound = cleanFound(nar.ifound)
-            nar.found = True
-            nar.polarity = var.polarity
-            nar.lastConst = var.knames[0]
-            r.append( nar.lastConst )
-    return r
+        event = False
+        if var==NULL_VAR:
+            i = i+1
+            continue            
+          
+        if T != NULL_VAR and var<=T:
+            event = True
+            T.ifound.extend(var.ifound)
+            T.ifound = cleanFound(T.ifound)
+            T.found = True
+            if var.knames[0]=='int' or var.knames[0]=='float':
+                T.lastConst = var.lastConst
+            else:
+                T.lastConst = var.lastConst # var.knames[0]
+ 
+        ifound.extend( T.ifound )
+        
+        ifound = delBelow( ifound, istart)
+ 
+        ######## SLOT EVENT #########
+        if event:
+            nar.generateLastConst() 
+
+        if event and prevConst != nar.lastConst: #(for now require a change) 
+            prevConst = nar.lastConst      
+            u = nar.numSlotsUsed()
+            a = nar.numSlotsActive()    
+            GOF = gof(segment, nar, ifound, istart, i)
+            if u == a :   # here, could test GOF vs a threshold    
+                r.append( [ GOF, nar.lastConst] )
+
+                nar.clear()  
+                ifound = []
+                istart = i + 1        
+
+        # here put AND and COMMA processing
+                               
+        i += 1
+    return r  
 
 def recordSlotEvents1(nar, segment):
     r = []
@@ -349,8 +385,7 @@ def recordSlotEvents1(nar, segment):
 
 # I am going to try to write this so it works when nar is of order 1
 def recordSlotEvents(nar,segment):
-
-    r = [] # record to be created
+       
     if nar.order==0 or isinstance( nar, VAR ):
         return recordSlotEvents0(nar,segment)
 
@@ -361,4 +396,10 @@ def recordSlotEvents(nar,segment):
         print "UNDER CONSTRUCTION"
         # here can compose a slot event for subnar into a single event
         # for higher order.
+
+def totalEventGOF( eventrecord ):
+    sum = 0.0
+    for event in eventrecord:
+        sum += event[0]
+    return sum
 
