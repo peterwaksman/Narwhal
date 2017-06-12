@@ -10,8 +10,14 @@ This defines the NWChatnode base class and the ChatManager that
 manages a system of multiple NWChatnodes.
 """
 
+class NWResponder():
+    def __init__(self):
+        self.node = None
+
+######################################
+
 class NWChatnode():
-    def __init__(self,treeroot, nars, cals = []):
+    def __init__(self, treeroot, nars, cals = []):
         self.tree = treeroot.copy()
         self.nreaders = []
         i = 0
@@ -25,7 +31,11 @@ class NWChatnode():
         self.ibest = -1    # index of bet fit narrative
         self.maxGOF = 0.0  # goodness of fit
         self.response = "" # what chatbot says back
-        #self.Responder = self # who currently answers questions
+
+        self.Responder = self # who currently answers questions
+        self.Parent = self # sub classes may take a parent CTOR argument
+                           # it is used to return control
+
 
     def bestFitI(self):
         ibest = -1
@@ -76,6 +86,19 @@ class NWChatnode():
         self.read( segment, tokens )
         return self.response
 
-    #def getResponder(self):
-    #    return self.Responder
- 
+   # if you cannot do this at construction, do it later
+   # it does not change the responder, just this instance NWChatnode instance
+    def setParentAndResponder(self, parent, responder):
+        self.Parent = parent        
+        self.Responder = responder  
+         
+
+
+    def getResponder(self):
+        return self.Responder
+
+    def restoreParentControl(self):
+        self.Responder.node = self.Parent  
+
+
+  

@@ -62,7 +62,7 @@ DULL_OP = dullD.var()
 kCONJUNCTIONS = " and , also , then , but also ,but more "
 
 
-kNEGATIONS = "isn't,wasn't,barely,hardly,unfounded, is not,isnt,"
+kNEGATIONS = "isn't,wasn't,barely,hardly,unfounded, is not,isnt,don't, do not, doesn't, does not,"
 kNEGATIONS += "avoid,rather than,not so,not true,false,nothing # too|being|was|but,"
 kNEGATIONS += " minimum,minimal,neither,forget it,not at all"
 kNEGATIONS += "low # volume|floor,or $ less,difficult to be,poor"
