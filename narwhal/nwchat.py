@@ -14,6 +14,11 @@ class NWResponder():
     def __init__(self):
         self.node = None
 
+    def respond(self, text):
+        s = self.node.respondText(text)
+        return s
+
+
 ######################################
 
 class NWChatnode():
