@@ -178,7 +178,14 @@ def ReadSegment(nar, seg):
                        # redundant in the current code
     
     if ORDER(nar) == 0:
-        return ReadSegment0(nar, seg)
+        if isinstance(nar,NAR):
+            return ReadSegment0(nar.thing, seg)
+        else:
+            return ReadSegment0(nar,seg)
+        #if isinstance(nar,VAR):
+        #    return ReadSegment0(nar, seg)
+        #else:
+        #    return ReadSegment0(nar.thing, seg)
 
     action = nar.action
     relation = nar.relation
@@ -202,8 +209,10 @@ def ReadSegment(nar, seg):
 # In this implementation the ifound's are stored with the vars in the segment
 # This makes reading cleaner. The nar gets its ifound filled here.
 def ReadSegment0(nar, seg):
+    t = isinstance(nar, VAR)
     if not isinstance(nar, VAR):
         return 0
+
     if len(seg) == 0:
         return 0
     foundNow = False
@@ -216,7 +225,8 @@ def ReadSegment0(nar, seg):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 nar.lastConst = var.lastConst
             else:
-                nar.lastConst = var.knames[0]  
+                #nar.lastConst = var.knames[0]  
+                nar.lastConst = var.lastConst 
             foundNow = True
 
     if foundNow:

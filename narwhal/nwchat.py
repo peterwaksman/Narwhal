@@ -32,23 +32,27 @@ class NWChatnode():
         self.maxGOF = 0.0  # goodness of fit
         self.response = "" # what chatbot says back
 
-        self.Responder = self # who currently answers questions
-        self.Parent = self # sub classes may take a parent CTOR argument
-                           # it is used to return control
+        self.responder = None # needs to be set externally
+        #self.responder = self # who currently answers questions
 
+        self.parent = self # sub classes may take a parent CTOR argument
+                           # it is used to return control
+        self.lastConst = ""
 
     def bestFitI(self):
         ibest = -1
         max = 0.0
+        lastConst = ""
         for i in range(len(self.nreaders)):
             N = self.nreaders[i]
             v = N.vault.maxGOF()
             if max < v:
                 max = v
                 ibest = i
+                lastConst = N.vault.lastConst()
 
         self.maxGOF = max
-
+        self.lastConst = lastConst
         return ibest
 
     def readAll( self, segment, tokens ):
@@ -62,7 +66,7 @@ class NWChatnode():
         return str(ibest)
   
     def read(self, segment, tokens):
- 
+
         self.readAll( segment, tokens)# does the read
  
         self.ibest = self.bestFitI() # collects the GOFs
@@ -80,6 +84,7 @@ class NWChatnode():
         print("\n")
         return ibest
 
+
     def respondText(self, text):
         tokens = prepareTokens(text)
         segment = PrepareSegment(self.tree,tokens)
@@ -87,18 +92,16 @@ class NWChatnode():
         return self.response
 
    # if you cannot do this at construction, do it later
-   # it does not change the responder, just this instance NWChatnode instance
+   # it does not change the responder, just this instance
     def setParentAndResponder(self, parent, responder):
-        self.Parent = parent        
-        self.Responder = responder  
-         
-
-
+        self.parent = parent        
+        self.responder = responder  
+ 
     def getResponder(self):
-        return self.Responder
+        return self.responder
 
     def restoreParentControl(self):
-        self.Responder.node = self.Parent  
+        self.responder.node = self.parent  
 
 
   
