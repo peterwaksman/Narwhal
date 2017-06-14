@@ -225,8 +225,9 @@ def ReadSegment0(nar, seg):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 nar.lastConst = var.lastConst
             else:
-                #nar.lastConst = var.knames[0]  
-                nar.lastConst = var.lastConst 
+                nar.lastConst = var.knames[0]  
+                # !!!!!!!! THE SEGMENTS IS BUILT WITH VARs not with lastConst's
+                #nar.lastConst = var.lastConst 
             foundNow = True
 
     if foundNow:
