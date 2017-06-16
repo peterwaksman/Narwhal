@@ -167,7 +167,7 @@ def tabulateSEG2( segment, tokens):
     out = ""
     for i in range(numTokens):
         out += tokens[i].rjust(8) + " " + x[i].rjust(8) + "\n"
-    print out
+    print( out )
     return out
 ################################################
 ################### inner read loop ############
@@ -222,13 +222,15 @@ def ReadSegment0(nar, seg):
             nar.ifound = cleanFound(nar.ifound)
             nar.found = True
             nar.polarity = var.polarity
+            foundNow = True
+
             if var.knames[0]=='int' or var.knames[0]=='float':
                 nar.lastConst = var.lastConst
             else:
                 nar.lastConst = var.knames[0]  
                 # !!!!!!!! THE SEGMENTS IS BUILT WITH VARs not with lastConst's
-                #nar.lastConst = var.lastConst 
-            foundNow = True
+                
+
 
     if foundNow:
         return 1

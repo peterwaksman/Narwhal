@@ -242,10 +242,10 @@ def asFloat(token):
         if token[0]=='-' or token[0]=='+':
             tmp = token[1:]
             if isdigitFL(tmp):
-                if token[0] == '-':
-                    return token # preserve the minus  
+                if token[0] == '-':#if it begins with a minus
+                    return token   # preserve the minus  
                 else:
-                    return tmp   # strip off the plus
+                    return tmp     # strip off the plus
         elif isdigitFL(token):
             return token
         else:

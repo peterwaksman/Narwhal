@@ -230,10 +230,10 @@ class NarVault:
 
 
 
-    ##############################################################
-    # recordSlotEvents() is a substitute for vaulting. A step towards
-    # the "golden" algorithm but lacking polarity and lacking higher order nar support
-    ###############################################################
+##############################################################
+# recordSlotEvents() is a substitute for vaulting. A step towards
+# the "golden" algorithm but lacking polarity and lacking higher order nar support
+###############################################################
 
 def delBelow(ifound,istart):
     newfound = []
@@ -322,7 +322,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 T.lastConst = var.lastConst
             else:
-                T.lastConst = var.knames[0]
+                #T.lastConst = var.knames[0]
+                T.lastConst = var.lastConst
  
         if A != NULL_VAR and var<=A:
             event = True
@@ -332,7 +333,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 A.lastConst = var.lastConst
             else:
-                A.lastConst = var.knames[0]
+                #A.lastConst = var.knames[0]
+                A.lastConst = var.lastConst
  
         if R != NULL_VAR and R != NULL_NAR and var<=R:
             event = True
@@ -342,7 +344,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 R.lastConst = var.lastConst
             else:
-                R.lastConst = var.knames[0]
+                #R.lastConst = var.knames[0]
+                R.lastConst = var.lastConst
  
         if V != NULL_VAR and var<=V:
             event = True
@@ -352,7 +355,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 V.lastConst = var.lastConst
             else:
-                V.lastConst = var.knames[0]
+                #V.lastConst = var.knames[0]
+                V.lastConst = var.lastConst
       
  
         ifound.extend( T.ifound )
@@ -393,7 +397,7 @@ def recordSlotEvents(nar,segment):
         return recordSlotEvents1(nar,segment)
     
     else:
-        print "UNDER CONSTRUCTION"
+        print( "UNDER CONSTRUCTION")
         # here can compose a slot event for subnar into a single event
         # for higher order.
 

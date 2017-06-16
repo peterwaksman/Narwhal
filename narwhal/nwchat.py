@@ -5,6 +5,7 @@ from narwhal.nwvault import *
 from narwhal.nwnreader import *
 
 strAPOLOGY = "Sorry, I did not understand that."
+strINFO = "Here is an link article about"
 """
 This defines the NWChatnode base class and the ChatManager that
 manages a system of multiple NWChatnodes.
@@ -18,6 +19,9 @@ class NWResponder():
         s = self.node.respondText(text)
         return s
 
+    def getContext(self):
+        s = self.node.getContext()
+        return s
 
 ######################################
 
@@ -84,9 +88,9 @@ class NWChatnode():
         # For debug
         N = self.nreaders[ibest]   
         s = N.vault.lastConst() 
-        h = self.getContext()
+        h = self.getContext() 
         print(h + " " + s)
-        print("\n")
+        #print("\n")
         return ibest
 
 

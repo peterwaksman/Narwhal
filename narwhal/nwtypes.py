@@ -265,7 +265,8 @@ class VAR:
                 if child.knames[0]=='int' or child.knames[0]=='float':
                     self.lastConst = foundC
                 else:
-                    self.lastConst = child.knames[0]
+                    #self.lastConst = child.knames[0]
+                    self.lastConst = child.lastConst
 
                 if not alreadyFound: # (non functional)
                     self.polarity = child.polarity
