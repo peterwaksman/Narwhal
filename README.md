@@ -1,4 +1,4 @@
-﻿![ScreenShot](https://github.com/peterwaksman/Narwhal/blob/master/DOCS/Logo.png)
+﻿![ScreenShot](https://github.com/peterwaksman/Narwhal/blob/master/DOCS/CLogo.png)
 
 
  - See "QuickStart.txt" for tutorial sketch 
