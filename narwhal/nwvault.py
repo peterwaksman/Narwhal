@@ -322,8 +322,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 T.lastConst = var.lastConst
             else:
-                #T.lastConst = var.knames[0]
-                T.lastConst = var.lastConst
+                T.lastConst = var.knames[0]
+                #T.lastConst = var.lastConst
  
         if A != NULL_VAR and var<=A:
             event = True
@@ -333,8 +333,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 A.lastConst = var.lastConst
             else:
-                #A.lastConst = var.knames[0]
-                A.lastConst = var.lastConst
+                A.lastConst = var.knames[0]
+                #A.lastConst = var.lastConst
  
         if R != NULL_VAR and R != NULL_NAR and var<=R:
             event = True
@@ -344,8 +344,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 R.lastConst = var.lastConst
             else:
-                #R.lastConst = var.knames[0]
-                R.lastConst = var.lastConst
+                R.lastConst = var.knames[0]
+                #R.lastConst = var.lastConst
  
         if V != NULL_VAR and var<=V:
             event = True
@@ -355,8 +355,8 @@ def recordSlotEvents1(nar, segment):
             if var.knames[0]=='int' or var.knames[0]=='float':
                 V.lastConst = var.lastConst
             else:
-                #V.lastConst = var.knames[0]
-                V.lastConst = var.lastConst
+                V.lastConst = var.knames[0]
+                #V.lastConst = var.lastConst
       
  
         ifound.extend( T.ifound )
@@ -389,7 +389,7 @@ def recordSlotEvents1(nar, segment):
 
 # I am going to try to write this so it works when nar is of order 1
 def recordSlotEvents(nar,segment):
-       
+      
     if nar.order==0 or isinstance( nar, VAR ):
         return recordSlotEvents0(nar,segment)
 

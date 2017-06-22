@@ -224,14 +224,11 @@ def ReadSegment0(nar, seg):
             nar.polarity = var.polarity
             foundNow = True
 
-            if var.knames[0]=='int' or var.knames[0]=='float':
+            if var.isUnknown():#knames[0]=='int' or var.knames[0]=='float':
                 nar.lastConst = var.lastConst
-            else:
+            else: # !!!!!!!! THE SEGMENTS IS BUILT WITH VARs not with lastConst's
                 nar.lastConst = var.knames[0]  
-                # !!!!!!!! THE SEGMENTS IS BUILT WITH VARs not with lastConst's
                 
-
-
     if foundNow:
         return 1
     else:

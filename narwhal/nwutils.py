@@ -220,7 +220,7 @@ def asInt(token):
     else:
         return ''
 
-# assume token has no sign prefix
+# assume utoken has no sign prefix
 def isdigitFL(token):
     pcount = 0 #count periods
     for i in range( len(token) ) :
@@ -228,7 +228,7 @@ def isdigitFL(token):
             pcount += 1
         elif not token[i].isdigit():
             return False
-    if pcount==1: # ints without no decimal are NOT matched
+    if pcount==1:
         return True
     else:
         return False

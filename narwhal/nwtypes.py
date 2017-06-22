@@ -37,6 +37,7 @@ class KList:
         # the KList does not keep track of its last search result
         # it is the responsibility to the client to pass in ifound
         # This method returns True or False
+        # It returns the token that was matched or with ''
     def findInText(self, tokens, itok, ifound):
         return nwfind.findInText(self, tokens, itok, ifound)
 
@@ -221,7 +222,12 @@ class VAR:
                 return x
         return NULL_VAR
 
-  
+    def isUnknown(self):
+        if self.knames[0]=='int' or self.knames[0]=='float':
+            return True
+        else:
+            return False
+
         # Finds VAR matching at itok. Only visit
         # children if no direct match is found
     def findInText2(self, tokens, itok):
@@ -234,9 +240,10 @@ class VAR:
         for kname in self.knames:  # for each name in self's klist
             j+=1
             klist = KList.instances[kname]
+                                    # get last matched token
             f = klist.findInText(tokens, itok, self.ifound)
             if len(f)>0:
-                self.found = True  # could have been true already
+                self.found = True  
                 # this can switch frequently and reflects the last found token
                 if self.exclusive and ikname > 0:
                     self.polarity = False
@@ -245,14 +252,19 @@ class VAR:
 
                 alreadyFound = True
 
+                if self.isUnknown():
+                    self.lastConst = f
+                else:
+                    self.lastConst = self.knames[0]
+
             ikname += 1
 
         # If nothing was found, search iteratively inside the children
         if alreadyFound:
-            if self.knames[0]=='int' or self.knames[0]=='float':#just for unknowns
+            if self.isUnknown() :#just for unknowns
                 self.lastConst = f
             else:
-                self.lastConst = f #self.knames[0]
+                self.lastConst = self.knames[0] # f
             return [self]
 
         vars = []

@@ -17,6 +17,8 @@ class NWResponder():
 
     def respond(self, text):
         s = self.node.respondText(text)
+        if self.node.pending:
+            s = self.node.respondText('')
         return s
 
     def getContext(self):
@@ -47,6 +49,11 @@ class NWChatnode():
         self.parent = self # sub classes may take a parent CTOR argument
                            # it is used to return control
         self.lastConst = ""
+
+        self.pending = False
+
+    def updatePending(self):
+        self.pending = False
 
     def bestFitI(self):
         ibest = -1
