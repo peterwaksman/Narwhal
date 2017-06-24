@@ -120,4 +120,42 @@ class NWChatnode():
         self.responder.node = self.parent  
 
 
-  
+class NWDatanode():
+    def __init__(self, id, treeroot, nar, cal=False):
+        self.id = id
+
+        self.tree = treeroot.copy()
+        self.nar = nar # convenient to use outside the reader
+        self.reader = NWNReader( nar, cal )
+
+        self.lastConst = ''
+        self.GOF = 0.0
+        self.eventrecord = ''
+        self.eventGOF = 0.0
+
+    def clear(self):
+        self.lastConst = ''
+        self.GOF = 0.0
+        self.eventrecord = ''
+
+    def read( self, text ):
+        tokens = prepareTokens(text)
+        segment = PrepareSegment(self.tree, tokens) #not efficient, could do this at higher level,
+
+        self.clear()
+
+        # look for structured data
+        self.eventrecord = recordSlotEvents( self.nar, segment )
+        self.eventGOF = maxEventGOF( self.eventrecord )
+
+        # freeform read
+        self.nar.clear()
+        self.reader.readText(segment,tokens)
+        self.GOF = self.reader.vault.maxGOF()
+        self.lastConst = self.reader.vault.lastConst
+
+    def getEvents(self):
+        out = ''
+        for event in self.eventrecord:
+            out += event[1] + ", "
+        return out

@@ -193,6 +193,8 @@ def cleanAMPM(text):
 
 # I was not able to use a recursive definition inside the VAR.__le__()
 def recursiveLE(self, other):
+    #if isinstance(self, NAR) or isinstant(other,NAR):
+        #x = 2
     if self.knames == other.knames:
         return True
     for child in other.children:

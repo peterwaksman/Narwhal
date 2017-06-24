@@ -310,6 +310,8 @@ def recordSlotEvents1(nar, segment):
     ifound = []
     for var in segment:
         event = False
+        #if var.isA("PERIOD"):
+          #  nar.clear()
         if var==NULL_VAR:
             i = i+1
             continue            
@@ -378,7 +380,8 @@ def recordSlotEvents1(nar, segment):
             if u == a :   # here, could test GOF vs a threshold    
                 r.append( [ GOF, nar.lastConst] )
 
-                nar.clear()  
+                nar.action.clear()  
+                nar.value.clear()
                 ifound = []
                 istart = i + 1        
 
@@ -407,3 +410,9 @@ def totalEventGOF( eventrecord ):
         sum += event[0]
     return sum
 
+def maxEventGOF( eventrecord ):
+    max = 0.0
+    for event in eventrecord:
+        if max<event[0] :
+            max = event[0]
+    return max

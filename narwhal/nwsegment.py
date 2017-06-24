@@ -194,10 +194,10 @@ def ReadSegment(nar, seg):
         return ReadSegmentAsAttribute(nar, seg)
 
         # check encoded operator "events"
-    if action == NAR_SO:
+    if action == VAR_SO:
         return ReadSegmentAsCausal(nar, seg)
 
-    elif action == NAR_THEN:
+    elif action == VAR_THEN:
         return ReadSegmentAsSequential(nar, seg)
 
         # check user-defined events
@@ -291,7 +291,7 @@ def ReadSegmentAsAction(nar, seg):
 
 
 def ReadSegmentAsCausal(nar, seg):
-    if nar.action != NAR_SO:
+    if nar.action != VAR_SO:
         return 0
 
     # check for directionality of the SO_OP token
@@ -396,7 +396,7 @@ def ReadSegmentAsCausal(nar, seg):
 
 
 def ReadSegmentAsSequential(nar, seg):
-    if nar.action != NAR_THEN:
+    if nar.action != VAR_THEN:
         return 0
 
     imax = 0

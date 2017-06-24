@@ -665,7 +665,7 @@ class NAR:
     # NAR.copyUsing returns a "copy" of the same name as self, but
     # using VARs from a other tree
     def copyUsing(self, tree):
-        if self == NAR_SO or self == NAR_THEN:  # these do not get copied
+        if self == VAR_SO or self == VAR_THEN:  # these do not get copied
             return self
 
         if isinstance(self, VAR):  # so it is a var
@@ -690,10 +690,10 @@ class NAR:
         # copies of these "constant" NARs. It means
         # we should never rely on the found or ifound of the VARs beneath
         # these "constants", since different users may also be using them
-        if self.action == NAR_SO:
-            n.action = NAR_SO
-        elif self.action == NAR_THEN:
-            n.action = NAR_THEN
+        if self.action == VAR_SO:
+            n.action = VAR_SO
+        elif self.action == VAR_THEN:
+            n.action = VAR_THEN
         else:
             n.action = self.action.copyUsing(tree)
 
@@ -768,9 +768,9 @@ class NAR:
 
         if relation != NULL_VAR:
             return ATTRIB_NARTYPE
-        elif action == NAR_SO:
+        elif action == VAR_SO:
             return SO_NARTYPE
-        elif action == NAR_THEN:
+        elif action == VAR_THEN:
             return THEN_NARTYPE
         elif action != NULL_VAR:
             return EVENT_NARTYPE
@@ -912,13 +912,13 @@ def event(x, y, act):
 #  - exactly opposite to the usage here.
 
 # a dummy to identify the "cause" type of statement
-NAR_SO = KList("so", "").var().nar()
-NAR_SO.makeImplicit()
+VAR_SO = KList("so", "").var()
+VAR_SO.makeImplicit()
 # the correct word searching is handled by internal lists
 
 # Worth mentioning: the internal list searching marks token indices in ifound[]
 # so those indices are not counted in the r/f part of the gof() formula.
-# Ensuring that NAR_SO and also NAR_THEN (below) are implicit, means ensuring they 
+# Ensuring that VAR_SO and also VAR_THEN (below) are implicit, means ensuring they 
 # are NOT counted as slots in the u/n part of the formula.
 
 
@@ -930,7 +930,7 @@ def cause(x, y):
     n = NAR()
     n.thing = X  # "we were happy"
 
-    n.action = NAR_SO   # (encode a "so" operation)
+    n.action = VAR_SO   # (encode a "so" operation)
     n.value = Y  # "we laughed"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
@@ -945,8 +945,8 @@ def cause(x, y):
 # directionalty,for now, requires using both X,Y and Y,X and you can
 # design code making them equivalent
 # used to identify the "and"/"then" type of statement
-NAR_THEN = KList("then", "").var().nar()
-NAR_THEN.makeImplicit() #revisit
+VAR_THEN = KList("then", "").var() 
+VAR_THEN.makeImplicit() #revisit
 
 
 def sequence(x, y):
@@ -955,12 +955,25 @@ def sequence(x, y):
 
     n = NAR()
     n.thing = X  # "we ate cookies"
-    n.action = NAR_THEN  # (encode a "then" operation)
+    n.action = VAR_THEN  # (encode a "then" operation)
     n.value = Y  # "we ate pie"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
 
 ##########################################
+# the num slots used doesn't work correctly here.
+#def combo(x,y,z,w):
+#    X = a2n(x)
+#    Y = a2n(y)
+#    Z = a2n(z)
+#    W = a2n(w)
+#    n = NAR()
+#    n.thing = X  # "we ate cookies"
+#    n.action = Y
+#    n.relation = Z
+#    n.value = W
+#    n.order = max(ORDER(X), ORDER(Y)) + 1
+#    return n
 
 
 ####################### REFERENCE CONSTANTS for NAR class ################
