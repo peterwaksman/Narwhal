@@ -4,6 +4,8 @@ from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
 
+from stdtrees.quantities import QUANTITY
+
 strAPOLOGY = "Sorry, I did not understand that."
 strINFO = "Here is an link article about"
 """
@@ -141,7 +143,7 @@ class NWDatanode():
     def read( self, text ):
         tokens = prepareTokens(text)
         segment = PrepareSegment(self.tree, tokens) #not efficient, could do this at higher level,
-
+ 
         self.clear()
 
         # look for structured data
@@ -159,3 +161,127 @@ class NWDatanode():
         for event in self.eventrecord:
             out += event[1] + ", "
         return out
+
+    def summary(self):
+        g = self.GOF
+        k = int(1000*g)
+        g = float(k)/1000.0
+        if self.nar.polarity==False and g>0:
+            g = -g
+        e = self.eventGOF
+        L = self.getEvents()
+        ID = self.id.ljust(15)
+        out = ID +  "g=" + str(g).ljust(5) + " " + "    e=" + str(e).ljust(5) + "    events=" + L
+        return out
+
+
+    #######################
+
+def bool32( ):
+    array = []
+    for i in range(33):
+        array.append(False)
+    return array
+def str32():
+    array = []
+    for i in range(33):
+        array.append('')
+    return array
+
+
+class NWChat():
+    def __init__(self, R):
+        self.nodes = R
+
+    def read(self, text ):
+        for node in R:
+            node.read( text )
+
+    def getNode(self, id ):
+        for node in self.nodes:
+            if node.id==id :
+                return node
+   
+
+
+class NBChat( NWChat ):
+    def __init__(self, R):
+        
+        NWChat.__init__(self,R )
+
+        # these should form the backbone of the data
+        self.teeth = bool32()
+
+        self.abtmaterial = str32() #will use slot 0 for name without toothnumber
+
+        self.abutmentsOK = False
+        self.crownsOK = False
+
+            
+    # after a read
+    def updateTeeth( self ):
+        t = self.getNode('toothno')
+        for event in t.eventrecord:
+            if event[0]<0.5:
+                continue
+            if not Value(event[1]):
+                continue
+            ntooth = int( Value(event[1]) )
+
+            if 0<ntooth and ntooth<33:
+                self.teeth[ntooth] = True
+
+    def updateAbutments( self ):
+        mkorder = self.getNode('makeorder')
+
+        polarity = mkorder.nar.polarity # can negate an order
+          
+        for event in mkorder.eventrecord:
+            if event[0] >= 0.5:
+                r = Relation( event[1] )
+                if r=='abutment':
+                    self.abutmentsOK = polarity
+                elif r=='crown':
+                    self.crownsOK = polarity
+     
+    def updateMaterial( self ):
+        getMat = self.getNode('getmaterial') 
+        for event in getMat.eventrecord:   
+            r = Relation( event[1] )
+            v = Value(event[1])
+            if event[0]>0.3 :
+                if r == 'titanium' or r=='zirconia':
+                    self.abtmaterial[0] = r
+                if asInt( v ):
+                    n = int( asInt(v) )
+                    if 0<n and n<33 :
+                        self.abtmaterial[0] = r
+                        self.abtmaterial[n] = r
+        x = 2     
+                           
+    def updata( self ):
+        self.updateTeeth()
+        self.updateAbutments()
+        self.updateMaterial()
+        x = 2
+
+    def respondNext( self ):
+        r = ""
+        if countBool( self.teeth ) ==0:
+            r += "Please enter the tooth numbers"
+
+        elif countStr( self.abtmaterial )==0:
+            r += "Do you want titanium or zirconia abutments?"
+
+        elif not self.abutmentsOK : #or crownsOK):
+            r += "Do you want abutment for those teeth?"
+
+        else:
+            n = countBool( self.teeth )
+            mat = self.abtmaterial[0]
+            r += "OK, I have got " + str(n) + " unit(s) of " + mat + " on teeth: "
+            for i in range(1,len(self.abtmaterial)):
+                if self.abtmaterial[i]:
+                    r += str(i) + ", "
+        return r
+            

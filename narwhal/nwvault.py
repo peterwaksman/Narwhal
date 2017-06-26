@@ -310,8 +310,10 @@ def recordSlotEvents1(nar, segment):
     ifound = []
     for var in segment:
         event = False
-        #if var.isA("PERIOD"):
-          #  nar.clear()
+
+        if var.isA("PERIOD"):
+            nar.clear()
+
         if var==NULL_VAR:
             i = i+1
             continue            

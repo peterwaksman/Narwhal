@@ -127,6 +127,13 @@ def dullCount(ifound, dull, ithresh):
 def countBool(array):
     return sum(1 for i in array if i)
 
+def countStr(array):
+    ret = 0
+    for val in array:
+        if len(val)>0:
+            ret +=1
+    return ret 
+
 
 def showFound(tokens, ifound):
     T = len(tokens)
