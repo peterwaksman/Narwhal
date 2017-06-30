@@ -76,9 +76,11 @@ class VAR:
 
         # ---these are constant in the VAR
         self.knames = []  # a VAR can always have its own KList
+
         # true means VAR represents a binary choice (I did not implement
         # ternary...)
         self.exclusive = False
+
         self.parent = 0  # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
         self.explicit = True  # When False, this allows nars to be multi purpose. Slots that

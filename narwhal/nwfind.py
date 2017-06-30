@@ -15,6 +15,12 @@ Similarly, this notation excludes being preceded by X:
 means text with "X abc" will not be matched by that item from the KList
  
 In both those cases, "abc", without the X, DOES match
+
+EG "tooth numbers" might be a pattern you want to match, separately from "tooth" or 
+"numbers" occurring alone. Those patterns are 
+tooth numbers    - to match "tooth numbers"
+tooth # numbers  - to match "tooth" alone
+tooth $ numbers  - to match "numbers" alone
  
 In this context we also use the '|' character as an "or", so that an entry
 like the following excludes several things at once:
@@ -30,13 +36,13 @@ means match by searcing forward from abc allowing one word in between
 [could be more complicated] before def.
  
 By the way, space before or after a keyword, means its ending (at the space)
-must match the ending of the
-token. Without the space, different beginnings or endings are allowed in
-matching a substring of the token.
+must match the ending of the token. Without the space, different beginnings
+or endings are allowed in matching a substring of the token.
 
 Obviously it could all be greatly improved if keywords implemented regular expressions
 and matchTOK() knew how to handle it. What is important for Narhwal is to keep track
-of the place in the text where the match occurs.
+of the place in the text where the match occurs. Each pattern must be centered on a
+particular token index 'itok'.
 """
 
 from narwhal.nwutils import *
@@ -126,7 +132,7 @@ def matchTOK(kword, itok, ifound, tokens):
     # harm if the keyword starts/ends without space, this allows
     # matching to words with ' ' terminations. We also allow the token
     # to be preceded by a comma or a period, in case someone is
-    # parsing larger units than sentences. It is up to them to
+    # parsing larger units than sentences. It should be up to them to
     # eliminate punctuation before this.
     tok = " " + tokens[itok] + " "
     if tok.find(kword) >= 0:
@@ -224,8 +230,8 @@ def findInText(klist, tokens, itok, ifound):
         # and return with ifound storing itok and any
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
-            # print("Found at itok="+str(itok)+" with kword="+kword+" in klist="+klist)
             ret = tokens[itok]
+            # NOTE this return value is ignored on the client side
     return ret
 
 ###############################################################

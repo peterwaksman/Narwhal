@@ -154,7 +154,7 @@ class NWDatanode():
         self.nar.clear()
         self.reader.readText(segment,tokens)
         self.GOF = self.reader.vault.maxGOF()
-        self.lastConst = self.reader.vault.lastConst
+        self.lastConst = self.reader.vault.lastConst #the method not the value
 
     def getEvents(self):
         out = ''
@@ -192,16 +192,34 @@ def str32():
 class NWChat():
     def __init__(self, R):
         self.nodes = R
+        self.maxGOF = 0.0
+        self.updated = False # becomes true when stored data is changing
 
     def read(self, text ):
-        for node in R:
+        self.maxGOF = 0.0
+        for node in self.nodes:
             node.read( text )
+            if self.maxGOF<node.GOF:
+                self.maxGOF= node.GOF
+            print( node.summary() )
+
+         # absorb the info
+        self.updateAll()
+
+    def updateAll(self):
+        x=2 # do nothing. override in derived class
 
     def getNode(self, id ):
         for node in self.nodes:
             if node.id==id :
                 return node
    
+            
+#######################################################
+#######################################################
+#######################################################
+
+
 
 
 class NBChat( NWChat ):
@@ -209,18 +227,27 @@ class NBChat( NWChat ):
         
         NWChat.__init__(self,R )
 
+        self.inforesponse = ''
+
         # these should form the backbone of the data
         self.teeth = bool32()
 
-        self.abtmaterial = str32() #will use slot 0 for name without toothnumber
+        self.abtmaterial = ''#str32() #will use slot 0 for name without toothnumber
 
         self.abutmentsOK = False
+        self.abutmentsOKPending = False
         self.crownsOK = False
+        #self.crownsOKPending = False
+        self.okcount = 0
 
             
     # after a read
     def updateTeeth( self ):
         t = self.getNode('toothno')
+        mkorder = self.getNode('makeorder') # to disambiguate
+        if mkorder.GOF==1 and t.GOF<=0.5:
+            return
+
         for event in t.eventrecord:
             if event[0]<0.5:
                 continue
@@ -243,45 +270,241 @@ class NBChat( NWChat ):
                     self.abutmentsOK = polarity
                 elif r=='crown':
                     self.crownsOK = polarity
+        if mkorder.GOF>0.6:
+            return True
+
+
      
     def updateMaterial( self ):
         getMat = self.getNode('getmaterial') 
+        askMat = self.getNode('askmaterial')
+        if askMat.GOF>getMat.GOF :
+            return True
         for event in getMat.eventrecord:   
             r = Relation( event[1] )
-            v = Value(event[1])
+            val = Value(event[1])
             if event[0]>0.3 :
                 if r == 'titanium' or r=='zirconia':
-                    self.abtmaterial[0] = r
-                if asInt( v ):
-                    n = int( asInt(v) )
-                    if 0<n and n<33 :
-                        self.abtmaterial[0] = r
-                        self.abtmaterial[n] = r
-        x = 2     
-                           
-    def updata( self ):
-        self.updateTeeth()
-        self.updateAbutments()
-        self.updateMaterial()
-        x = 2
+                    self.abtmaterial =  r
+        return True
+        #            self.abtmaterial[0] = r
+        #        if asInt( val ):
+        #            n = int( asInt(val) )
+        #            if 0<n and n<33 :
+        #                self.abtmaterial[0] = r
+        #                self.abtmaterial[n] = r
+        #x = 2     
+     
+    def updateHi(self):
+        h = self.getNode('hi')
+        if h.GOF>=0.5:
+            return True
+        else:
+            return None
+    
+    def updateAccount(self):
+        a = self.getNode('account')
+        if a.GOF>0.5:
+            return True
+        else:
+            return None   
 
+    def updateAbout(self):
+        a = self.getNode('about')
+        if a.GOF>0.5:
+            return True
+        else:
+            return None   
+             
+    def updateProductInfo(self):
+        p = self.getNode('productinfo')
+        if p.GOF>0.5:
+            return True
+        else:
+            return None        
+                         
+    def updateYesNo(self):
+        yn = self.getNode('yesno')
+        if not yn.eventrecord:
+            return None
+        
+        # extact the yes or no - quite a hassle
+        isYes = None
+        event = yn.eventrecord[0]
+        if event[0]>=0.5:
+            if Value(event[1])=='YES':
+                isYes = True
+            elif Value(event[1])=='NO':
+                isYes = False
+        else:
+            return None
+
+        # apply yes/no to the pending confirmation
+        if self.abutmentsOKPending:
+            self.abutmentsOK = isYes
+            # clear the pending flag
+            self.abutmentsOKPending = False
+
+        return self.abutmentsOK
+
+    def updateInfoRequest(self):
+        self.inforesponse = ''
+        if self.getNode('hi').GOF >= 0.5:
+            self.inforesponse = "Hi, hello, good morning."
+            return True
+
+        node = self.getNode('about')
+        if node.GOF>0.6:
+            T = Thing( node.lastConst() )  
+            if len(T)==0:
+                self.inforesponse = "Please give me a little more information." 
+            elif T=='how':
+                self.inforesponse = "Good, thank you. I finally got my mood swings under control."
+            else:
+                self.inforesponse = "I am Naomibot, hoping to help you order a custom abutment.\
+                \nDo you want abutments or other products?"
+            return True
+
+        node = self.getNode('orderinfo')
+        if node.GOF>0.6:
+            self.inforesponse = "Do you have a case number I can reference?"
+            self.inforesponse += "\n[UNDER CONSTUCTION HERE]"
+            return True
+
+        node = self.getNode('productinfo')
+        val = Value(node.lastConst())
+        if node.GOF>0.6:
+            self.inforesponse = "[HERE SUMMARY about " +val + "].\n[HERE LINK]\n[HERE recommend]"
+            return True
+     
+        node = self.getNode('account') 
+        if node.GOF>0.6:
+            self.inforesponse = "For questions about your account please call Customer Service at 1-844-848-0137" 
+            return True
+        
+        node = self.getNode('askmaterial')
+        if node.GOF > 0.6:
+            self.inforesponse =  "[Ti versus Zr: HERE SUMMARY, RECOMMEND, LINK]"
+            return True
+
+        return False
+                
+    def updateAll( self ):
+        if self.maxGOF==0.0:
+            self.updated = False
+            return
+        #if self.maxGOF==1.0:
+        #    self.updated = True
+        #    return
+
+        self.updated = False
+        if self.updateAbout():
+            self.updated = True
+        if self.updateHi():
+            self.updated = True
+        if self.updateAccount():
+            self.updated = True
+        if self.updateProductInfo():
+            self.updated = True
+        if self.updateYesNo():
+            self.updated = True        
+        if self.updateTeeth():
+            self.updated = True
+        if self.updateAbutments():
+            self.updated = True
+        if self.updateMaterial():
+            self.updated = True
+   
     def respondNext( self ):
+        if self.updated==False:
+            return "I wish I could help with that. My porpoise is to help you make an order\
+            \nor help if you have questions about our abutments, crowns, and bridge products. "
+        else: # reset for future use 
+            self.updated = False
+
+        # deflect questions
+        if self.updateInfoRequest():
+            return self.inforesponse
+
         r = ""
         if countBool( self.teeth ) ==0:
             r += "Please enter the tooth numbers"
 
-        elif countStr( self.abtmaterial )==0:
+ #       elif countStr( self.abtmaterial )==0:
+        elif len( self.abtmaterial)==0:
             r += "Do you want titanium or zirconia abutments?"
 
-        elif not self.abutmentsOK : #or crownsOK):
-            r += "Do you want abutment for those teeth?"
+        elif not self.abutmentsOK: #or crownsOK):
+            if self.okcount==0: 
+                r += "Do you want abutments for those tooth numbers?" # A YESNO
+                self.okcount = 1
+            else: # (so customer already said "no" once
+                r += "OK, let's leave that blank for now, and add crowns etc later\n"
+                r += self.simpleOrderString()
+                self.okcount = 0
+            self.abutmentsOKPending = True
 
         else:
-            n = countBool( self.teeth )
-            mat = self.abtmaterial[0]
-            r += "OK, I have got " + str(n) + " unit(s) of " + mat + " on teeth: "
-            for i in range(1,len(self.abtmaterial)):
-                if self.abtmaterial[i]:
-                    r += str(i) + ", "
+            r = self.simpleOrderString()
+        
+        if r=='':
+            r = "Oops. My programmers missed the possibility you would say that"
+
         return r
+
+    def simpleOrderString(self):
+        r = ""
+        c = countBool(self.teeth)
+        if countBool(self.teeth)==1:
+            th = "tooth "
+        else:
+            th = "teeth "
             
+        n = countBool( self.teeth )
+        mat = self.abtmaterial 
+        q = ''  
+        if self.crownsOK and self.abutmentsOK:
+            q = " abutment/crown"
+
+        r += "So far, I have " + str(n) + q + " unit(s) of " + mat + " on " + th
+        for i in range(1,len(self.teeth)):
+            if self.teeth[i]:
+                r += "#"+str(i) + ", "
+        r += "\nShall we continue with your patient data? \nScans, interface IDs, etc?"
+        return r
+
+    def getOrder(self):
+        order = Order()
+
+        # get the abutments
+        mat = self.abtmaterial 
+        if self.abutmentsOK and countBool( self.teeth )>0:
+            for i in range(0,33):
+                if self.teeth[i]:
+                    abutment = Abutment()
+                    abutment.material = mat
+                    abutment.tooth_number = i
+                    order.abutments.append( abutment )
+        
+        # transfer referece
+
+        # transfer scanner name
+
+        return order
+        
+
+
+class Abutment(object):
+    def __init__(self):
+        self.tooth_number = 0 # 1-32
+        self.material = ''# "Titanium" # Ti or Zr
+
+class Order(object):
+    def __init__(self):
+        self.reference = "" # user-entered order identifier
+        self.scanner = "" # the scanner being used in the lab -- 3SHAPE etc.
+        self.tooth_numbering_system = "US" # US, FDI
+
+        self.abutments = [] # abutment objects
+ 
+                    
