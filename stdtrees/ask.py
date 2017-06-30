@@ -20,7 +20,7 @@ kHOW = " how # much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , to find out, finding out, what are, status , check , to check , verify ,\
+kWHAT = " what , are you, to find out, finding out, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
@@ -62,7 +62,7 @@ REQUEST = KList( "request", kREQUEST ).var()
 #########################################
 # not really quantities but what the heck
 
-kYOU = ' you , dentsply '
+kYOU = ' you , dentsply, person '
 YOU =  KList( "you", kYOU ).var()
 #########################################
 kYES = ' yes , ok , y , done , no problem'
@@ -147,3 +147,10 @@ class YesNoChat( NWChatnode ):
 def OK(parent, responder, lbool):
     Y = YesNoChat(parent,responder, lbool)
     responder.node = Y
+
+
+######################################
+######################################
+kUNDO = " undo, no , not that, no that's not right, no that is not right, wrong,\
+cancel, cancel that, not right, not what I want, redo, redo that"
+UNDO = KList( "undo", kUNDO ).var()
