@@ -1,3 +1,7 @@
+July 3:
+Building out the chatbot platform, with NWDataNode, TopicTree,
+and NWChat.
+
 June 6
 Major additions: 
  - New form of vaulting called recordSlotEvents()
