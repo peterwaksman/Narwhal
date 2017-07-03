@@ -381,12 +381,14 @@ def recordSlotEvents1(nar, segment):
             GOF = gof(segment, nar, ifound, istart, i)
             if u == a :   # here, could test GOF vs a threshold    
                 r.append( [ GOF, nar.lastConst] )
-
                 nar.action.clear()  
                 nar.value.clear()
                 ifound = []
                 istart = i + 1        
-
+            else:
+                nar.action.clear()  #?
+                nar.value.clear()   #?
+                istart = i + 1
         # here put AND and COMMA processing
                                
         i += 1

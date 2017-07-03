@@ -331,3 +331,16 @@ def Value(lastConst):
     if len(temp)<4 :
         return ''
     return temp[3]
+
+
+def bool32( ):
+    array = []
+    for i in range(33):
+        array.append(False)
+    return array
+
+def str32():
+    array = []
+    for i in range(33):
+        array.append('')
+    return array
