@@ -136,10 +136,10 @@ I am using 'x' to indicate "unknown"
 """
 
 kINT = " __d__ "
-INTx = KList("int", kINT).var()
+INTx = KList('int', kINT).var()
 # See the connection to the asInt() method in nwutils.pw
 
 kFLOAT = " __fl__ "
-FLOATx = KList("float", kFLOAT).var()
+FLOATx = KList('float', kFLOAT).var()
 # See the connection to the asFloat() method in nwutils.pw
 
