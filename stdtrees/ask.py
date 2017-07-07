@@ -5,11 +5,9 @@ can re-arrange it or sub divide it if you like.
 
 """
 from narwhal.nwtypes import * #KList, attribute
-from narwhal.nwchat import NWChatnode, strAPOLOGY
+from narwhal.nwchat import strAPOLOGY
 from narwhal import nwutils as nwu
 from narwhal import nwvault as nwv
-
-
 
 
 # in spoken language this can be an inflection 
@@ -20,7 +18,7 @@ kHOW = " how # much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , how $ are you, to find out, finding out, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how $ are you, to find out, finding out, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
@@ -75,78 +73,7 @@ YES_NO = KList("yesno", "yesno" ).var()
 YES_NO.sub(YES)
 YES_NO.sub(NO)
 
-""" 
-YES_NO could be handled several different ways:
- - as a nar based on a var with polarity. In this case slot Events will
-   not be useful because the last const is not a VAR name but a token
- - as a nar based on a var parent (yesno) with two children ( yes and no)
-   In that case the name of the child found would be available instead of the
-   lastConst. 
- - as an two valued "unknown", tested using recordSlotEvents(), and readable
- from the lastConst. However there are too many spellings to check for that 
- too work well.
- 
- I guess you cannot have your cake (two alternate values) and eat it too 
- (have the value equal what was typed). So I do the first option. 
-"""
 yesno = attribute([YOU], YES_NO )
-
-class YesNoChat( NWChatnode ):
-    def __init__(self, parent, responder, lbool):
-        self.yes = True
-
-        NWChatnode.__init__(self, YES_NO , [ yesno ])
-        self.parent = parent
-        self.responder = responder
-        self.lbool = lbool # a list of answers
-        x = 2
-
-    def getContext(self):
-        return "YES/NO"
-
-    def read(self,segment,tokens):
-
-        self.readAll( segment, tokens) 
- 
-        self.ibest = self.bestFitI() 
-
-        ibest = self.ibest # onely one nar, so -1 or 0
-
-        eventrecord = nwv.recordSlotEvents(yesno, segment)
-        val = None
-        for event in eventrecord :
-            val = nwv.Value( event[1] ) # phew!
-
-        if ibest<0:
-            self.response = strAPOLOGY
-            val = ''
-            self.yes = None
-        else:   
-            if val=='YES':
-               polarity = True
-            else:
-                polarity = False
-
-            #polarity = self.nreaders[0].nar.polarity # see above comment
-            self.yes = polarity
-            self.parent.lastConst = val
-            self.response = '' #haven't thought of a reason to use this
-
-        self.restoreParentControl()
-
-        #self.parent.lastConst = nwu.Value( self.lastConst )
-
-
-        if self.yes==True or self.yes==False: 
-            self.lbool.append( self.yes )
-
-        return ibest
-
-
-
-def OK(parent, responder, lbool):
-    Y = YesNoChat(parent,responder, lbool)
-    responder.node = Y
 
 
 ######################################
