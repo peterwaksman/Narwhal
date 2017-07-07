@@ -223,7 +223,6 @@ class NarVault:
                 sign = "-"
             i = lastIFound( r.ifound )
             if 0 <= i and i < numTokens:
-                #x[i] =  "{0:.4g}".format(r.GOF) + sign
                 x[i] =  sign + "{0:.4g}".format(r.GOF) 
                 #x[i] +=  " " + r.lastConst
         return x
@@ -306,7 +305,6 @@ def recordSlotEvents1(nar, segment):
     R = nar.relation
     V = nar.value
     prevConst = nar.lastConst  
-    #event = False
     ifound = []
     for var in segment:
         event = False
@@ -327,7 +325,6 @@ def recordSlotEvents1(nar, segment):
                 T.lastConst = var.lastConst
             else:
                 T.lastConst = var.knames[0]
-                #T.lastConst = var.lastConst
  
         if A != NULL_VAR and var<=A:
             event = True
@@ -338,9 +335,12 @@ def recordSlotEvents1(nar, segment):
                 A.lastConst = var.lastConst
             else:
                 A.lastConst = var.knames[0]
-                #A.lastConst = var.lastConst
  
-        if R != NULL_VAR and R != NULL_NAR and var<=R:
+        # remember this small bit of pain
+        #h = isNullNar(R)
+        #if not h and R!= NULL_VAR and R != NULL_NAR and var<=R:
+        # not needed now, since NULL_NAR is copied correctly (i.e. NOT)
+        if R!= NULL_VAR and R != NULL_NAR and var<=R:
             event = True
             R.ifound.extend(var.ifound)
             R.ifound = cleanFound(R.ifound)
@@ -349,7 +349,6 @@ def recordSlotEvents1(nar, segment):
                 R.lastConst = var.lastConst
             else:
                 R.lastConst = var.knames[0]
-                #R.lastConst = var.lastConst
  
         if V != NULL_VAR and var<=V:
             event = True
@@ -360,13 +359,12 @@ def recordSlotEvents1(nar, segment):
                 V.lastConst = var.lastConst
             else:
                 V.lastConst = var.knames[0]
-                #V.lastConst = var.lastConst
-      
+     
  
         ifound.extend( T.ifound )
         ifound.extend( A.ifound )
         if R!=NULL_NAR:
-            ifound.extend( R.ifound )
+             ifound.extend( R.ifound )
         ifound.extend( V.ifound )
         ifound = delBelow( ifound, istart)
  

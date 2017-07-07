@@ -173,6 +173,8 @@ class VAR:
 
     # call this once, usually on the root node of the tree
     def copy(self):
+        if self==NULL_VAR:
+            return NULL_VAR
         v = VAR()
         v.knames = self.knames
         v.exclusive = self.exclusive
@@ -196,6 +198,8 @@ class VAR:
 
 
     def copyUsing(self, tree):
+        if self==NULL_VAR:
+            return self
         name = self.knames[0]
         #print(name+ "\n")
         if not isinstance(tree, VAR):
@@ -476,12 +480,13 @@ class VAR:
 
 # -----------ZERO for VAR type
 NULL_VAR = NULL_KLIST.var()
-
+# NOTE: when copying, but NULL_VAR and NULL_NAR are returned without being copied;
 
 
 #######################################################################
 #                            NAR                                      #
 #######################################################################
+
 class NAR:
     """
     NAR - the nestable entities that wrap VARs or other NARs. They are 
@@ -588,6 +593,8 @@ class NAR:
 
     # this copy uses the same VARs in the same tree as the original
     def copy(self):
+        if self==NULL_NAR:
+            return NULL_NAR
         n = NAR()
         n.order = self.order
         n.polarity = self.polarity
@@ -822,8 +829,19 @@ class NAR:
 #####################################################
 
 
-# ------------ZERO for NAR() type
+ 
 NULL_NAR = NULL_VAR.nar()  # used as a default arg
+# NOTE: when copying, but NULL_VAR and NULL_NAR are returned without being copied;
+
+def isNullNar( R ):
+    if not isinstance(R,NAR):
+        return False
+    T = R.thing
+    if isinstance(T,VAR) and T.isA('nullK'):
+        return True
+    else:
+        return False
+
 
 # NOTE: NULL_VAR is used to indicate an uninitialized NAR
 # and NULL_NAR is used to indicate a NAR that is empty. NULL_NAR
@@ -870,6 +888,7 @@ def a2n(arg):
 # TODO: put in a check for this
 
 def attribute(x, y, rel=NULL_NAR):
+#def attribute(x, y, rel=NULL_VAR):
     X = a2n(x)  # interpret args
     Y = a2n(y)
     REL = a2n(rel)
