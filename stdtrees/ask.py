@@ -60,7 +60,7 @@ REQUEST = KList( "request", kREQUEST ).var()
 #########################################
 # not really quantities but what the heck
 
-kYOU = ' you , dentsply, person '
+kYOU = ' you , dentsply, person , your '
 YOU =  KList( "you", kYOU ).var()
 #########################################
 kYES = ' yes , ok , y , done , no problem'
