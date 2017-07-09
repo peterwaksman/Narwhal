@@ -67,7 +67,7 @@ def findInSegment(segment, itok):
 def getLo(segment):
     lo = 10000
     for var in segment:
-        if var == NULL_VAR:
+        if var == NULL_VAR or len(var.ifound)==0:
             continue
         x = max(var.ifound)
         if lo > x:
@@ -78,7 +78,7 @@ def getLo(segment):
 def getHi(segment):
     hi = -1
     for var in segment:
-        if var == NULL_VAR:
+        if var == NULL_VAR or len(var.ifound)==0:
             continue
         x = max(var.ifound)
         if hi < x:

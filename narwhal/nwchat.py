@@ -73,6 +73,7 @@ class NWDatanode():
 
 
 #######################
+
 class TopicTree():
     def __init__(self, treeroot, datanodes):
         self.tree = treeroot.copy()
