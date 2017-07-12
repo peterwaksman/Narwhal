@@ -231,6 +231,7 @@ def findInText(klist, tokens, itok, ifound):
         # adjacent indices used during the matching
         if matchTOK(kword, itok, ifound, tokens):
             ret = tokens[itok]
+            x = 2
             # NOTE this return value is ignored on the client side
     return ret
 

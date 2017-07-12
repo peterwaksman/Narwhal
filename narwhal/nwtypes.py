@@ -189,6 +189,8 @@ class VAR:
         v.lastConst = self.lastConst 
 
         for child in self.children:
+            if isinstance(child, KList):
+                x = 2
             newchild = child.copy()
             v.children.append(newchild)
 

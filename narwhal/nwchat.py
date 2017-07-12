@@ -129,7 +129,8 @@ class NWChat():
         for topic in self.topics:
             if topic.tree.knames[0]==id :
                 return topic
- 
+
+    # tid and nid are, respectively, names of a datanode and its TREE
     def getNode( self, tid, nid):
         topic = self.getTopic( tid )
         if topic:
