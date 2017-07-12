@@ -18,12 +18,12 @@ kHOW = " how # much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , what about , how $ are you, to find out, finding out, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how $ are , to find out, finding out, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
 kDOES = " do you , does it , can it " #asking about possibility
-kCAN = " can I , may I , will you , can you " # asking permission for an action
+kCAN = " can I , may I , will , can " # asking permission for an action
 kAMOUNT = " how much , how often , how well , how many " #asking for a quantity
 
 
