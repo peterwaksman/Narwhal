@@ -1,4 +1,5 @@
 """
+DEPRECATED, HERE FOR OLD APPS
 nwapp.py contans the NWApp object. This is the (new) official narwhal 
 application object. 
 """
