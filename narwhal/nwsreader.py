@@ -1,4 +1,5 @@
 """
+DEPRECATED
 nwreader.py contains the NWSReader object, the highest level reader. 
 
 Members include:
