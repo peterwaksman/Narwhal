@@ -36,10 +36,12 @@ def PrepareSegment(tree, tokens):
     seg = []
     itok = 0
     for itok in range(len(tokens)):
+        # LEAVE IN OR TAKE OUT? After all, it is WRONG
         # here is the "criminal" line.
-        if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
-            seg.append(NULL_VAR)
-            continue
+
+        #if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
+        #    seg.append(NULL_VAR)
+        #    continue
         vars = tree.findInText2(tokens, itok)
         # findInText2() can return a list of all vars matching here.
         if len(vars) > 0:

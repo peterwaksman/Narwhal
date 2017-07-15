@@ -128,10 +128,10 @@ class NWNReader:
 
             
         record = self.makeRecord(segment, istart, CD.ictrl,tokens)
-        #if record == None :
-        #    # For now, really just istart = istart+1
-        #    istart = istart + 1 
-        #    return istart
+        if record == None :
+            # For now, really just istart = istart+1
+            istart = istart + 1 
+            return istart
 
         if CD.type == END_CTRLTYPE:
             self.rollUpAndVault(record, 0.1)
@@ -180,7 +180,7 @@ class NWNReader:
             self.clear()   
 
         else:
-            print("did not apply contol: " + CTRL.knames[0])
+            print("did not apply contol: " + CD.ctrl.knames[0])
             self.clearIFound()
             return istart + max(1, len(CD.ctrl.ifound))
 
