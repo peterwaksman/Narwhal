@@ -125,11 +125,10 @@ class NWNReader:
     def applyControl(self, CD, istart, segment,tokens):
         if CD.type == NO_CTRLTYPE:
             return istart
-
             
         record = self.makeRecord(segment, istart, CD.ictrl,tokens)
         if record == None :
-            # For now, really just istart = istart+1
+            self.rollUp(None, 0.5 )
             istart = istart + 1 
             return istart
 

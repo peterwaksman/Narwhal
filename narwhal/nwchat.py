@@ -8,6 +8,7 @@ from stdtrees.quantities import QUANTITY
 
 strAPOLOGY = "Sorry, I did not understand that."
 strINFO = "Here is an link article about"
+strDETAILS = "Are there any details you would like to add?"
 
 """ NWDatanode
  Poorly named. This merges reading from NWNReader and from ReadSlotEvents()
@@ -74,11 +75,12 @@ class NWDatanode():
 
 #######################
 
-class TopicTree():
+class TopicFamily():
     def __init__(self, treeroot, datanodes):
         self.tree = treeroot.copy()
         self.nodes = datanodes
         self.maxGOF = 0.0
+        self.pastSegment = [] #track conversations
 
     def read(self,text):
         # (inefficient but leaves the door open to tree specific customization)
@@ -92,6 +94,10 @@ class TopicTree():
 
             if self.maxGOF<node.GOF: #update
                 self.maxGOF= node.GOF
+
+        # might as well keep a record
+        self.pastSegment.append(segment)
+
 
     def summary(self):
         out = self.tree.knames[0] + ":\n"
@@ -107,7 +113,7 @@ class TopicTree():
 #######################################################
 #######################################################
 #######################################################
-# init with an array of TopicTrees
+# init with an array of TopicFamilies
 class NWChat():
     def __init__(self, topics):
         self.topics = topics
