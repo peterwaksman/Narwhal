@@ -127,10 +127,12 @@ class NWNReader:
             return istart
             
         record = self.makeRecord(segment, istart, CD.ictrl,tokens)
-        if record == None :
-            self.rollUp(None, 0.5 )
-            istart = istart + 1 
-            return istart
+
+        # connected to negation processing.
+        #if record == None :
+        #    self.rollUp(None, 0.5 )
+        #    istart = istart + 1 
+        #    return istart
 
         if CD.type == END_CTRLTYPE:
             self.rollUpAndVault(record, 0.1)
