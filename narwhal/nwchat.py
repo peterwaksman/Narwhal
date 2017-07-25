@@ -30,6 +30,7 @@ class NWDatanode():
         self.eventGOF = 0.0
 
     def clear(self):
+        self.nar.clear()
         self.lastConst = ''
         self.GOF = 0.0
         self.eventrecord = ''
@@ -81,11 +82,12 @@ class TopicFamily():
         self.nodes = datanodes
         self.maxGOF = 0.0
         self.pastSegment = [] #track conversations
-
+        self.numtokens = 0
     def read(self,text):
         # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
- 
+        self.numtokens = len(tokens) #useful
+
         segment = PrepareSegment(self.tree, tokens) 
 
         self.maxGOF = 0.0
@@ -118,10 +120,12 @@ class NWChat():
     def __init__(self, topics):
         self.topics = topics
         self.updated = False # becomes true when stored data is changing
+        self.numtokens = 0   #you'll see why this is helpful
 
     def read(self, text ):
         for topic in self.topics:
             topic.read( text )         
+            self.numtokens = topic.numtokens
             print( topic.summary() )
 
          # absorb the info

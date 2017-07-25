@@ -23,7 +23,7 @@ from narwhal.nwcontrol import *
 """ 
 The heart of Narwhal in some ways, yet this code is wrong.
 In fact, PrepareSegment() should loop through all the VARS in the 
-tree. The current code may fail to set the ifound for VARs in the
+tree [it does now]. The current code may fail to set the ifound for VARs in the
 tree ocurring later than ones found first. See the "criminal" line
 of code below.
 """
@@ -42,6 +42,8 @@ def PrepareSegment(tree, tokens):
         #if (itok in tree.ifound) or (itok in GENERAL_OP.ifound):
         #    seg.append(NULL_VAR)
         #    continue
+
+        var = None
         vars = tree.findInText2(tokens, itok)
         # findInText2() can return a list of all vars matching here.
         if len(vars) > 0:
