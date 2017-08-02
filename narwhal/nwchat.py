@@ -83,6 +83,7 @@ class TopicFamily():
         self.maxGOF = 0.0
         self.pastSegment = [] #track conversations
         self.numtokens = 0
+
     def read(self,text):
         # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
