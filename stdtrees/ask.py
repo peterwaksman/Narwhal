@@ -18,7 +18,7 @@ kHOW = " how # much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , what about , how $ are , to find out, finding out, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how $ are , show me, to find out, finding out, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
@@ -52,15 +52,15 @@ QUESTION.sub(AMOUNT)
 
 ########################################
 ########################################
-kREQUEST = ' please , use , build , ask for , sell me , fabricate , produce , provide ,\
+kREQUEST = ' you get, please , use , build , ask for , sell me , fabricate , produce , provide ,\
  provide me , make #an , make me , to make , my|the|an $ order , to order ,\
- want , want to , want you to, need ,need to , need you to, give me ,  '
+ want , want to , want you to, need ,need to , need you to, give me ,add,'
 REQUEST = KList( "request", kREQUEST ).var()
 
 #########################################
 # not really quantities but what the heck
 
-kYOU = ' you , dentsply, person , your '
+kYOU = ' you # get, dentsply, person , your '
 YOU =  KList( "you", kYOU ).var()
 #########################################
 kYES = ' yes , ok , y , done , no problem'
