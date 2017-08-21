@@ -3,6 +3,7 @@ from narwhal.nwutils import *
 from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
+from narwhal.nwcontext import *
 
 from stdtrees.quantities import QUANTITY
 
@@ -81,27 +82,49 @@ class TopicFamily():
         self.tree = treeroot.copy()
         self.nodes = datanodes
         self.maxGOF = 0.0
-        self.pastSegment = [] #track conversations
         self.numtokens = 0
+
+        self.context = [] # will be extended with segments during read, and
+                          # and with response VARs during 
+        #self.contextLen = [] # will store the num VARs in each addition to the context
 
     def read(self,text):
         # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
         self.numtokens = len(tokens) #useful
-
+        
         segment = PrepareSegment(self.tree, tokens) 
 
+        self.context.extend(segment)
+      
+        # now read and generate a response
         self.maxGOF = 0.0
         for node in self.nodes:
             node.readSegment( segment, tokens )
 
             if self.maxGOF<node.GOF: #update
                 self.maxGOF= node.GOF
-
-        # might as well keep a record
-        self.pastSegment.append(segment)
-
-
+        
+        # if you barely made it (low GOF), see if you can grab some 
+        # context(these lines of code will take some doing)
+        if 0.3<= self.maxGOF and self.maxGOF<=0.5: 
+            # scan segment for context operators
+            # if found, use to extend current segment with context VARs
+            ext = []
+            newseg = []
+            for var in segment:
+                newseg.append(var)
+                if var.contextFn:
+                    ext = var.contextFn( self.tree, self.context)
+                    newseg.extend( ext ) #insert
+            if ext:
+                for node in self.nodes:
+                    node.readSegment( newseg, tokens )
+                if self.maxGOF<node.GOF: #update
+                    self.maxGOF= node.GOF
+            # we do not add the newseg to the context because its elements are already there
+            # this package of those elements is used for the readSegment() only.
+  
     def summary(self):
         out = self.tree.knames[0] + ":\n"
         for node in self.nodes:
@@ -122,6 +145,8 @@ class NWChat():
         self.topics = topics
         self.updated = False # becomes true when stored data is changing
         self.numtokens = 0   #you'll see why this is helpful
+        self.rawmode = False
+        self.responseVARs = []
 
     def read(self, text ):
         for topic in self.topics:
@@ -133,9 +158,24 @@ class NWChat():
         self.updateAll()
 
     def updateAll(self):
-        x=2 # do nothing. override in derived class
+        x=2 # do nothing. override in derived classes
 
 
+    def RespondNext( self ):
+        x = 2 # override in derived classes
+
+
+    def respondNext( self ):
+        self.responseVARs = [] # to store internally generated VARs for addition to the context
+
+        response = self.RespondNext() # also sets the self.responseVARs, per derived class
+
+        for topic in self.topics:
+            topic.context.extend( self.responseVARs )
+  
+        return response
+
+ 
     def getTopic(self, id ):
         for topic in self.topics:
             if topic.tree.knames[0]==id :

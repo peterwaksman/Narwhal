@@ -62,11 +62,25 @@ def PrepareSegment(tree, tokens):
                 seg.append(NULL_VAR)
     return seg
 
+# same as PrepareSegment, but only uses topic tree
+def PrepareSimpleSegment(tree, tokens):
+    tree.clear()
+    seg = []
+    itok = 0
+    for itok in range(len(tokens)):
+        var = None
+        vars = tree.findInText2(tokens, itok)
+        if len(vars) > 0:
+            for var in vars:
+                var.ifound = cleanFound(var.ifound)
+                newvar = var.copy()
+                seg.append(newvar)
+    return seg
+
+
     # a sort of inverse to findInText2()
     # you return with the first var whose ifound contains itok
     # or else return NULL_VAR
-
-
 def findInSegment(segment, itok):
     for var in segment:
         if itok in var.ifound:

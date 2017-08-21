@@ -9,6 +9,14 @@ The NAR is a four part narrative with actor, action, relation, and target
 from narwhal import nwfind
 from narwhal import nwutils
 
+# These define "casting" operations to convert and insert past conversation 
+#  into current sentences
+NO_CONTEXT = 0
+ALTERNATIVE_CONTEXT = 1
+GROUP_CONTEXT = 2
+MERGE_CONTEXT = 3
+SEQUENCE_CONTEXT = 4
+
 
 class KList:
     """ 
@@ -28,12 +36,12 @@ class KList:
         KList.instances[name] = self  # syntax: klist = KList.instances[ name ]
 
 
-    def var(self):  # turn a KList into a VAR. Known as a "KList VAR"
-        Z = VAR()
+    def var(self, contextFn=None):  # turn a KList into a VAR. Known as a "KList VAR"
+        Z = VAR(contextFn)
         Z.knames.append(self.name)
         return Z
 
-
+ 
         # the KList does not keep track of its last search result
         # it is the responsibility to the client to pass in ifound
         # This method returns True or False
@@ -72,7 +80,7 @@ class VAR:
 
     foundInChildren - means a child of the VAR node found a match
     """
-    def __init__(self):
+    def __init__(self, contextFn=None):
 
         # ---these are constant in the VAR
         self.knames = []  # a VAR can always have its own KList
@@ -81,6 +89,9 @@ class VAR:
         # ternary...)
         self.exclusive = False
 
+        # added at later date, to handle retrieving past words.
+        self.contextFn = contextFn
+
         self.parent = 0  # makes a VAR into a tree node, but tree info is lost by operators
         self.children = []
         self.explicit = True  # When False, this allows nars to be multi purpose. Slots that
@@ -88,6 +99,9 @@ class VAR:
         # into the GOF formula. Non-explicit VARs are called 'implicit'
         # If an implicit is not 'found' then, functionally, the nar just
         # becomes shorter
+
+         #some VAR can get labelled otherwise
+        self.contextType = NO_CONTEXT
 
         # FOR READING:
         self.found = False
@@ -102,7 +116,8 @@ class VAR:
         #become set to last read var<=this
         self.lastConst = "" 
 
-      
+       
+
     def __le__(self, other):
         """ typically a "var<=nar" means the var is a child or itself"""
         return nwutils.recursiveLE(self, other)
@@ -180,6 +195,9 @@ class VAR:
         v.exclusive = self.exclusive
         if self.parent == 0:
             v.parent = 0
+
+        v.contextType = self.contextType
+        v.contextFn = self.contextFn
 
         v.found = self.found
         v.ifound = self.ifound[:]
@@ -451,9 +469,12 @@ class VAR:
     # note this does not climb up the tree of parents returning true if foundInChildren
     # This only returns true for the self VAR's knames[0] argument
     # nor does it climb down the tree searching for childern. (Gosh someone
-    # should do that)
+    # should do that: see __le__())
     def isA(self, name):
         return name == self.knames[0]
+
+    def equals(self, other):
+        return self.knames[0]== other.knames[0]
 
     #def __eq__(a,b):
     #    return a.knames[0]== b.knames[0]
@@ -478,6 +499,15 @@ class VAR:
             return self
         else:            # found in child or beneath it 
             return L[0]
+
+        """ We assume the context is saved first-to-last
+        and it is the contextFn's job to re-order as last-to-first.
+        This method returns a list of VARs
+        """
+    def findInContext(self, context):
+        if self.contextFn:
+            return self.contextFn( self, context )
+        # else return None
 
 
 # -----------ZERO for VAR type
