@@ -8,6 +8,7 @@ from narwhal.nwtypes import * #KList, attribute
 from narwhal.nwchat import strAPOLOGY
 from narwhal import nwutils as nwu
 from narwhal import nwvault as nwv
+from narwhal.nwcontext import *
 
 
 # in spoken language this can be an inflection 
@@ -48,7 +49,7 @@ QUESTION.sub(WHY)
 QUESTION.sub(DOES) 
 QUESTION.sub(CAN) 
 QUESTION.sub(AMOUNT)
-
+QUESTION.sub(DIFF)
 
 ########################################
 ########################################
