@@ -4,6 +4,7 @@ from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
 from narwhal.nwcontext import *
+from narwhal.nwlog import NWLog
 
 from stdtrees.quantities import QUANTITY
 
@@ -148,7 +149,13 @@ class NWChat():
         self.rawmode = False
         self.responseVARs = []
 
+        self.log = NWLog()
+        self.loggingOn = True
+
     def read(self, text ):
+        if self.loggingOn:
+            self.log.add("Q: "+text + "\n")
+
         for topic in self.topics:
             topic.read( text )         
             self.numtokens = topic.numtokens
@@ -173,6 +180,9 @@ class NWChat():
         for topic in self.topics:
             topic.context.extend( self.responseVARs )
   
+        if self.loggingOn:
+            self.log.add("A: "+ response + "\n\n")
+
         return response
 
  
