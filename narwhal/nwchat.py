@@ -165,6 +165,20 @@ class NWChat():
         self.updateAll()
 
     def updateAll(self):
+        """ 
+        To be overridden in derived classes. Assuming a derived class contains a data object "meta"
+        and a narrative narX, we might call meta.updateX( narX ) after a read() and consider accessing 
+        these sorts of values 
+         - is narX==None?
+         - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
+         - is narX.polatity True or False? (False means a negative of some kind)
+         - is len( narX.eventRecord )>0?
+         for event in narX.eventRecord:
+            access event[0], the event GOF 
+            access event[1] content with Thing(event[1]), Action(event[1]), 
+            Relation(event[1]), or Value(event[1]) 
+        access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
+        """
         x=2 # do nothing. override in derived classes
 
 
