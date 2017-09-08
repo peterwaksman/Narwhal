@@ -283,7 +283,7 @@ def ReadSegmentAsAttribute(nar, seg):
             nar.polarity = True
     elif R == False:  # a "Bad" relation is passed to nar, if that has a meaning
         nar.polarity = False
-    elif v == 0 and T == False:  # handling for partial matches
+    elif (v == 0 or v==1) and T == False:  # handling for partial matches
         nar.polarity = False
 
     nar.generateLastConst()
