@@ -19,7 +19,7 @@ kHOW = " how # much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , what about , how $ are , show , show me, to find out, finding out, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how $ are , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information " #asking for information
 
 kWHY = " why " #asking for a story
@@ -56,7 +56,10 @@ QUESTION.sub(DIFF)
 kREQUEST = ' you get, please , use , build , ask for , sell me , fabricate , produce , provide ,\
  provide me , make #an , make me , to make , my|the|an $ order , to order ,\
  want , want to , want you to, need ,need to , need you to, give me ,add,'
-REQUEST = KList( "request", kREQUEST ).var()
+
+kUNREQUEST = "remove, unselect, deselect"
+
+REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var()
 
 #########################################
 # not really quantities but what the heck
