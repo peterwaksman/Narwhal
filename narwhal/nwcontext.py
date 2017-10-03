@@ -21,6 +21,7 @@ words that share the right sort of parent.
 from narwhal.nwtypes import *
 from narwhal.nwutils import *
 from narwhal.nwcontrol import *
+from narwhal.nwsegment import *
 
 
 """ Some basic methods, followed by increasingly abstract entitiees"""
@@ -113,6 +114,19 @@ def getManyOfGroup(tree, segment):
         h.append(var)
     return h
 
+    # look for two ints in context and get their associated last const
+def get2Ints(tree, segment):
+    revseg = segment[::-1] # reverse the list
+    p = NULL_VAR
+    h = []
+    numints = 0
+    for var in revseg:
+        if var.isA("int"):
+            numints += 1
+            if numints<=2:
+                h.append( var )
+    h = h[::-1]
+    return h
 
 
 def testSeg(tree, segment):
@@ -128,3 +142,7 @@ def testSeg(tree, segment):
 kDIFF = "difference, compare "
 
 DIFF = KList("diff", kDIFF).var(get2Alternatives)
+
+
+kBOTH = "both"
+BOTH = KList("both", kBOTH).var(get2Ints)

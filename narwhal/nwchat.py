@@ -97,34 +97,77 @@ class TopicFamily():
         segment = PrepareSegment(self.tree, tokens) 
 
         self.context.extend(segment)
-      
-        # now read and generate a response
-        self.maxGOF = 0.0
+
+        # Sanity check
+        bInsertSafe = True
+        if len(segment) > len(tokens ):
+            print("Oops your trees are messed up!. Multiple nodes match one token")
+            bInsertSafe = False
+
+        # consider inserting context into the segment
+        ext = []
+        newseg = []
+
+        if bInsertSafe:
+            itok = 0
+            newtokens = [] # prepare for inserting
+        else:
+            newtokens = tokens
+
+        for var in segment:
+            newseg.append(var)
+
+            if bInsertSafe:
+                newtokens.append( tokens[itok] )
+                itok += 1
+
+            if var.contextFn:
+                ext = var.contextFn( self.tree, self.context)
+                newseg.extend( ext ) #insert or append
+                for var in ext:
+                    newtokens.append( var.lastConst )
+
         for node in self.nodes:
             node.readSegment( segment, tokens )
+            
+            if ext and 0.25<= node.GOF and node.GOF<=0.5:
+                node.readSegment( newseg, newtokens )
 
-            if self.maxGOF<node.GOF: #update
-                self.maxGOF= node.GOF
+        if self.maxGOF<node.GOF: #update
+            self.maxGOF= node.GOF
+     
+        ## now read and generate a response
+        #self.maxGOF = 0.0
+        #for node in self.nodes:
+        #    node.readSegment( segment, tokens )
+
+        #    if self.maxGOF<node.GOF: #update
+        #        self.maxGOF= node.GOF
+
         
-        # if you barely made it (low GOF), see if you can grab some 
-        # context(these lines of code will take some doing)
-        if 0.3<= self.maxGOF and self.maxGOF<=0.5: 
-            # scan segment for context operators
-            # if found, use to extend current segment with context VARs
-            ext = []
-            newseg = []
-            for var in segment:
-                newseg.append(var)
-                if var.contextFn:
-                    ext = var.contextFn( self.tree, self.context)
-                    newseg.extend( ext ) #insert
-            if ext:
-                for node in self.nodes:
-                    node.readSegment( newseg, tokens )
-                if self.maxGOF<node.GOF: #update
-                    self.maxGOF= node.GOF
-            # we do not add the newseg to the context because its elements are already there
-            # this package of those elements is used for the readSegment() only.
+        ## if you barely made it (low GOF), see if you can grab some 
+        ## context(these lines of code will take some doing)
+        #if 0.25<= self.maxGOF and self.maxGOF<=0.5: 
+        #    # scan segment for context operators
+        #    # if found, use to extend current segment with context VARs
+        #    ext = []
+        #    newseg = []
+        #    for var in segment:
+        #        newseg.append(var)
+        #        if var.contextFn:
+        #            ext = var.contextFn( self.tree, self.context)
+        #            newseg.extend( ext ) #insert
+        #            for var in ext:
+        #                tokens.append( var.lastConst )
+        #    if ext:
+        #        for node in self.nodes:
+        #            x = 2;
+        #            node.readSegment( newseg, tokens )
+
+        #            if self.maxGOF<node.GOF: #update
+        #                self.maxGOF= node.GOF
+        #    # we do not add the newseg to the context because its elements are already there
+        #    # this package of those elements is used for the readSegment() only.
   
     def summary(self):
         out = self.tree.knames[0] + ":\n"

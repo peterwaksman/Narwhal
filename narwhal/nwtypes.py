@@ -230,6 +230,10 @@ class VAR:
             x = tree.lookup(name)  # find VAR with same name, in this tree
         if x != NULL_VAR:
             x.explicit = self.explicit
+            x.contextType = self.contextType
+            x.contextFn = self.contextFn
+
+
             return x  # x.copy().
         else:
             return NULL_VAR
