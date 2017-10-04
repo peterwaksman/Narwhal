@@ -131,7 +131,7 @@ class TopicFamily():
             node.readSegment( segment, tokens )
             
             #if ext and 0.25<= node.GOF and node.GOF<=0.5:
-            if ext and 0.25<= node.GOF and node.GOF<=0.75:
+            if ext and 0.25<= node.GOF and node.GOF<0.75:
                 node.readSegment( newseg, newtokens )
 
             if self.maxGOF<node.GOF: #update
