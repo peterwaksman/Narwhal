@@ -124,17 +124,18 @@ class TopicFamily():
             if var.contextFn:
                 ext = var.contextFn( self.tree, self.context)
                 newseg.extend( ext ) #insert or append
-                for var in ext:
-                    newtokens.append( var.lastConst )
+                for var1 in ext:
+                    newtokens.append( var1.lastConst )
 
         for node in self.nodes:
             node.readSegment( segment, tokens )
             
-            if ext and 0.25<= node.GOF and node.GOF<=0.5:
+            #if ext and 0.25<= node.GOF and node.GOF<=0.5:
+            if ext and 0.25<= node.GOF and node.GOF<=0.75:
                 node.readSegment( newseg, newtokens )
 
-        if self.maxGOF<node.GOF: #update
-            self.maxGOF= node.GOF
+            if self.maxGOF<node.GOF: #update
+                self.maxGOF= node.GOF
      
         ## now read and generate a response
         #self.maxGOF = 0.0
