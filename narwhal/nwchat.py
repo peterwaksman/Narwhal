@@ -89,7 +89,7 @@ class TopicFamily():
                           # and with response VARs during 
         #self.contextLen = [] # will store the num VARs in each addition to the context
 
-    def read(self,text):
+    def read2(self,text):
         # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
         self.numtokens = len(tokens) #useful
@@ -127,49 +127,71 @@ class TopicFamily():
                 for var1 in ext:
                     newtokens.append( var1.lastConst )
 
+        self.maxGOF = 0.0
         for node in self.nodes:
             node.readSegment( segment, tokens )
             
-            #if ext and 0.25<= node.GOF and node.GOF<=0.5:
             if ext and 0.25<= node.GOF and node.GOF<0.75:
                 node.readSegment( newseg, newtokens )
 
             if self.maxGOF<node.GOF: #update
                 self.maxGOF= node.GOF
      
-        ## now read and generate a response
-        #self.maxGOF = 0.0
-        #for node in self.nodes:
-        #    node.readSegment( segment, tokens )
-
         #    if self.maxGOF<node.GOF: #update
         #        self.maxGOF= node.GOF
-
-        
         ## if you barely made it (low GOF), see if you can grab some 
         ## context(these lines of code will take some doing)
-        #if 0.25<= self.maxGOF and self.maxGOF<=0.5: 
-        #    # scan segment for context operators
-        #    # if found, use to extend current segment with context VARs
-        #    ext = []
-        #    newseg = []
-        #    for var in segment:
-        #        newseg.append(var)
-        #        if var.contextFn:
-        #            ext = var.contextFn( self.tree, self.context)
-        #            newseg.extend( ext ) #insert
-        #            for var in ext:
-        #                tokens.append( var.lastConst )
-        #    if ext:
-        #        for node in self.nodes:
-        #            x = 2;
-        #            node.readSegment( newseg, tokens )
-
-        #            if self.maxGOF<node.GOF: #update
-        #                self.maxGOF= node.GOF
         #    # we do not add the newseg to the context because its elements are already there
         #    # this package of those elements is used for the readSegment() only.
-  
+ 
+    def read(self,text):
+        # (inefficient but leaves the door open to tree specific customization)
+        tokens = prepareTokens(text) 
+        self.numtokens = len(tokens) #useful
+        
+        segment = PrepareSegment(self.tree, tokens) 
+        self.context.extend(segment)
+ 
+        # Sanity check. It is easy to fail this, but want robuts code below
+        # that works around the failure
+        if len(segment) > len(tokens ):
+            print("Oops your trees are messed up!. Multiple nodes match one token")
+            bInsertSafe = False
+        else:
+            bInsertSafe = True
+        bInsertSafe = False
+
+        self.maxGOF = 0.0
+        for node in self.nodes:
+            node.readSegment( segment, tokens )
+            
+            if 0.25<= node.GOF and node.GOF<0.75:
+                ext = []
+                newseg = []
+                if bInsertSafe:
+                    itok = 0
+                    newtokens = [] # prepare for inserting
+                else:
+                    newtokens = tokens
+
+                for var in segment:
+                    newseg.append(var)
+                    if bInsertSafe:
+                        newtokens.append( tokens[itok] )
+                        itok += 1
+
+                    if var.contextFn:
+                        ext = var.contextFn( self.tree, self.context)
+                        newseg.extend( ext ) #insert or append
+                        for var1 in ext:
+                            newtokens.append( var1.lastConst )
+
+                node.readSegment( newseg, newtokens )
+
+            if self.maxGOF<node.GOF: #update
+                self.maxGOF= node.GOF
+   
+
     def summary(self):
         out = self.tree.knames[0] + ":\n"
         for node in self.nodes:
