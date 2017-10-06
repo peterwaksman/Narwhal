@@ -159,7 +159,7 @@ class TopicFamily():
             bInsertSafe = False
         else:
             bInsertSafe = True
-        bInsertSafe = False
+        #bInsertSafe = False
 
         self.maxGOF = 0.0
         for node in self.nodes:
@@ -184,7 +184,10 @@ class TopicFamily():
                         ext = var.contextFn( self.tree, self.context)
                         newseg.extend( ext ) #insert or append
                         for var1 in ext:
+                            q = len(newtokens)-1
+                            var1.ifound =[q]
                             newtokens.append( var1.lastConst )
+
 
                 node.readSegment( newseg, newtokens )
 
