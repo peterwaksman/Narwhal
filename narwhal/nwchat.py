@@ -4,7 +4,10 @@ from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
 from narwhal.nwcontext import *
+from narwhal.nwsegment import *
+
 from narwhal.nwlog import NWLog
+
 
 from stdtrees.quantities import QUANTITY
 
@@ -55,6 +58,10 @@ class NWDatanode():
         self.nar.clear()
         self.reader.readText(segment,tokens)
         self.GOF = self.reader.vault.maxGOF()
+        v = self.reader.vault._vault
+        if len(v)>0:
+            self.nar = v[ len(v)-1 ].nar
+
         self.lastConst = self.reader.vault.lastConst #the method not the value
 
     def getEvents(self):
@@ -85,64 +92,11 @@ class TopicFamily():
         self.maxGOF = 0.0
         self.numtokens = 0
 
-        self.context = [] # will be extended with segments during read, and
+        #self.context = [] # will be extended with segments during read, and
                           # and with response VARs during 
-        #self.contextLen = [] # will store the num VARs in each addition to the context
+        self.C = SegmentBuffers(5)
 
-    def read2(self,text):
-        # (inefficient but leaves the door open to tree specific customization)
-        tokens = prepareTokens(text) 
-        self.numtokens = len(tokens) #useful
-        
-        segment = PrepareSegment(self.tree, tokens) 
-
-        self.context.extend(segment)
-
-        # Sanity check
-        bInsertSafe = True
-        if len(segment) > len(tokens ):
-            print("Oops your trees are messed up!. Multiple nodes match one token")
-            bInsertSafe = False
-
-        # consider inserting context into the segment
-        ext = []
-        newseg = []
-
-        if bInsertSafe:
-            itok = 0
-            newtokens = [] # prepare for inserting
-        else:
-            newtokens = tokens
-
-        for var in segment:
-            newseg.append(var)
-
-            if bInsertSafe:
-                newtokens.append( tokens[itok] )
-                itok += 1
-
-            if var.contextFn:
-                ext = var.contextFn( self.tree, self.context)
-                newseg.extend( ext ) #insert or append
-                for var1 in ext:
-                    newtokens.append( var1.lastConst )
-
-        self.maxGOF = 0.0
-        for node in self.nodes:
-            node.readSegment( segment, tokens )
-            
-            if ext and 0.25<= node.GOF and node.GOF<0.75:
-                node.readSegment( newseg, newtokens )
-
-            if self.maxGOF<node.GOF: #update
-                self.maxGOF= node.GOF
-     
-        #    if self.maxGOF<node.GOF: #update
-        #        self.maxGOF= node.GOF
-        ## if you barely made it (low GOF), see if you can grab some 
-        ## context(these lines of code will take some doing)
-        #    # we do not add the newseg to the context because its elements are already there
-        #    # this package of those elements is used for the readSegment() only.
+ 
  
     def read(self,text):
         # (inefficient but leaves the door open to tree specific customization)
@@ -150,7 +104,11 @@ class TopicFamily():
         self.numtokens = len(tokens) #useful
         
         segment = PrepareSegment(self.tree, tokens) 
-        self.context.extend(segment)
+         
+        self.C.addSegment(segment)
+        
+        # for debug
+        a = self.C.getAll()
  
         # Sanity check. It is easy to fail this, but want robuts code below
         # that works around the failure
@@ -159,8 +117,7 @@ class TopicFamily():
             bInsertSafe = False
         else:
             bInsertSafe = True
-        #bInsertSafe = False
-
+ 
         self.maxGOF = 0.0
         for node in self.nodes:
             node.readSegment( segment, tokens )
@@ -181,7 +138,9 @@ class TopicFamily():
                         itok += 1
 
                     if var.contextFn:
-                        ext = var.contextFn( self.tree, self.context)
+                        a = self.C.getAll()
+                        ext = var.contextFn( self.tree, a )
+                         
                         newseg.extend( ext ) #insert or append
                         for var1 in ext:
                             q = len(newtokens)-1
@@ -194,6 +153,70 @@ class TopicFamily():
             if self.maxGOF<node.GOF: #update
                 self.maxGOF= node.GOF
    
+    def read2(self,text):
+                # (inefficient but leaves the door open to tree specific customization)
+        tokens = prepareTokens(text) 
+        self.numtokens = len(tokens) #useful
+        
+        segment = PrepareSegment(self.tree, tokens) 
+         
+        self.C.addSegment(segment)
+        
+                # Sanity check. It is easy to fail this, but we want robuts code 
+                # below, that works around the failure
+        if len(segment) > len(tokens ):
+            print("Oops your trees are messed up!. Multiple nodes match one token")
+            bInsertSafe = False
+        else:
+            bInsertSafe = True
+ 
+        self.maxGOF = 0.0
+        for node in self.nodes:
+            node.readSegment( segment, tokens )
+
+            if self.maxGOF<node.GOF:  
+                self.maxGOF= node.GOF
+
+            if 0.25<= node.GOF and node.GOF<0.75:
+                        # find the missing node (if there is just one)
+                EBM = node.nar.getExpectedButMissing()
+                if EBM==NULL_VAR : 
+                    continue
+
+                        #convert the context into children of that node
+                a = self.C.getAll()  
+                a2  = EBM.filter(a)
+                if len(a2)==0:
+                    continue
+                              
+                ext = []
+                newseg = []
+                if bInsertSafe:
+                    itok = 0
+                    newtokens = [] # prepare for inserting
+                else:
+                    newtokens = tokens 
+                        # in this case "insertions" happen at the end of the array
+
+                for var in segment:
+                    newseg.append(var)
+                    if bInsertSafe:
+                        newtokens.append( tokens[itok] )
+                        itok += 1
+
+                    if var.contextFn:
+                        
+                        ext = var.contextFn( a2 )
+                         
+                        newseg.extend( ext ) #insert or append
+                        for var1 in ext:
+                            newtokens.append( var1.lastConst )
+
+                if len(ext)>0:
+                    node.readSegment( newseg, newtokens )
+
+            if self.maxGOF<node.GOF: #update
+                self.maxGOF= node.GOF
 
     def summary(self):
         out = self.tree.knames[0] + ":\n"
@@ -226,7 +249,7 @@ class NWChat():
             self.log.add("Q: "+text + "\n")
 
         for topic in self.topics:
-            topic.read( text )         
+            topic.read2( text )         
             self.numtokens = topic.numtokens
             print( topic.summary() )
 
@@ -240,7 +263,7 @@ class NWChat():
         these sorts of values 
          - is narX==None?
          - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
-         - is narX.polatity True or False? (False means a negative of some kind)
+         - is narX.polarity True or False? (False means a negative of some kind)
          - is len( narX.eventRecord )>0?
          for event in narX.eventRecord:
             access event[0], the event GOF 
@@ -261,8 +284,9 @@ class NWChat():
         response = self.RespondNext() # also sets the self.responseVARs, per derived class
 
         for topic in self.topics:
-            topic.context.extend( self.responseVARs )
-  
+            #topic.context.extend( self.responseVARs )
+            topic.C.addSegment( self.responseVARs )
+
         if self.loggingOn:
             self.log.add("A: "+ response + "\n\n")
 

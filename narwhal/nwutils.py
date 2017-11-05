@@ -344,3 +344,10 @@ def str32():
     for i in range(33):
         array.append('')
     return array
+
+
+def printSEG(segment):
+    out = ""
+    for var in segment:
+        out += varstring(var) + " "
+    return out

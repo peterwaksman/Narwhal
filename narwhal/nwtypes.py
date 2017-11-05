@@ -122,6 +122,14 @@ class VAR:
         """ typically a "var<=nar" means the var is a child or itself"""
         return nwutils.recursiveLE(self, other)
 
+    # this version of filtering returns a result shorter than the input segment
+    # you can create a different filtering that inserts NULL_VARs to keep length constant.
+    def filter(self, segment):
+        F = []
+        for var in segment:         
+            if var<=self: 
+                F.append(var)         
+        return F
 
     # All children become implicit when their parent does
     def makeImplicit(self):
@@ -215,7 +223,6 @@ class VAR:
         v.explicit = self.explicit
 
         return v
-
 
     def copyUsing(self, tree):
         if self==NULL_VAR:
@@ -447,6 +454,11 @@ class VAR:
         else:
             return 0
 
+    def getExpectedButMissing(self):
+        if self.found:
+            return self
+        else:
+            return NULL_VAR
 
     # like a minimal "print". It is used by nar.string()
     def string(self, ntabs=0):
@@ -645,7 +657,8 @@ class NAR:
 
         return n
 
-  
+       
+
     def generateLastConst(self):
         lastC = ""
 
@@ -803,6 +816,60 @@ class NAR:
 
     def numIFound(self):
         return len(self.getIFound())
+
+    # This method is used to pick a VAR for filtering past context
+    # If an explicit slot is empty (and there is only one) that is picked.
+    # Otherwise pick an empty implicit  slot (when there is one)
+    def getExpectedButMissing(self):
+        if self.order>1: #punt, for now
+            return NULL_VAR
+
+        if isinstance(self,VAR):
+            return self.getExpectedButMissing()
+
+        T = self.thing
+        A = self.action
+        R = self.relation
+        V = self.value
+        emissing = 0 # num explicit slots that are not filled
+        imissing = 0 # num implicit slots that are filled
+        X = NULL_VAR
+        Y = NULL_VAR
+        if T!=NULL_VAR and not T.found:
+            if T.explicit:
+                X = T
+                emissing += 1
+            else:
+                Y = T
+                imissing += 1
+        if A!=NULL_VAR and not A.found:
+            if A.explicit:
+                X = A
+                emissing += 1
+            else:
+                Y = A
+                imissing += 1
+        if R!=NULL_VAR and R!= NULL_NAR and not R.found:
+            if R.explicit:
+                X = R
+                emissing += 1
+            else:
+                Y = R
+                imissing += 1
+        if V!=NULL_VAR and not V.found:
+            if V.explicit:
+                X = V
+                emissing += 1
+            else:
+                Y = V
+                imissing += 1
+
+        if emissing==1:
+            return X
+        elif imissing==1:
+            return Y
+        else:
+            return NULL_VAR
 
 
     def getType(nar):

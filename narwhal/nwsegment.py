@@ -198,7 +198,12 @@ def tabulateSEG2( segment, tokens):
     return out
 ################################################
 ################### inner read loop ############
-
+def isNullSegment(seg):
+    for var in seg:
+        if var != NULL_VAR:
+            return False
+    return True
+            
 
 def ReadSegment(nar, seg):
     nar.lastConst = "" # may get set in a sub ReadXXX
