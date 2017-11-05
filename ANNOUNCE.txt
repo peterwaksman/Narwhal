@@ -1,3 +1,6 @@
+Nov 5
+Have implemented a simple and elegant context retrieval, triggered by missing parts of a narrative, in the presence of an indeterminate word like "it" or "both". I only implemented a couple indeterminates: both, and difference.
+
 July 3:
 Building out the chatbot platform, with NWDataNode, TopicTree,
 and NWChat.
