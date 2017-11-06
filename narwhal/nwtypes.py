@@ -100,9 +100,6 @@ class VAR:
         # If an implicit is not 'found' then, functionally, the nar just
         # becomes shorter
 
-         #some VAR can get labelled otherwise
-        self.contextType = NO_CONTEXT
-
         # FOR READING:
         self.found = False
         # to store indices of tokens in text, with matches words of self's
@@ -204,7 +201,6 @@ class VAR:
         if self.parent == 0:
             v.parent = 0
 
-        v.contextType = self.contextType
         v.contextFn = self.contextFn
 
         v.found = self.found
@@ -237,7 +233,6 @@ class VAR:
             x = tree.lookup(name)  # find VAR with same name, in this tree
         if x != NULL_VAR:
             x.explicit = self.explicit
-            x.contextType = self.contextType
             x.contextFn = self.contextFn
 
 

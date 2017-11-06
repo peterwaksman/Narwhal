@@ -171,8 +171,9 @@ def getN(segment, N):
         if var != NULL_VAR:
             if n<N:
                 h.append( var )
-            n += 1
-
+                n += 1
+            if n==N:
+                break
     h = h[::-1]
 
     if len(h)<N :

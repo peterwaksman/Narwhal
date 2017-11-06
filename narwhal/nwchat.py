@@ -98,62 +98,8 @@ class TopicFamily():
 
  
  
+ 
     def read(self,text):
-        # (inefficient but leaves the door open to tree specific customization)
-        tokens = prepareTokens(text) 
-        self.numtokens = len(tokens) #useful
-        
-        segment = PrepareSegment(self.tree, tokens) 
-         
-        self.C.addSegment(segment)
-        
-        # for debug
-        a = self.C.getAll()
- 
-        # Sanity check. It is easy to fail this, but want robuts code below
-        # that works around the failure
-        if len(segment) > len(tokens ):
-            print("Oops your trees are messed up!. Multiple nodes match one token")
-            bInsertSafe = False
-        else:
-            bInsertSafe = True
- 
-        self.maxGOF = 0.0
-        for node in self.nodes:
-            node.readSegment( segment, tokens )
-            
-            if 0.25<= node.GOF and node.GOF<0.75:
-                ext = []
-                newseg = []
-                if bInsertSafe:
-                    itok = 0
-                    newtokens = [] # prepare for inserting
-                else:
-                    newtokens = tokens
-
-                for var in segment:
-                    newseg.append(var)
-                    if bInsertSafe:
-                        newtokens.append( tokens[itok] )
-                        itok += 1
-
-                    if var.contextFn:
-                        a = self.C.getAll()
-                        ext = var.contextFn( self.tree, a )
-                         
-                        newseg.extend( ext ) #insert or append
-                        for var1 in ext:
-                            q = len(newtokens)-1
-                            var1.ifound =[q]
-                            newtokens.append( var1.lastConst )
-
-
-                node.readSegment( newseg, newtokens )
-
-            if self.maxGOF<node.GOF: #update
-                self.maxGOF= node.GOF
-   
-    def read2(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
         self.numtokens = len(tokens) #useful
@@ -249,7 +195,7 @@ class NWChat():
             self.log.add("Q: "+text + "\n")
 
         for topic in self.topics:
-            topic.read2( text )         
+            topic.read( text )         
             self.numtokens = topic.numtokens
             print( topic.summary() )
 
