@@ -6,20 +6,29 @@ from narwhal.nwnreader import *
 from narwhal.nwcontext import *
 from narwhal.nwsegment import *
 
-from narwhal.nwlog import NWLog
 
-
-from stdtrees.quantities import QUANTITY
-
-strAPOLOGY = "Sorry, I did not understand that."
-strINFO = "Here is an link article about"
-strDETAILS = "Are there any details you would like to add?"
-
-""" NWTopicReader
- This merges reading from NWNReader and from ReadSlotEvents()
- (only for NARs of order <=1). 
 
 """
+An NWTopicReader is a NAR wrapped with recording mechanisms.
+An NWTopicData is a data object along with canned responses, in  
+the form of canned response text and canned response VARs. 
+
+The NWTopic brings a family of readers into combination with a data object so
+it can manage conversations in its topic area. It supports a basic read/write,
+which is (supposed to be) the basis of "communities" of topics.
+During a read() it will:
+
+
+
+"""
+
+
+
+""" 
+ NWTopicReader
+ This merges reading from NWNReader and from ReadSlotEvents()
+"""
+
 class NWTopicReader():
     def __init__(self, id, treeroot, nar, cal=False):
         self.id = id
@@ -39,13 +48,6 @@ class NWTopicReader():
         self.GOF = 0.0
         self.eventrecord = ''
 
-        # deprecated
-    def read( self, text ):
-        tokens = prepareTokens(text)
-        segment = PrepareSegment(self.tree, tokens) #not efficient, could do this at higher level,
-        self.readSegment( segment, tokens)
-   
-
     def readSegment( self, segment, tokens ):
         self.clear()
 
@@ -57,9 +59,9 @@ class NWTopicReader():
         self.nar.clear()
         self.reader.readText(segment,tokens)
         self.GOF = self.reader.vault.maxGOF()
-        v = self.reader.vault._vault
-        if len(v)>0:
-            self.nar = v[ len(v)-1 ].nar
+        V = self.reader.vault._vault
+        if len(V)>0:
+            self.nar = V[ len(V)-1 ].nar
 
         self.lastConst = self.reader.vault.lastConst #the method not the value
 
@@ -82,35 +84,55 @@ class NWTopicReader():
         return out
 
 
-#######################
+##############################################
+##############################################
+##############################################
+
+class NWTopicData:
+    def __init__(self, Responses, ResponseVARs, data ):
+        self.responses = Responses
+        self.responseVARs = ResponseVARs
+        self.NumStages = min( len( Responses), len(ResponseVARs)) #should be same
+        self.stage = 0
+        self.data = data 
+
+    def getResponse(self):
+        return self.responses[ self.stage ]
+
+    def getResponseVARs(self):
+        return self.responseVARs[ self.stage ]
+
+    def update(self, readers):
+        x = 2 # override in subclass
+
+##############################################
+##############################################
+##############################################
 
 class NWTopic():
-    def __init__(self, treeroot, readers):
+    def __init__(self, treeroot, topic_readers):
         self.tree = treeroot.copy()
-        self.readers = readers
+        self.readers = topic_readers
         self.maxGOF = 0.0
-        self.numtokens = 0
+        self.context = SegmentBuffers(8) # stores last 4 input/output
+        
+        self.numtokens = 0  
 
-        #self.context = [] # will be extended with segments during read, and
-                          # and with response VARs during 
-        self.C = SegmentBuffers(8) #??
+        self.data = None # override in subclasses
 
- 
- 
- 
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
-        self.numtokens = len(tokens) #useful
+        self.numtokens = len(tokens)  
         
         segment = PrepareSegment(self.tree, tokens) 
          
-        self.C.addSegment(segment)
+        self.context.addSegment(segment)
         
                 # Sanity check. It is easy to fail this, but we want robuts code 
                 # below, that works around the failure
         if len(segment) > len(tokens ):
-            print("Oops your trees are messed up!. Multiple VARs match one token")
+            print("Oops your trees are messed up!. Multiple nodes match one token")
             bInsertSafe = False
         else:
             bInsertSafe = True
@@ -119,7 +141,7 @@ class NWTopic():
         for reader in self.readers:
             reader.readSegment( segment, tokens )
 
-            if self.maxGOF<reader.GOF:  
+            if self.maxGOF<reader.GOF:  # update even when continue occurs below
                 self.maxGOF= reader.GOF
 
             if 0.25<= reader.GOF and reader.GOF<0.75:
@@ -129,7 +151,7 @@ class NWTopic():
                     continue
 
                         #convert the context into children of that node
-                a = self.C.getAll()  
+                a = self.context.getAll()  
                 a2  = EBM.filter(a)
                 if len(a2)==0:
                     continue
@@ -163,49 +185,22 @@ class NWTopic():
             if self.maxGOF<reader.GOF: #update
                 self.maxGOF= reader.GOF
 
-    def summary(self):
-        out = self.tree.knames[0] + ":\n"
-        for reader in self.readers:
-            out += reader.summary() + "\n"
-        return out
-
-    def getNode(self, id ):
+    def getReader(self, id ):
         for reader in self.readers:
             if reader.id==id :
                 return reader
-   
-#######################################################
-#######################################################
-#######################################################
-# init with an array of TopicFamilies
-class NWChat():
-    def __init__(self, topics):
-        self.topics = topics
-        self.updated = False # becomes true when stored data is changing
-        self.numtokens = 0   #you'll see why this is helpful
-        self.rawmode = False
-        self.responseVARs = []
 
-        self.log = NWLog()
-        self.loggingOn = True
+    def summary(self):
+        out = self.tree.knames[0] + ":\n"
+        for reader in self.reader:
+            out += reader.summary() + "\n"
+        return out
 
-    def read(self, text ):
-        if self.loggingOn:
-            self.log.add("Q: "+text + "\n")
-
-        for topic in self.topics:
-            topic.read( text )         
-            self.numtokens = topic.numtokens
-            print( topic.summary() )
-
-         # absorb the info
-        self.updateAll()
-
-    def updateAll(self):
+    def update(self):
         """ 
-        To be overridden in derived classes. Assuming a derived class contains a data object "meta"
-        and a narrative narX, we might call meta.updateX( narX ) after a read() and consider accessing 
-        these sorts of values 
+        To be overridden in derived classes. Assuming a derived class contains a self.data object  
+        and a narrative narX of a topic reader, we might call data.updateX( narX ) after a read()
+        and consider accessing these sorts of values. Each consists of an aspect of what was read. 
          - is narX==None?
          - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
          - is narX.polarity True or False? (False means a negative of some kind)
@@ -218,37 +213,3 @@ class NWChat():
         """
         x=2 # do nothing. override in derived classes
 
-
-    def RespondNext( self ):
-        x = 2 # override in derived classes
-
-
-    def respondNext( self ):
-        self.responseVARs = [] # to store internally generated VARs for addition to the context
-
-        response = self.RespondNext() # also sets the self.responseVARs, per derived class
-
-        for topic in self.topics:
-            #topic.context.extend( self.responseVARs )
-            topic.C.addSegment( self.responseVARs )
-
-        if self.loggingOn:
-            self.log.add("A: "+ response + "\n\n")
-
-        return response
-
- 
-    def getTopic(self, id ):
-        for topic in self.topics:
-            if topic.tree.knames[0]==id :
-                return topic
-
-    # tid and nid are, respectively, names of a topic reader and its (sub) TREE
-    def getNode( self, tid, nid):
-        topic = self.getTopic( tid )
-        if topic:
-            return topic.getNode( nid )
-
-
-
-          
