@@ -32,6 +32,7 @@ class NWTopicReader():
         self.GOF = 0.0
         self.eventrecord = ''
         self.eventGOF = 0.0
+        self.lastEvent = None
 
     def clear(self):
         self.nar.clear()
@@ -52,6 +53,9 @@ class NWTopicReader():
         # look for structured data
         self.eventrecord = recordSlotEvents( self.nar, segment )
         self.eventGOF = maxEventGOF( self.eventrecord )
+        if self.eventGOF>0:
+            self.lastEvent = self.eventrecord[ len(self.eventrecord)-1]
+
 
         # freeform read
         self.nar.clear()
@@ -68,6 +72,39 @@ class NWTopicReader():
         for event in self.eventrecord:
             out += event[1] + ", "
         return out
+
+    def getLastThing(self):
+        event = self.nar.lastConst
+        return Thing(event)
+
+    def getLastThingVAR(self):
+        T = self.nar.thing
+        return self.tree.lookup(T.lastConst)
+
+    def getLastAction(self):
+        event = self.nar.lastConst
+        return Action(event)
+
+    def getLastActionVAR(self):
+        A = self.nar.action 
+        return self.tree.lookup( A.lastConst )
+
+    def getLastRelation(self):
+        event = self.nar.lastConst
+        return Relation(event)
+
+    def getLastRelationVAR(self):
+        R = self.nar.relation
+        event = self.nar.lastConst
+        return self.tree.lookup(R.lastConst)
+
+    def getLastValue(self):
+        event = self.nar.lastConst
+        return Value(event)
+
+    def getLastValueVAR(self):
+        V = self.nar.value
+        return self.tree.lookup(V.lastConst)
 
     def summary(self):
         g = self.GOF
@@ -90,14 +127,12 @@ class NWTopic():
         self.readers = readers
         self.maxGOF = 0.0
         self.numtokens = 0
-
-        #self.context = [] # will be extended with segments during read, and
-                          # and with response VARs during 
-        self.C = SegmentBuffers(8) #??
-
- 
- 
- 
+                # These will be extended with segments during read(), and
+                # and with response VARs during write(). Saves the last
+                # 4 exchanges - a short term context
+        self.Context = SegmentBuffers(8)  
+     
+  
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 
@@ -105,7 +140,7 @@ class NWTopic():
         
         segment = PrepareSegment(self.tree, tokens) 
          
-        self.C.addSegment(segment)
+        self.Context.addSegment(segment)
         
                 # Sanity check. It is easy to fail this, but we want robuts code 
                 # below, that works around the failure
@@ -129,7 +164,7 @@ class NWTopic():
                     continue
 
                         #convert the context into children of that node
-                a = self.C.getAll()  
+                a = self.Context.getAll()  
                 a2  = EBM.filter(a)
                 if len(a2)==0:
                     continue
@@ -169,11 +204,18 @@ class NWTopic():
             out += reader.summary() + "\n"
         return out
 
-    def getNode(self, id ):
+    def getReader(self, id ):
         for reader in self.readers:
             if reader.id==id :
                 return reader
-   
+       
+    def getBestReader( self ):
+        for reader in self.readers:
+              if reader.GOF==self.maxGOF:
+                  return reader
+
+
+
 #######################################################
 #######################################################
 #######################################################
@@ -183,7 +225,7 @@ class NWChat():
         self.topics = topics
         self.updated = False # becomes true when stored data is changing
         self.numtokens = 0   #you'll see why this is helpful
-        self.rawmode = False
+        self.stringmode = False
         self.responseVARs = []
 
         self.log = NWLog()
@@ -230,7 +272,7 @@ class NWChat():
 
         for topic in self.topics:
             #topic.context.extend( self.responseVARs )
-            topic.C.addSegment( self.responseVARs )
+            topic.Context.addSegment( self.responseVARs )
 
         if self.loggingOn:
             self.log.add("A: "+ response + "\n\n")
@@ -244,11 +286,98 @@ class NWChat():
                 return topic
 
     # tid and nid are, respectively, names of a topic reader and its (sub) TREE
-    def getNode( self, tid, nid):
+    def getReader( self, tid, nid):
         topic = self.getTopic( tid )
         if topic:
-            return topic.getNode( nid )
+            return topic.getReader( nid )
+
+#################################
+# This model of data is that of a collection of bins, 
+# Each empty or containing something interesting. 
+# They are put in a preferred sequence but
+# may end up being filled non-sequentially
+# At the current abstract stage, a responder is
+# a pair of dictionaries - of response strings, and respond VARs
+# The sequentional nature is NOT required.
+#################################
+NULLSTAGE = 0
+# Note that response[] and responseVARs[] are constant dictionaries
+# and a class instance will be constant
+class NWTopicResponder:
+    def __init__(self, response, responseVARs ):
+        self.response = response  
+        self.responseVARs = responseVARs
+        self.NumStages = min( len(response), len(responseVARs) ) #should be same
+        self.stage = NULLSTAGE
+        self.extratext = ''
+
+    def getExtraResponse(self):
+        return self.extratext
+
+    # in case you want to default to the plain message
+    def getStageResponse(self):
+        s = self.response[ self.stage ] 
+        return s
+
+    def getAllResponse(self):
+        s = self.getExtraResponse() + "\n" + self.getStageResponse()
+        return s
+
+    def getResponseVARs(self):
+        return self.responseVARs[ self.stage ]
+
+# "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
+#
+# TChat's streamiled API of Read/Write/GOF score might be visualized
+# as a box with an input wire, an output wire, and a light bulb that
+# is bright or dim according to the GOF - colored accoring to the
+# completion state of the data. How shall we visualize a community
+# of tchats?     
+class NWTopicChat( ):
+    def __init__(self, topic, responder): 
+        self.topic = topic
+        self.responder = responder
+        self.gof = 0
+
+    ### Public API for an topic chat ######
+        
+    def Read(self, text ):       
+        self.topic.read( text )  
+        self.gof = self.topic.maxGOF
+        print( self.topic.summary() )
+                # transfer info from subreaders of the topic into the data structure
+        self.update()
 
 
+    def Write( self ):
+        outtext = self.write() # also changes the responseVARs 
+        self.topic.Context.addSegment( self.responder.getResponseVARs() )
+        return outtext
 
-          
+
+ 
+        ### Private implementation for an topic chat ######
+
+    """ update()
+    To be overridden in derived classes. Assuming a derived class contains a data object "data"
+    and a narrative narX, we might call data.updateX( narX ) after a read() and consider accessing 
+    these sorts of values 
+        - is narX==None?
+        - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
+        - is narX.polarity True or False? (False means a negative of some kind)
+        - is len( narX.eventRecord )>0?
+        for event in narX.eventRecord:
+        access event[0], the event GOF 
+        access event[1] content with Thing(event[1]), Action(event[1]), 
+        Relation(event[1]), or Value(event[1]) 
+    access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
+    """
+    def update(self):
+        self.responder.extratext = ''
+        x=2 # do nothing. override in derived classes
+
+        # override in derived classes. This is called after a read()
+        # it sets a response and a responseVARs slot.
+    def write( self ):
+        return self.responder.getStageResponse()
+

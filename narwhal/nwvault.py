@@ -1,6 +1,5 @@
 """
 nwvault.py implents the NarRecord and the NarVault for storing them.
-
 A key aspect of this is scoring the goodness-of-fit between a nar and
 a segement of text. This is the gof() function.   
 """
@@ -113,8 +112,6 @@ class NarVault:
     To "roll up" the vault means to push something new (perhaps a NULL_VAR) 
     into the "pre" staging area, while also pushing what was already in
     the "pre" into the final repository (unless it is NULL_VAR).
-
-
     For convenience, the nar record includes the relevant snippet of
     original text. So later the vault can be evaluated by the client.  
     """
@@ -330,7 +327,7 @@ def recordSlotEvents1(nar, segment):
             event = True
             A.ifound.extend(var.ifound)
             A.ifound = cleanFound(A.ifound)
-            A.Found = True
+            A.found = True
             if var.knames[0]=='int' or var.knames[0]=='float':
                 A.lastConst = var.lastConst
             else:
@@ -366,7 +363,7 @@ def recordSlotEvents1(nar, segment):
         if R!=NULL_NAR:
              ifound.extend( R.ifound )
         ifound.extend( V.ifound )
-        ifound = delBelow( ifound, istart)
+        #ifound = delBelow( ifound, istart) !!!!
  
         ######## SLOT EVENT #########
         if event:
@@ -384,9 +381,12 @@ def recordSlotEvents1(nar, segment):
                 ifound = []
                 istart = i + 1        
             else:
-                nar.action.clear()  #?
-                nar.value.clear()   #?
-                istart = i + 1
+                # recently disabled. Still worried it is wrong.
+                #nar.action.clear()  #?
+                #nar.value.clear()   #?
+                #istart = i + 1 !!!!
+                x = 2
+
         # here put AND and COMMA processing
                                
         i += 1

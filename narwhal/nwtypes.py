@@ -1028,7 +1028,7 @@ def event(x, y, act):
 # are listed in internal KLists and are not needed from the client
 # Worth mentioning (as part of another rant below) that these words in English are
 # translated by logicians into "therefor" - which is supposed to be timeless
-#  - exactly opposite to the usage here.
+#  - exactly opposite to the usage here, where the passage of time is inherent in 'becoming'.
 
 # a dummy to identify the "cause" type of statement
 VAR_SO = KList("so", "").var()
@@ -1039,8 +1039,6 @@ VAR_SO.makeImplicit()
 # so those indices are not counted in the r/f part of the gof() formula.
 # Ensuring that VAR_SO and also VAR_THEN (below) are implicit, means ensuring they 
 # are NOT counted as slots in the u/n part of the formula.
-
-
 
 def cause(x, y):
     X = a2n(x)  # interpret args
