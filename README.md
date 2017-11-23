@@ -6,6 +6,11 @@
  - See DOCS for Narwhal specification, hints for debugging, etc. 
 
  - See "nwchat.py" for chat template (under development)
+ A now NEW AND IMPROVED - sample chatbots for:
+     * a 'scene editor' using more-or-less structured commands 
+     * an 'about chatbot' for greetings and answering questions
+     * a 'confirm chatbot' for getting and confirming a string from the client.
+
 
 Narwhal is a library of objects that can read text. It uses keywords based on client-provided synonym lists and also client-provided formulas in the keywords. So the client can focus on the details of the topic vocabularies and how people express themselves, rather than on how language works. While relying on Narwhal to understand the incoming language the client must still write code that transfers information from the Narwhal objects into more convenient data structures. 
 
