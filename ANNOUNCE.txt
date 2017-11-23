@@ -1,3 +1,7 @@
+Nov 23 (Thanksgiving).
+Am implementing example "mini" chatbots: the tchats.py and the bouncy application. 
+
+
 Nov 5
 Have implemented a simple and elegant context retrieval, triggered by missing parts of a narrative, in the presence of an indeterminate word like "it" or "both". I only implemented a couple indeterminates: both, and difference.
 
