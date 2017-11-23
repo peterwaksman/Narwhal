@@ -15,11 +15,11 @@ from narwhal.nwcontext import *
 kQUESTION = " ? , ask # about, question, question about , questions about , problem , problem with, need to know , want to know, want to find out, help with , info, information, infomation " 
 
 kWHO = " who , who are" #asking for a person
-kHOW = " how # much|often, not sure how , do I " #asking for instructions
+kHOW = " how # did|much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , what about , how $ are , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how|where $ are , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information, tell me about " #asking for information
 
 kWHY = " why " #asking for a story
@@ -44,12 +44,13 @@ QUESTION.sub(WHO)
 QUESTION.sub(HOW) 
 QUESTION.sub(WHEN)
 QUESTION.sub(WHERE) 
-QUESTION.sub(WHAT)  
+  
 QUESTION.sub(WHY) 
 QUESTION.sub(DOES) 
 QUESTION.sub(CAN) 
 QUESTION.sub(AMOUNT)
 QUESTION.sub(DIFF)
+QUESTION.sub(WHAT)
 
 ########################################
 ########################################
@@ -82,6 +83,15 @@ yesno = attribute([YOU], YES_NO )
 
 ######################################
 ######################################
-kUNDO = " undo , not that, no that's not right, no that is not right, wrong,\
+
+kHELLO = ' hi , hello , greeting'
+HELLO = KList("hello", kHELLO).var()
+
+
+######################################
+######################################
+kUNDO = "undo, undo that, not that, no that's not right, no that is not right, wrong,\
 cancel, cancel that, not right, not what I want, redo, redo that"
 UNDO = KList( "undo", kUNDO ).var()
+
+THANKS = KList("thanks", "thanks, thx, thank you").var()
