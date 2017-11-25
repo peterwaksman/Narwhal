@@ -212,8 +212,7 @@ def recursiveLE(self, other):
 
 #related to int unknowns
 def asInt(token):
-    """ if token is digits, optionally preceeded with a '+' or '-' """
-
+    """ true if token is digits, optionally preceeded with a '+' or '-' """
     if len(token)<1 :
         return ''
     if token[0]=='-' or token[0]=='+':

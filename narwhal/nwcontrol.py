@@ -199,9 +199,10 @@ SKIP_OP.sub(DESIGNATOR_OP)
 # (or other)
 
 def replaceSpecialChars(text):
-    begin = 0
     newtext = ""
     for i in range(len(text)):
+        # preserve periods with numbers after them.
+        # see connection to asFloat()
         if text[i] == '.':
             if i < len(text)-1 and text[i+1].isdigit():
                 newtext += '.'
@@ -229,6 +230,7 @@ def replaceSpecialChars(text):
         else:
             newtext += text[i]
     return newtext
+
 
 
 kPERIOD = KList("PERIOD", "_period_")
