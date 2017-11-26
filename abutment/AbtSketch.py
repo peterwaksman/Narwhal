@@ -280,8 +280,8 @@ CONVEXEPS  = 2
 ANKYLOSEPS = 3
 # margin (height) reference settings
 GUMREF = 0
-IFACEMREF = 1
-ADJMREF = 2
+IFACEREF = 1
+ADJREF = 2
 
 # AMOUNT rel reference
 BELOWAMT = 0
@@ -340,12 +340,12 @@ class AbutmentState:
     def setMarginReference(self, sketch):
           # TO DO, add other pics for AT and close
         if self.mref == GUMREF and (self.mamt==BELOWAMT or self.mamt==ATAMT or self.mamt==CLOSEAMT ):
-            sketch.makeSubG()
+            sketch.makeSubG()    
         elif self.mref == GUMREF and self.mamt==ABOVEAMT:
             sketch.makeSupraG()
-        elif self.mref == IFACEMREF:
-            sketch.makeAtIFace()
-        elif self.mref == ADJMREF:
+        elif self.mref == IFACEREF:
+            sketch.makeAtIface()
+        elif self.mref == ADJREF:
             sketch.makeAtAdjacent()
 
     def setTissueDisplacement(self, sketch):

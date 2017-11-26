@@ -88,16 +88,22 @@ class AbutmentChat( NWTopicChat ):
                 data.setEPSParams( self.sketch )
 
             elif id=='relationReader' and reader.GOF>=0.75: 
+                if r=='above':
+                    data.mamt = ABOVEAMT 
+                elif r=='below':
+                    data.mamt = BELOWAMT
+                elif r=='at':
+                    data.mamt = ATAMT
+                elif r=='closest':
+                    data.mamt = CLOSEAMT  
+
                 if t=='gingiva':
                     data.mref = GUMREF
-                    if r=='above':
-                        data.mamt = ABOVEAMT 
-                    elif r=='below':
-                        data.mamt = BELOWAMT
-                    elif r=='at':
-                       data.mamt = ATAMT
-                    elif r=='closest':
-                        data.mamt = CLOSEAMT  
+                elif t=='interface':
+                    data.mref = IFACEREF
+                elif t=='adjacent':
+                    data.mref = ADJREF
+                   
                 data.setMarginReference( self.sketch ) 
 
             elif id == 'coreReader' and reader.GOF>=0.75:
@@ -109,8 +115,6 @@ class AbutmentChat( NWTopicChat ):
                     data.core = NORMALCORE
 
                 data.setCoreThickness( self.sketch, data.core )
-                     
- 
 
 
     def write(self):
