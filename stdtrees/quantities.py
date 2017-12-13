@@ -133,6 +133,9 @@ sepecific sub VARs. Here we deal with knowns to be
 read from the input.
 
 I am using 'x' to indicate "unknown"
+
+It is safe to say that I wouldn't need to define these "unknowns" if I 
+had the time to name all the numbers I might encounter. :)
 """
 
 kINT = " __d__ "
@@ -143,3 +146,53 @@ kFLOAT = " __fl__ "
 FLOATx = KList('float', kFLOAT).var()
 # See the connection to the asFloat() method in nwutils.pw
 
+"""
+I realize that my handling of this is inconsistent. I cannot look 
+look for a generic variable string. But I can allow prefix and 
+suffix matching with the remainder generic and variable. Also, sadly, 
+only lower case letters are handled.
+
+To match things with a prefix, use something like this:
+PARTNO = KList("STR_[YOUR LISTNAME HERE]", "__prfx__[YOUR PREFIX HERE]").var()
+example:
+P = KList("STR_parts","__prfx__ABC_.var()
+matches anything of the form ABCxxxxxx and the whole token is returned from findInText()
+
+Make sure to include STR_ as the beginning of the list name; and
+__prfx__ as the beginning of the list entry. Your list can include more
+than one entry.
+
+
+Similarly, to match things with a suffix, use something like this:
+PARTNO = KList("STR_[YOUR LISTNAME HERE]", "__sufx__[YOUR SUFFIX HERE]").var()
+
+Usage is defined in this comment, and supported in:
+       nwtypes.VAR.isUnknown() 
+       nwfind.findInText() [not tested yet but let's be optimistic]
+
+It would be good to implement a convention where, if the KList name begins with "REGEX_"
+and a kword in its list begins with __regex__ then what follows is a regular expression to be matched.
+So the entries of the VARs klist are regular expressions. The isUnknown() could
+check for "REGEX_" in the list name and the findInText() could do a regular expression 
+match when it detects __regex__ at the  beginning of a kword. 
+So KList("REGEX_[your listname]","__regex__*").var() will match anything. 
+
+"""
+
+
+#------------------
+UNITS= KList("unittype","").var()
+MM = KList( "mm", "mm, mn, millimeter").var()
+IN = KList( "in","in, inch").var() # god forbid!
+DEGREE= KList( "degree","deg, degree").var()
+UNITS.sub(MM)
+UNITS.sub(IN)
+UNITS.sub(DEGREE)
+
+##################### PUT TOGETHER FOR EXTERNAL SIMPLICITY
+GEN_QUANTITY = KList("allquantities", "").var()
+GEN_QUANTITY.sub(QUANTITY)
+GEN_QUANTITY.sub(TOOTH)
+GEN_QUANTITY.sub(INTx)
+GEN_QUANTITY.sub(FLOATx)
+GEN_QUANTITY.sub(UNITS)

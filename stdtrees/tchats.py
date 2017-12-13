@@ -1,4 +1,6 @@
 """ 
+A "tchat" is a NWTopicChat with data in it.
+
 Implementing some basic NWTopicChat's: an AboutChat that answers questions and a ConfirmChat
 that gets confirmation from the client.
 """
@@ -23,14 +25,17 @@ CLIENTASK.sub(YOU)
 CLIENTASK.sub(HELLO)
 CLIENTASK.sub(YES_NO) #this ensures YES_NO is used when the CLIENTASK tree is used.
 CLIENTASK.sub(THANKS)
+
 TOPIC = KList( "topic", "put a list here" ).var()
 CLIENTASK.sub(TOPIC)
+
 ###NARS
 about = attribute(QUESTION,[TOPIC],YOU)
 hello = attribute(HELLO,HELLO) 
 # have yesno defined in ask.py
 asktopic = attribute(QUESTION, TOPIC )
 thankyou = attribute(THANKS, YOU)
+ 
 
  
 Q = [ 
