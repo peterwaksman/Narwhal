@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 """
-Basic example. 
+Basic example. To test your TChat directly.
+
 """
 import sys
 import os 
 from time import gmtime, strftime
-
- 
-
 
 ver = sys.version.split('.')
 majorV = ver[0]

@@ -2,41 +2,6 @@
 """
 Basic example. 
 """
-#temppath = "C:\\Users\\Edge540\\Desktop\\temp\\"
-#path0 = temppath + "temp.jpg"
-
-#class intswap():
-#    def __init__(self):
-#        self.val = 0
-
-#GG = intswap()
-
-#path = "c:\\MB.png"
-#path2 = "c:\\MFlowers.png"
-#path3 = "c:\\Blank.png"
-
-
-#def testf(event):
-
-#    img = ImageTk.PhotoImage(Image.open(path))
-#    img2 = ImageTk.PhotoImage(Image.open(path2))
-#    img3 = ImageTk.PhotoImage(Image.open(path3))
-
-#    panel = Label(root, image = img)
-#    panel.grid(row=8, column = 0)
-#    if GG.val==0:
-#        panel.configure( image=img2 )
-#        panel.image = img2
-#        GG.val = 1
-#    elif GG.val==1:
-#        panel.configure( image=img )
-#        panel.image = img
-#        GG.val = 2
-#    elif GG.val==2:
-#        panel.configure( image=img3 )
-#        panel.image = img3
-#        GG.val = 0
-#    print "You typed " + T.get()
 
 import sys
 import os 
@@ -63,6 +28,7 @@ from narwhal.nwchat import NWTopicChat
 from bouncyscene import *
 from bouncychat import *
 
+# Initialize the scene data, and the editor/reader chatbot
 BScene = BouncySceneData("red",False,SMALLRAD,[Ox+SMALLRAD,Oy-2*SMALLRAD],False, TICWIDTH, [Ox,Oy] )
 BB = BouncyChat( BScene )
 
@@ -96,18 +62,27 @@ def readText(event):
     s = BB.Write()
     print s
 
-#This creates the main root of an application
+    response.set(s)
+
+
+#----------- APP ------------------
 root = Tk()
 root.title("Bouncy")
 root.geometry("640x480")
 root.configure(background='grey')
 
-# text entry
+# text entry bound to readText()
 T = Entry(root, width=80)
 T.bind("<Return>", readText)
 T.grid(row=1, column=0) 
  
 initImage()
+
+response = StringVar()
+e = Entry(root, textvariable=response)
+e.config(width=60)
+e.grid()
+response.set("")
 
 #Start the GUI
 root.mainloop()

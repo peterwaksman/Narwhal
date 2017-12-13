@@ -33,9 +33,9 @@ LARGE = KList("big", "big, large").var()
 SMALL = KList("small", "small, normal").var()
 SIZE = SMALL | LARGE #make negatives of each other
 
-RIGHT = KList("right","right, to the right").var()
-LEFT = KList("left", "left, to the left").var()
-DIRECTION = RIGHT|LEFT
+RIGHTDIR = KList("right","right, to the right").var()
+LEFTDIR = KList("left", "left, to the left").var()
+DIRECTION = RIGHTDIR|LEFTDIR
 
 
 kDIMENSION = "dimension, attribute, property"
@@ -54,7 +54,7 @@ ZOOMIN = KList("zoomin","zoom in, go in, magnify").var()
 ZOOMOUT = KList("zoomout","zoom out, go out, shrink").var()  
 ZOOM = ZOOMIN | ZOOMOUT
 
-MAKE = KList("make", "make, make it, turn it").var()
+MAKE = KList("make", "make, make it, turn, turn it").var()
 
 MOVE = KList("move", "move").var()
 

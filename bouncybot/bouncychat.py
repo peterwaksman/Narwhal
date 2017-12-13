@@ -131,10 +131,13 @@ class BouncyChat( NWTopicChat ):
                     data.ballxy[0] = data.ballxy[0]-TICWIDTH
                 else:
                     self.caveat = 'left or right?'
-
+            
                 x = 2
         x = 2
 
 
     def write(self):
-        x = 2
+        if self.caveat:
+            return self.caveat
+        else:
+            return self.responder.getStageResponse()
