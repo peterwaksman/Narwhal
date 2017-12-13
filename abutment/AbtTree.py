@@ -86,7 +86,7 @@ FEATURE.sub(OPPOSING)
 
 ################## AMOUNTS
 JUST = KList("just", "just, slightlye").var()
-ASPOSS = KList("possible", "possible, as possible, as much as possible").var()
+ASPOSS = KList("possible", "possible, as possible, as * as possible, as much as possible").var()
 RELAMOUNT = KList("amount", "amoount").var()
 RELAMOUNT.sub(JUST)
 RELAMOUNT.sub(ASPOSS)
@@ -138,6 +138,7 @@ doHeightAction = event( FEATURE, RELATION, ACTION )
 doEPSAction = attribute ( [EPS], EPSSHAPE, MAKE )
 
 doCoreAction = attribute ( [CORE], COREWIDTH, MAKE )
+# LATER requestCoreAction = attribute( CORE, REQUEST, COREWIDTH  )
 
 ################## READERS
 A = [ 

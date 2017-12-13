@@ -26,11 +26,13 @@ from PIL import ImageTk, Image
 from narwhal.nwchat import NWTopicChat
 from AbtSketch import *
 from AbtChat import AbutmentChat
+from stdtrees.tchats import *
 
  
 ABT = AbutmentChat( )
-
-
+Q = ABT
+#Q = ABT + AboutChat()  
+#Q = AboutChat()  
 
 def initImage():
     h = Image.new("RGB",(IMGWIDTH,IMGHEIGHT), "white")    
@@ -50,7 +52,8 @@ def initImage():
 
 def readText(event):
     text = T.get()
-    ABT.Read(text)
+    #ABT.Read(text)
+    Q.Read(text)
 
     h = Image.new("RGB",(IMGWIDTH,IMGHEIGHT), "white")    
 
@@ -67,7 +70,7 @@ def readText(event):
     panel.configure( image=img )
     panel.image = img
  
-    s = ''#ABT.responder.getStageResponse()
+    s = Q.Write()#''#ABT.responder.getStageResponse()
     response.set(s)
 
 #This creates the main root of an application

@@ -28,7 +28,7 @@ def SCALE( xy, r ):
 
 ########### draw functions
 DASHLEN = 3.5 # used 
-def dottedSegment( draw, P, Q, dashlen ):
+def dottedSegment( draw, P, Q, dashlen, width=1 ):
     L = DIST( P, Q )
     s = 0.0
     sig=1
@@ -40,18 +40,18 @@ def dottedSegment( draw, P, Q, dashlen ):
             Q1 = SUM( P, SCALE( DIFF(Q,P),(s+dashlen)/L) )
         
         if sig>0:
-            draw.line( [P1,Q1], "black" )
+            draw.line( [P1,Q1], "black", width )
 
         s += dashlen  
         sig = -sig  
         if s>L:
             break   
 
-def dottedLine( draw, path, dashlen ):
+def dottedLine( draw, path, dashlen, width=1 ):
     for i in range(0, len(path)-1):
         P = path[i]
         Q = path[i+1]
-        dottedSegment( draw, P, Q, dashlen)
+        dottedSegment( draw, P, Q, dashlen, width)
 
 
 ###########################################
@@ -218,6 +218,7 @@ class AbutmentSketch:
 
         M = self.getMARG()
         draw.line( M, "black", 3)
+        #dottedLine( draw, M, 3, 3)
 
         T = self.getTOP()
         dottedLine( draw, T, DASHLEN )
@@ -312,7 +313,8 @@ class AbutmentState:
         self.mamt     = other.mamt 
         self.tiss     = other.tiss    
         self.epsshape = other.epsshape
-        self.core     = other.core    
+        self.core     = other.core  
+          
     def comp(self, other ):
         if( 
             self.mref     == other.mref    and

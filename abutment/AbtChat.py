@@ -13,6 +13,7 @@ from narwhal.nwchat import *
 from AbtTree import *  
 from AbtSketch import *
 
+
 SENSE_CUTOFF = 0.3
 
 AOK = 0 # agree
@@ -119,3 +120,8 @@ class AbutmentChat( NWTopicChat ):
 
     def write(self):
         return self.responder.getStageResponse()
+
+
+###########################################
+###########################################
+###########################################
