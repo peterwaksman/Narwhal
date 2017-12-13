@@ -1,3 +1,12 @@
+Dec 13
+Did a checkin "synch to home" that did several things:
+ - added a new kind of NAR - the four part relation()
+ - wrote long comment in quantities.py about how to support __regex__ matching
+ - TChat's are refactored (NWChat deprecated)
+ - The chatbot architecture plan is moving towards modularity. The TChat now suppots composition with a '+' operator
+ - Began work on a dental dictionary. I do not think it damages my company to use words I learned there.
+
+
 Nov 23 (Thanksgiving).
 Am implementing example "mini" chatbots: the tchats.py and the bouncy application. 
 
