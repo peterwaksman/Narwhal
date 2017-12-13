@@ -4,11 +4,9 @@ just a plain lists of VARs, without any wrapping. The most important are
     PrepareSegement() -  to convert text-to-tokens-VARs 
     ReadSegment() - the "inner loop" which reads all the text, recursively
     per the hierarchy inside each nar.
-
 The relation between indices in the original tokens of text and indices in
 the new "segmented text" is an unhappy one. Various methods try to 
 coordinate them: getHi(), getLo(), wordReadRange
-
 """
 # nwsegment.py for handling text segmentation utilities.
 # used by the NWSReader. Contains utilities and the inner loop read() methods
@@ -221,6 +219,12 @@ def ReadSegment(nar, seg):
 
     action = nar.action
     relation = nar.relation
+    target = nar.thing
+    value = nar.value
+
+    if target != NULL_VAR and action != NULL_VAR \
+      and relation != NULL_VAR and value != NULL_VAR:
+        return ReadSegmentAsRelation(nar, seg)
 
     if relation != NULL_VAR:
         return ReadSegmentAsAttribute(nar, seg)
@@ -466,6 +470,40 @@ def ReadSegmentAsSequential(nar, seg):
 
     return t + v + a
 
+################################
+def ReadSegmentAsRelation(nar, seg):
+    t = ReadSegment(nar.thing, seg)
+    v = ReadSegment(nar.value, seg)
+    r = ReadSegment(nar.relation, seg)
+    m = ReadSegment(nar.action, seg) # this is the 'modifier'
+
+    # a little algorithm to determine polarity of nar.
+    # NOTE: this is the same as the attribute() algorithm
+    # With modifier polarity tacked on at the end
+    T = nar.thing.polarity
+    V = nar.value.polarity
+    R = nar.relation.polarity
+    M = nar.action.polarity
+
+    if v > 0 and V == False:  # a "Bad" value is passed to the nar, regardless of R
+        if R:
+            nar.polarity = False
+        else:
+            nar.polarity = True
+    elif R == False:  # a "Bad" relation is passed to nar, if that has a meaning
+        nar.polarity = False
+    elif (v == 0 or v==1) and T == False:  # handling for partial matches
+        nar.polarity = False
+
+        # the polarity of the modifer is applied externally
+    if m>0 and M==False:
+        nar.polarity = not nar.polarity
+
+
+    nar.generateLastConst()
+
+    return t + v + r + m
+ 
 ################################
 
 

@@ -3,19 +3,12 @@ nwtypes.py defines the basic data types involved in "narrative" entities
 KList, VAR, and NAR. 
 The KList is a list of keywords with text matching capabilities
 The VAR is like a "concept" that wraps the KList. VARs are tree nodes
-The NAR is a four part narrative with actor, action, relation, and target
+The NAR is a four part narrative with actor, action, relation, and target.
+These can be set to VARs or to other NAR, so that NARs are nestable.
 """
 
 from narwhal import nwfind
 from narwhal import nwutils
-
-# These define "casting" operations to convert and insert past conversation 
-#  into current sentences
-NO_CONTEXT = 0
-ALTERNATIVE_CONTEXT = 1
-GROUP_CONTEXT = 2
-MERGE_CONTEXT = 3
-SEQUENCE_CONTEXT = 4
 
 
 class KList:
@@ -257,6 +250,8 @@ class VAR:
     def isUnknown(self):
         if self.knames[0]=='int' or self.knames[0]=='float':
             return True
+        elif self.knames[0][4:]=='STR_': # sorry about that
+            return True
         else:
             return False
 
@@ -306,7 +301,7 @@ class VAR:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
                 self.ifound = nwutils.cleanFound(self.ifound)
-                if child.knames[0]=='int' or child.knames[0]=='float':
+                if child.isUnknown():# child.knames[0]=='int' or child.knames[0]=='float':
                     self.lastConst = foundC
                 else:
                     #self.lastConst = child.knames[0]
@@ -986,7 +981,6 @@ def a2n(arg):
 # TODO: put in a check for this
 
 def attribute(x, y, rel=NULL_NAR):
-#def attribute(x, y, rel=NULL_VAR):
     X = a2n(x)  # interpret args
     Y = a2n(y)
     REL = a2n(rel)
@@ -1076,6 +1070,34 @@ def sequence(x, y):
     n.value = Y  # "we ate pie"
     n.order = max(ORDER(X), ORDER(Y)) + 1
     return n
+
+
+    # Here ALL slots must be non NULL_VAR and 
+    # the 'action' is re-purposed to hold a modifier 
+    # So "x in relation to y, with this modifier" 
+    # Design follows attribute() but with new use of n.action
+    # as a modifier. Examples are
+    #   relation( ROOM, MCDONALDS, OVER, JUST) or
+    #   relation( MARGIN, GINGIVA, BELOW, FLOATx)
+    # Understood as x_rel_/y_/modifier
+    # Very typical for the modifier to be given as an implicit slot.
+def relation(x,y,relation,modifier):
+    X = a2n(x)  # interpret args
+    Y = a2n(y)  # other part of relation
+    R = a2n(relation)
+    M = a2n(modifier)
+
+    n = NAR()
+    n.thing = X     #  ROOM     ,  MARGIN
+    n.relation = R  #  OVER     ,  BELOW
+    n.value = Y     #  MCDONALS ,  GINGIVA
+    
+    # adding the modifier
+    n.action = M    #  JUST     ,  FLOATx
+
+    n.order = max(ORDER(X), ORDER(Y)) + 1
+    return n
+
 
 ##########################################
 # the num slots used doesn't work correctly here.

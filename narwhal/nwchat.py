@@ -47,6 +47,7 @@ class NWTopicReader():
         self.readSegment( segment, tokens)
    
 
+        # not to be confused with ReadSegment() implemented in nwsegment.py
     def readSegment( self, segment, tokens ):
         self.clear()
 
@@ -65,7 +66,7 @@ class NWTopicReader():
         if len(v)>0:
             self.nar = v[ len(v)-1 ].nar
 
-        self.lastConst = self.reader.vault.lastConst #the method not the value
+        self.lastConst = self.reader.vault.lastConst #the method not the value [??]
 
     def getEvents(self):
         out = ''
@@ -142,10 +143,12 @@ class NWTopic():
          
         self.Context.addSegment(segment)
         
-                # Sanity check. It is easy to fail this, but we want robuts code 
-                # below, that works around the failure
+                # Sanity check. It is easy to fail this test, but we want robust  
+                # code below, that works around the failure.
+                # Cause is a tree with different nodes matching the token. Inserting
+                # makes the indexing be out of sync between tokens and VARs in the segment
         if len(segment) > len(tokens ):
-            print("Oops your trees are messed up!. Multiple VARs match one token")
+            print("warning: several VARs match one token")
             bInsertSafe = False
         else:
             bInsertSafe = True
@@ -215,82 +218,6 @@ class NWTopic():
                   return reader
 
 
-
-#######################################################
-#######################################################
-#######################################################
-# init with an array of TopicFamilies
-class NWChat():
-    def __init__(self, topics):
-        self.topics = topics
-        self.updated = False # becomes true when stored data is changing
-        self.numtokens = 0   #you'll see why this is helpful
-        self.stringmode = False
-        self.responseVARs = []
-
-        self.log = NWLog()
-        self.loggingOn = True
-
-    def read(self, text ):
-        if self.loggingOn:
-            self.log.add("Q: "+text + "\n")
-
-        for topic in self.topics:
-            topic.read( text )         
-            self.numtokens = topic.numtokens
-            print( topic.summary() )
-
-         # absorb the info
-        self.updateAll()
-
-    def updateAll(self):
-        """ 
-        To be overridden in derived classes. Assuming a derived class contains a data object "meta"
-        and a narrative narX, we might call meta.updateX( narX ) after a read() and consider accessing 
-        these sorts of values 
-         - is narX==None?
-         - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
-         - is narX.polarity True or False? (False means a negative of some kind)
-         - is len( narX.eventRecord )>0?
-         for event in narX.eventRecord:
-            access event[0], the event GOF 
-            access event[1] content with Thing(event[1]), Action(event[1]), 
-            Relation(event[1]), or Value(event[1]) 
-        access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
-        """
-        x=2 # do nothing. override in derived classes
-
-
-    def RespondNext( self ):
-        x = 2 # override in derived classes
-
-
-    def respondNext( self ):
-        self.responseVARs = [] # to store internally generated VARs for addition to the context
-
-        response = self.RespondNext() # also sets the self.responseVARs, per derived class
-
-        for topic in self.topics:
-            #topic.context.extend( self.responseVARs )
-            topic.Context.addSegment( self.responseVARs )
-
-        if self.loggingOn:
-            self.log.add("A: "+ response + "\n\n")
-
-        return response
-
- 
-    def getTopic(self, id ):
-        for topic in self.topics:
-            if topic.tree.knames[0]==id :
-                return topic
-
-    # tid and nid are, respectively, names of a topic reader and its (sub) TREE
-    def getReader( self, tid, nid):
-        topic = self.getTopic( tid )
-        if topic:
-            return topic.getReader( nid )
-
 #################################
 # This model of data is that of a collection of bins, 
 # Each empty or containing something interesting. 
@@ -326,20 +253,98 @@ class NWTopicResponder:
     def getResponseVARs(self):
         return self.responseVARs[ self.stage ]
 
+
+ 
+###########################
+class TChat:
+    # public API
+    def __init__(self):
+        self.gof = 0.0
+
+    def Read(self, text):
+        x = 2
+
+    def Write(self):
+        x = 2
+
+       
+        #  Derived classes can reference the same data
+    def SetData(self, data):
+        x = 2
+
+    def GOF():
+        return self.gof
+
+    def __add__(self, other):
+        return CompositeChat(self, other)
+
+    # Implements tchat1 + tchat2
+class CompositeChat( TChat ):
+    def __init__(self, A, B):
+        if isinstance(A, CompositeChat ):
+            a = A.chats
+        else:
+            a = [A]
+        if isinstance(B, CompositeChat ):
+            b = B.chats
+        else:
+            b = [B]
+
+        self.chats = a + b 
+        self.gof = 0.0
+
+    def Read( self, text ):
+        for chat in self.chats:
+            chat.Read( text )
+
+    def Write(self):
+        s = ''
+        maxGOF = 0.0
+        first = True
+        for chat in self.chats:
+            if maxGOF<chat.GOF():
+                maxGOF = chat.GOF()
+            w = chat.Write() 
+            if chat.GOF()<0.5:
+                continue         
+            if len(w)>0:
+                if first:
+                    first = False
+                else:
+                    s += '\n'
+                s += w 
+
+        self.gof = maxGOF
+
+        if maxGOF>=0.5 : # cutoff on response
+            return s
+        else:
+            return ''
+
+    def SetData(self, data):
+        for chat in self.chats:
+           chat.SetData(data)
+
+
 # "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
+#
+# Derived classes will implement data, and its modification by input text
 #
 # TChat's streamiled API of Read/Write/GOF score might be visualized
 # as a box with an input wire, an output wire, and a light bulb that
 # is bright or dim according to the GOF - colored accoring to the
-# completion state of the data. How shall we visualize a community
-# of tchats?     
-class NWTopicChat( ):
+# completion state of the data. 
+#
+# NO. A chatbot community will be structured like the data that is 
+# central to its topics. Note the NWTopicChat, does not implement SetData()
+
+class NWTopicChat(TChat):
     def __init__(self, topic, responder): 
         self.topic = topic
         self.responder = responder
         self.gof = 0
 
-    ### Public API for an topic chat ######
+    ### Public API for a topic chat ######
         
     def Read(self, text ):       
         self.topic.read( text )  
@@ -348,14 +353,14 @@ class NWTopicChat( ):
                 # transfer info from subreaders of the topic into the data structure
         self.update()
 
+    def GOF(self):
+        return self.gof
 
     def Write( self ):
         outtext = self.write() # also changes the responseVARs 
         self.topic.Context.addSegment( self.responder.getResponseVARs() )
         return outtext
 
-
- 
         ### Private implementation for an topic chat ######
 
     """ update()
@@ -380,4 +385,3 @@ class NWTopicChat( ):
         # it sets a response and a responseVARs slot.
     def write( self ):
         return self.responder.getStageResponse()
-

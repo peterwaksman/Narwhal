@@ -226,7 +226,7 @@ def replaceSpecialChars(text):
             else:
                 newtext += " - "  # for now
         elif text[i] == "#":
-            newtext += " _hash_ " #(not a punctionation)
+            newtext += " _hash_ " #(not a punctuation)
         else:
             newtext += text[i]
     return newtext
@@ -302,6 +302,32 @@ class ControlData:
         self.ctrl = ctrl
         self.ictrl = ictrl
 
+def separateMM(text):
+    h = len(text)
+    if h < 3:
+        return text
+    
+    newtext = ""
+    c = text[0]
+    newtext += c
+    for i in range(1, len(text)-1):
+        if text[i]=='m' and text[i+1]=='m' and c.isdigit():
+            newtext += " "   
+        c = text[i]
+        newtext += c
+    newtext += text[len(text)-1]
+    return newtext       
+
+def cleanDecimals(text):
+    newtext = ""
+    for i in range(0, len(text)-1):
+        if text[i]=='.' and text[i+1].isdigit():
+            if i==0 or not text[i-1].isdigit():
+                newtext += '0'  
+        newtext += text[i]
+    newtext += text[len(text)-1]
+    return newtext    
+
 #######################################################
 def prepareTokens(text):
     """
@@ -315,8 +341,11 @@ def prepareTokens(text):
     # one of several future cleanups
     text = cleanAMPM(text)
 
-    ## another
-    #text = replaceCharacter(text,'#', " _#_ ")
+    # mm
+    text = separateMM(text)
+     
+    # insert 0 before decimal
+    text = cleanDecimals(text)
 
     # lower case tokens
     tokens = text.split(' ')

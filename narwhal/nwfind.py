@@ -213,7 +213,7 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
 
 # ------------------------------------------------
-def findInText(klist, tokens, itok, ifound):
+def findInTextXXX(klist, tokens, itok, ifound):
     ret = ''
     for kword in klist.list:
         if kword == ' __d__ ':
@@ -235,5 +235,46 @@ def findInText(klist, tokens, itok, ifound):
             # NOTE this return value is ignored on the client side
     return ret
 
+def findInText(klist, tokens, itok, ifound):
+    ret = ''
+    tok = tokens[itok]
+    for kword in klist.list:
+        if kword == ' __d__ ': # spaces for no particular reason
+            a = asInt(tok)
+            if len(a)>0 :
+                ifound.append(itok)
+            return a
+        elif kword == ' __fl__ ':
+            a = asFloat(tok)
+            if len(a)>0:
+                ifound.append(itok)
+            return a
+        elif kword[8:]=='__prfx__': #no spaces dammit!
+            p = kword[:8] # the body of the keyword IS the prefix
+                          # match it to prefix of token
+            if p==tok[8:]:
+                ifound.append(itok)
+                return tok
+            else:
+                return '' #?? prevents finding by matchTOK below
+        elif kword[8:]=='__sufx__':
+            L = len(tok)
+            m = kword[:8] # the body of the keyword IS the suffix
+                          # match it to suffix of token
+            if len(m)<=len(tok) and m==tok[:L-len(m)]: 
+                ifound.append(itok)
+                return tok
+            else:
+                return ''           
+
+        # look for this kword at itok position in tokens
+        # and return with ifound storing itok and any
+        # adjacent indices used during the matching
+        if matchTOK(kword, itok, ifound, tokens):
+            ret = tok
+            x = 2
+            # NOTE this return value is ignored on the client side
+            # [No it isn't it's length is used]
+    return ret
 ###############################################################
 ###############################################################
