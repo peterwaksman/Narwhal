@@ -25,10 +25,12 @@ from PIL import ImageTk, Image
 
 #from narwhal.nwchat import NWTopicChat
 from stdtrees.tchats import *
-from abutmentChats import BaseChat 
+from abutmentChats import BaseChat, MarginChat
 
 #Q = AboutChat()  + BaseChat()
-Q = BaseChat()
+#Q = BaseChat()
+Q = MarginChat() # + BaseChat() + AboutChat()
+
 IMGHWIDTH=300
 IMGHEIGHT=300
 

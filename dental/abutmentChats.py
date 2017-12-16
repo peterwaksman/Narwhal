@@ -16,40 +16,18 @@ from dentalData import *
 
 SENSE_CUTOFF = 0.3
 
-AOK = 0 # agree
-ANOK = 1 # apologize but "no"
-AQU = 2 # ask clarifaction
-
-
-aResponse = {
-    AOK : "ok",
-    ANOK: "I {}",
-    AQU : "please clarify {}"
-    }
-
-aResponseV = {
-    AOK : [],
-    ANOK : [],
-    AQU : []
-    }
-
-BaseResponder = NWTopicResponder(aResponse, aResponseV)
+BaseResponder = DefaultResponder() #NWTopicResponder(aResponse, aResponseV)
 
 ###################################################
 class BaseChat( NWTopicChat ):
     def __init__(self):
         NWTopicChat.__init__(self, BaseTopic, BaseResponder)
         
+        # implement data
         self.data     = AbutmentBase()
         self.prevdata = AbutmentBase()
          
-        self.caveat = ''   # for out-of-bounds warning 
-
-    def Read(self, text):
-        self.caveat = ''
-        self.prevdata = self.data # keep copy
-        NWTopicChat.Read(self, text)
-
+        #self.caveat = ''   # for out-of-bounds warning 
 
     def update(self):
         NWTopicChat.update(self)
@@ -86,7 +64,42 @@ class BaseChat( NWTopicChat ):
                     data.pressure.value = 0.1
                     self.responder.stage = AOK
                
-    
+ 
+    def write(self):
+        return self.responder.getStageResponse()
+
+################################################
+
+class MarginChat( NWTopicChat ):
+    def __init__(self):
+        NWTopicChat.__init__(self, MarginTopic , DefaultResponder())
+        
+        # implement data
+        self.data     = MarginData()
+        self.prevdata = MarginData()
+
+    def update(self):
+        NWTopicChat.update(self)
+        if self.gof==0:
+            self.responder.stage = AQU  
+            return
+
+                # margin reader  
+        mReader = self.topic.readers[0]
+        margin = mReader.getLastThing()
+        amount = mReader.getLastAction()
+        rel = mReader.getLastRelation()
+        ref = mReader.getLastValue()  
+          
+        polarity = mReader.nar.polarity # assume it is same for both nars
+
+                # tooth and side surface reader (no action)
+        mtReader = self.topic.readers[1]
+        tmargin = mtReader.getLastThing()      
+        toothno = mtReader.getLastRelation()
+        side = mtReader.getLastValue()
+        x=2
+        #setMarginData( data, margin, amount, rel, ref, side, toothno, side)
 
     def write(self):
         return self.responder.getStageResponse()

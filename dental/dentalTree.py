@@ -82,99 +82,12 @@ DENTAL= KList(
         DIASTEMA= KList( "diastema, diestema, diastama"
         GAP= KList(
 
-    TOOTHSITE
-        TOOTH  # borrowed from quantities
-
-        TOOTHGROUP = KList(  "tooth"
-            ANTERIOR= KList(  "anterior"
-            POSTERIOR= KList(  "posterior"
-            MOLAR= KList(  "molar"
-            PREMOLAR= KList(  "premolar, pre-molar, primolar, bicuspid, bi-cuspid, bi-suspid"
-            INCISOR= KList(  "incisor, central, lateral"
-                CENTRAL
-                LATERAL
-            CANINE= KList(  "canine, eye tooth, eye teeth"
-
+ 
        CONDITION
             PREP= KList(  "prep"
             PONTIC= KList(  "pontic"
             MISSING= KList(   "missing, absent"
             REGULAR= KList(    
-
-        SIDE = KList( 
-            ALL= KList(  "all sides, all around, 360, circumferential, around, other values",
-            REMAINING= KList(  "rest, other, other values" # as in "the rest of the margins
-            BF= KList(  "b/f, f/b, buccal/facial, b&f"
-                BUCCAL= KList(  " b , buccal, baccal, buc, buck, bucca, "
-                FACIAL= KList(  "f , facial"
-                LABIAL= KList(  " labial"
-                LINGUAL= KList(  "lingual, ling, lin, l"
-                PALATAL= KList(  "palat"
-            MD= KList(  "m/d", d/m, mesial/distal, distal/mesial, m&d, proximal, interproximal"
-                MESIAL= KList(  "m , mesial , mesail , mes , meaisl , mesial"
-                DISTAL= KList(  " d , distal , dist, distall "
-            OCCLUSAL= KList(  "occ"
-            INCISAL= KList(  "incisal, inc"
-
-        FEATURE= KList(
-            FOSSA= KList( "fossa"
-            CUSP= KList( "cusp"
-            EMBRASURE= KList( "embrasure, vestibule"
-            CINGULUM= KList( "cingulum"
-            ROOT= KList( "root"
-            WALL= KList( "wall"
-
-        REFFEATURE= KList(                   
-            SOFTTISSUE= KList( "soft tissue, softtissue, support tissue"   
-            SULCUS= KList( "sulcus"
-            GUM= KList( "gingiva, gingival, subgingival, subginival, gum, supra_g,sub_g,ridge, gm crest, \
-                    supra-gingival, supra-ging, supra_g,\
-                    sub-gingival, sub-ginival, sub_g, subgingival, subginival, crest, ridge"
-            OPPOSING= KList( "opp"
-            ADJACENT= KList( "adjacent, adjacent tooth, adjacent teeth, adjecent, neighbor, \
-                            neighboring tooth, neighboring teeth, surrounding"
-            INTERFACE= KList(   "interface, fixture, implant, analog, anolog"
-            MARK "mark, line"     
-            CEJ= KList(  "cej, cement enamel junction"          
-            CONTRALATERAL
-
-        CROWN (maybe no indent?)
-            CROWNMATERIAL
-                PFM= KList( "pfm"
-                EMAX= KList( "emax"
-                GOLD
-            CROWNTYPE= KList(
-                FULL= KList( "anatomical, anatomic, full, full contour, anotomical",
-                CUTBACK= KList( "cutback, cut back, cutback"
-                TEMP= KList( "temp, temporary"
-                JANUS= KList( "janus"
-            RETENTION= KList( "retained"
-                SCREWR= KList( "screwretention, screw retained"
-                CEMENTR= KList( "cementretnetion, cement retained"
- 
-        ABUTMENT (no indent?)
-            ABTMATERIAL
-                ZR= KList( "zirconia, zirconium, zr"
-                TI= KList( "titanium, ti, titania"
-                GOLDTI = KList("goldhue","gold, gold hue").var()
-            ABTTYPE
-                HEALING
-                SMOOTH
-                
-            ABTFEATURE
-                MARGIN "margin, collar, outline, height"
-                BASE "base, between interface and margin"
-                    EPS "eps, esp, ets, profile, emergence, emergense, emergency, emmergence"
-                        STRAIGHT "straight, straight eps, striaght, srtaight, off"
-                        CONCAVE "concave, convave"
-                        CONVEX "convex"
-                        ANKYLOS  "ankylos, golf, tee"
-                    PRESSURE  "press, presure, blanch, blaching, push, push on, support, expand,\
-                                compression, displace,displacement, diplace, impinge, impingement"               
-                CORE "core # file, post"
-                SHOULDER "shoulder, sholder, chamfer, chamf, champfer, champ, flar, flair"    
-                BEVEL "bevel, occlusal bevel"
-                GROOVE "groove, retention groove, retentive groove"
 
 
     PRODUCT= KList( 
@@ -201,14 +114,14 @@ DENTAL= KList(
 SIDE = KList("side","").var()
 ALL = KList( "all",  "all sides, all around, 360, circumferential, around, other values").var()
 REMAINING= KList( "remainder", "remainder, rest of, other, other values").var() # as in "the rest of the margins
-BF= KList("bf",  "b/f, f/b, buccal/facial, b&f").var()
+BF= KList("bf",  " b/f, f/b, buccal/facial, b&f").var()
 BUCCAL= KList("buccal", " b , buccal, baccal, buc, buck, bucca").var()
-FACIAL= KList( "facial","f , facial").var()
+FACIAL= KList( "facial"," f , facial").var()
 BF.sub(BUCCAL)
 BF.sub(FACIAL)
 
-MD= KList("md", "m/d, d/m, mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
-MESIAL= KList( "mesial", "m , mesial , mesail , mes , meaisl , mesial").var()
+MD= KList("md", " m/d, d/m, mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
+MESIAL= KList( "mesial", " m , mesial , mesail , mes , meaisl , mesial").var()
 DISTAL= KList("d",  " d , distal , dist, distall ").var()
 MD.sub(MESIAL)
 MD.sub(DISTAL)
@@ -324,13 +237,31 @@ BASE.sub(EPSTYPE)
 BASE.sub(PRESSURE)
 #------------------------------
 
+ABUTMENT = KList("abutment", "abutment, abut").var()
+ABTMATERIAL = KList("abtmaterial", "").var()
+ZR= KList( "zirconia", "zirconia, zirconium, zr").var()
+TI= KList( "titanium", "titanium, ti, titania").var()
+GOLDTI = KList("goldhue","gold, gold hue").var()
+ABTMATERIAL.sub(TI)
+ABTMATERIAL.sub(GOLDTI)
+
+ABTTYPE = KList("abttype", "").var()
+HEALING = KList("healingabut","healing abutment").var()
+SMOOTH = KList("smoothabut", "smooth abutment").var()
+ABTTYPE.sub(HEALING)
+ABTTYPE.sub(SMOOTH)
+
+ABUTMENT.sub(ABTFEATURE)
+ABUTMENT.sub(ABTMATERIAL)
+ABUTMENT.sub(ABTTYPE)
+
 # FINAL DENTAL TREE----------------------
 TOOTHSITE = KList("dentaltree", "").var()
 TOOTHSITE.sub(TOOTHGROUP)
 TOOTHSITE.sub(REFFEATURE)
 TOOTHSITE.sub(SIDE)
+#TOOTHSITE.sub(ABUTMENT)
 TOOTHSITE.sub(ABTFEATURE)
-TOOTHSITE.sub(ABTMATERIAL)
 
 # ADD THE INCLUDED TREES
 TOOTHSITE.sub(GEN_QUANTITY)
@@ -338,17 +269,34 @@ TOOTHSITE.sub(GEN_GEOMETRY)
 #------------------------------
 
 
- # NARs and readers for the BASE topic
-epsNAR = attribute( EPS, EPSTYPE ) # an easy one
+ # BASE topic
+# "make base convex" or "convex EPS please"
+epsNAR = attribute( BASE, EPSTYPE ) # an easy one 
+# ".2mm tissue pressure"
 tisspressNAR = attribute( PRESSURE, FLOATx, [MM] )
+# "light tissue pressure"
 tisspressNAR2 = attribute( PRESSURE, STRENGTH, [SOFTTISSUE] )
 
 B = [
         NWTopicReader("epsReader", TOOTHSITE , epsNAR ),
-        NWTopicReader("tpReader", TOOTHSITE , tisspressNAR ),
+        NWTopicReader("tpReader",  TOOTHSITE , tisspressNAR ),
         NWTopicReader("tpReader2", TOOTHSITE , tisspressNAR2 )
     ]
 BaseTopic = NWTopic( TOOTHSITE, B ) 
+
+#-----------------------------------------------
+ # MARGIN topic
+ # "put margin .2mm below gingiva", or ".2 mm below" or "below gingiva"
+marginNAR = relation( [SIDE], [REFFEATURE], RELATION , [FLOATx] )
+margintoothNAR = attribute( ABTFEATURE, [INTx]) # will often score .5
+
+M = [
+        NWTopicReader("marginReader", TOOTHSITE, marginNAR),
+        NWTopicReader("margintoothReader", TOOTHSITE, margintoothNAR)
+    ]
+
+MarginTopic = NWTopic( TOOTHSITE, M)
+
 
 
 
