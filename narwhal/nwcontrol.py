@@ -316,6 +316,10 @@ def separateMM(text):
         c = text[i]
         newtext += c
     newtext += text[len(text)-1]
+
+    # TODO: check for decimal point preceeding an "mm", and insert one if needed
+    # helps disambiguate ints that are intended as floats
+
     return newtext       
 
 def cleanDecimals(text):

@@ -53,7 +53,11 @@ class NWTopicReader():
 
         # look for structured data
         self.eventrecord = recordSlotEvents( self.nar, segment )
-        self.eventGOF = maxEventGOF( self.eventrecord )
+        if self.eventrecord:
+            self.eventGOF = maxEventGOF( self.eventrecord )
+        else:
+            self.eventGOF = 0.0
+
         if self.eventGOF>0:
             self.lastEvent = self.eventrecord[ len(self.eventrecord)-1]
 
@@ -69,6 +73,9 @@ class NWTopicReader():
         self.lastConst = self.reader.vault.lastConst #the method not the value [??]
 
     def getEvents(self):
+        if not self.eventrecord:
+            return ''
+
         out = ''
         for event in self.eventrecord:
             out += event[1] + ", "
@@ -254,6 +261,27 @@ class NWTopicResponder:
         return self.responseVARs[ self.stage ]
 
 
+#--------------------------------------
+# Default responder
+AOK = 0 # agree
+ANOK = 1 # apologize but "no"
+AQU = 2 # ask clarifaction
+aResponse = {
+    AOK : "ok",
+    ANOK: "I {}",
+    AQU : "please clarify {}"
+    }
+aResponseV = {
+    AOK : [],
+    ANOK : [],
+    AQU : []
+    }
+
+class DefaultResponder( NWTopicResponder ):
+    def __init__(self):
+        NWTopicResponder.__init__( self, aResponse, aResponseV)
+         
+
  
 ###########################
 class TChat:
@@ -344,9 +372,16 @@ class NWTopicChat(TChat):
         self.responder = responder
         self.gof = 0
 
+        self.data     = 0
+        self.prevdata = 0
+        self.caveat = ''   # for out-of-bounds warning 
+
     ### Public API for a topic chat ######
         
-    def Read(self, text ):       
+    def Read(self, text ):  
+        self.caveat = ''
+        self.prevdata = self.data # keep copy
+            
         self.topic.read( text )  
         self.gof = self.topic.maxGOF
         print( self.topic.summary() )
@@ -366,7 +401,8 @@ class NWTopicChat(TChat):
     """ update()
     To be overridden in derived classes. Assuming a derived class contains a data object "data"
     and a narrative narX, we might call data.updateX( narX ) after a read() and consider accessing 
-    these sorts of values 
+    these sorts of values. Mostly these are on the screen after a read, due to the active printing
+    funcitons. So you can see what you have to work with.
         - is narX==None?
         - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
         - is narX.polarity True or False? (False means a negative of some kind)
