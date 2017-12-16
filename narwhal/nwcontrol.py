@@ -322,6 +322,7 @@ def separateMM(text):
 
     return newtext       
 
+
 def cleanDecimals(text):
     newtext = ""
     for i in range(0, len(text)-1):
@@ -331,6 +332,24 @@ def cleanDecimals(text):
         newtext += text[i]
     newtext += text[len(text)-1]
     return newtext    
+
+####################################################
+def isPureDigits(tok):
+    if len(tok)==0:
+        return False
+    for c in tok:
+        if not c.isdigit():
+            return False
+    return True
+def ensureFloatBeforeMM(tokens):
+    for i in range(1, len(tokens)):
+        tok = tokens[i]
+        prev = tokens[i-1]
+        if tok=='mm' and isPureDigits(prev):
+            tokens[i-1] = prev + ".0"
+    return tokens
+
+
 
 #######################################################
 def prepareTokens(text):
@@ -345,22 +364,24 @@ def prepareTokens(text):
     # one of several future cleanups
     text = cleanAMPM(text)
 
-    # mm
+    # put space before an "mm"
     text = separateMM(text)
-     
+
     # insert 0 before decimal
     text = cleanDecimals(text)
 
-    # lower case tokens
+    # make lower case tokens
     tokens = text.split(' ')
     newtokens = []
     for tok in tokens:
         if len(tok) > 0:
-            newtokens.append(tok)
+            newtokens.append(tok)  
 
     for i in range(len(newtokens)):
         tok = newtokens[i].lower()
         newtokens[i] = tok
+
+    newtokens = ensureFloatBeforeMM(newtokens)
 
     return newtokens
 
