@@ -183,7 +183,7 @@ So KList("REGEX_[your listname]","__regex__*").var() will match anything.
 #------------------
 UNITS= KList("unittype","").var()
 MM = KList( "mm", "mm, mn, millimeter").var()
-IN = KList( "in","in, inch").var() # god forbid!
+IN = KList( "in"," in , inch").var() # god forbid!
 DEGREE= KList( "degree","deg, degree").var()
 UNITS.sub(MM)
 UNITS.sub(IN)

@@ -60,6 +60,12 @@ kREQUEST = ' you get, please , use , build , ask for , sell me , fabricate , pro
 
 kUNREQUEST = "remove, unselect, deselect"
 
+kUNDO = "undo, undo that, not that, no that's not right, no that is not right, wrong,\
+cancel, cancel that, not right, not what I want, redo, redo that"
+
+kUNREQUEST += kUNDO
+
+
 REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var()
 
 #########################################
@@ -90,8 +96,6 @@ HELLO = KList("hello", kHELLO).var()
 
 ######################################
 ######################################
-kUNDO = "undo, undo that, not that, no that's not right, no that is not right, wrong,\
-cancel, cancel that, not right, not what I want, redo, redo that"
-UNDO = KList( "undo", kUNDO ).var()
+
 
 THANKS = KList("thanks", "thanks, thx, thank you").var()

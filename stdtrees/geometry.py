@@ -28,7 +28,7 @@ GEN_GEOMETRY= KList("geometry", "geometry").var()
 #-----------------
 DIRECTION= KList( "direction", "direction").var()
 
-# values
+# values duplicated in LO_HI
 UP = KList("up", "up").var()
 DOWN = KList("down", "down").var()
 UP_DOWN = UP|DOWN
@@ -98,34 +98,34 @@ SHAPE.sub(CIRC)
 SHAPE.sub(OVAL)
 #------------------------
 RELATION= KList("relation", "relation, relative to").var()
-AMOUNT= KList("amount", "amount, quantity").var()
-AT = KList("at"," at, flush, even with, match, noimpingment, level, even ").var()
+#AMOUNT= KList("amount", "amount, quantity").var()
+AT = KList("at"," at, flush, even with, match, noimpingment, level, even , keep ").var()
 CLOSEST= KList("just", "just, close, close to, closest, slightly, possible, \
                 if possible, as poss, as possible, as much as possible").var()
 BETWEEN= KList( "between", "between, mid ").var()
 OFFSET = KList( "offset", "offset, distance, clearance, clearance, clerance, \
-                clearence, room, space").var()
+                clearence, room, space , from ").var()
 PARALLEL= KList("parallel",  "para, parra, pare, parre, splint").var()
 MATCH= KList("match", "match, follow, according" ).var()
 MATCH.sub(PARALLEL) #??? parallel is a kind of matching
-HI= KList("hi",  " positive, pos , hi , high,  raise, above, over, sup, supra, supra-, supra_, \
-          super, super-, super_, positive, up, hi as possible, high as possible").var()
-LO= KList("low",  " negative, neg , lo , low, deep, lower, drop, below, sub, sub-, sub_, under, \
-          depth , down , lo as possible, low as possible").var()
-HI_LO= HI|LO  
+HI= KList("above",  " positive, pos , hi , high,  raise, above, over, sup, supra, supra-, supra_, \
+          super, super-, super_, positive, up, hi as possible, high as possible, up ").var()
+LO= KList("below",  " negative, neg , lo , low, deep, lower, drop, below, sub, sub-, sub_, under, \
+          depth , down , lo as possible, low as possible, down ").var()
+LO_HI= LO | HI  
 
 NEAR= KList("near",  "near, near to").var()
 FAR= KList( "far", "far, far from, away, out, away from, out from").var()
 NEAR_FAR = NEAR|FAR 
 
-RELATION.sub(AMOUNT)
+
 RELATION.sub(AT)
 RELATION.sub(CLOSEST)
 RELATION.sub(BETWEEN)
 RELATION.sub(OFFSET)
 #RELATION.sub(PARALLEL) #part of MATCH
 RELATION.sub(MATCH)
-RELATION.sub(HI_LO)
+RELATION.sub(LO_HI)
 RELATION.sub(NEAR_FAR)
 
 #------------------------
