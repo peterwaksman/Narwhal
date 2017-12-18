@@ -9,6 +9,7 @@ sys.path.insert(0, narwhal_dir)
 
 from narwhal.nwtypes import *
 from narwhal.nwchat import *
+from stdtrees.tchats import *
  
 from dentalTree import *  
 from dentalData import *
@@ -74,9 +75,49 @@ class MarginChat( NWTopicChat ):
     def __init__(self):
         NWTopicChat.__init__(self, MarginTopic , DefaultResponder())
         
-        # implement data
-        self.data     = MarginData()
-        self.prevdata = MarginData()
+        # don't implement data ownership
+        self.data     = None
+         
+        # assumes the data is an AllAbutments
+    def SetData(self, data):
+        self.data = data # a reference, not a copy
+
+    def fillData(self, Vault, toothno):
+        rel = ''
+        ref = ''
+        margin = self.data.margin[toothno]  
+        for v in Vault:
+            lc = v.lastConst
+
+            side = Thing(lc)
+
+            amount = Action(lc)
+            a = float(amount)
+            if not a:
+                a = 0
+
+            r = Relation(lc)
+            f = Value(lc) 
+            
+            if len(r)>0:
+                rel = r
+            if len(f)>0:
+                ref = f
+
+            spec = MarginSpec(rel,ref,a)
+            if side=='mesial':
+                margin.M = spec
+            elif side=='distal':
+                margin.D = spec
+            elif side=='facial':
+                margin.F = spec
+            elif side == 'lingual':
+                margin.L = spec
+            else:
+                margin.M = spec
+                margin.D = spec
+                margin.F = spec
+                margin.L = spec
 
     def update(self):
         NWTopicChat.update(self)
@@ -84,22 +125,51 @@ class MarginChat( NWTopicChat ):
             self.responder.stage = AQU  
             return
 
-                # margin reader  
+                # margin reader, side surface reader  
         mReader = self.topic.readers[0]
-        margin = mReader.getLastThing()
+        mtReader = self.topic.readers[1]
+         
+        polarity = mReader.nar.polarity # assume it is same for both nars
+              
+        side = mReader.getLastThing()
         amount = mReader.getLastAction()
         rel = mReader.getLastRelation()
-        ref = mReader.getLastValue()  
-          
-        polarity = mReader.nar.polarity # assume it is same for both nars
+        ref = mReader.getLastValue()     
+        V = mReader.reader.vault._vault   
 
-                # tooth and side surface reader (no action)
-        mtReader = self.topic.readers[1]
-        tmargin = mtReader.getLastThing()      
-        toothno = mtReader.getLastRelation()
-        side = mtReader.getLastValue()
-        x=2
-        #setMarginData( data, margin, amount, rel, ref, side, toothno, side)
+        feature = mtReader.getLastThing()      
+        toothword = mtReader.getLastRelation()
+        toothno = mtReader.getLastValue()
+         
+        # feature can be missing but not something else
+        if feature != 'margin' and feature != '':
+            return
+        t = 0
+        if toothno.isdigit():
+            t = int(toothno)
+
+        
+        self.fillData( V, t )
 
     def write(self):
         return self.responder.getStageResponse()
+
+
+####################################################
+
+class DentalChat(  NWTopicChat ):
+    def __init__(self):
+        NWTopicChat.__init__(self, ToothNumTopic, DefaultResponder())
+
+        # root piece of data
+        self.sites = ToothSites()
+
+        # language UI for one part
+        self.abutmentChat = MarginChat() + BaseChat()
+        self.abutmentChat.SetData(self.sites.abutments)
+     
+    def Read(self, text):
+        self.abutmentChat.Read(text)
+        x = 2
+
+  

@@ -33,17 +33,6 @@ MISCELLANEOUS= KList(
     SHOWING = KList("showing"
     CONICAL = KList("conical, conicity"
 
-MEASUREMENTUNIT= KList(
-     LINEAR= KList(
-        MM= KList( "mm, mn, millimeter"
-        IN= KList( "in, inch" # god forbid!
-     ANGULAR= KList(
-        DEGREE= KList( "deg, degree"
-        ANGLE= KList( "angle, angulation" # overlaps with the verb
-        AXIS = KList("axis", axes, axial"
-
-
-
 ACTIONS = KList( 
     SEND= KList( "send, resubmit, submit"
     SHIP = KLIst("ship"
@@ -78,7 +67,6 @@ DENTAL= KList(
         OPENBITE= KList( "open # the"
         CLOSEDBITE= KList( "closed, close # the"
    
-    TOOTHGROUPFEATURE
         DIASTEMA= KList( "diastema, diestema, diastama"
         GAP= KList(
 
@@ -170,7 +158,7 @@ TOOTHGROUP.sub(POSTERIOR)
 
 ############### REFFEATURE ######################
 SOFTTISSUE = KList("softtissue", "soft tissue, softtissue, support tissue, tissue").var()
-GUM= KList("gum", "gingiva, gingival, subgingival, subginival, gum, supra_g,sub_g,ridge, gm crest, \
+GUM= KList("gum", "gingiva, gingival, gigival , subgingival, subginival, gum, supra_g,sub_g,ridge, gm crest, \
     supra-gingival, supra-ging, supra_g,\
     sub-gingival, sub-ginival, sub_g, subgingival, subginival, crest, ridge").var()
 INTERFACE= KList("interface","interface, fixture, implant, analog, anolog").var()
@@ -224,7 +212,7 @@ PRESSURE =  KList("pressure", "press, presure, blanch, blaching, push, push on, 
 STRAIGHT = KList("off", "off, straight, striaght, srtaight").var()
 CONCAVE = KList("concave", "concave, convave").var()
 CONVEX = KList("convex", "convex").var()
-ANKYLOS  = KList("ankylos", "ankylos, golf, tee, option _hash_ 5").var()
+ANKYLOS  = KList("ankylos", "ankylos, golf, tee , option _hash_ 5").var()
 #------------------------------------
 EPSTYPE = KList("epstype", "").var()
 EPSTYPE.sub(STRAIGHT)
@@ -288,15 +276,23 @@ BaseTopic = NWTopic( TOOTHSITE, B )
  # MARGIN topic
  # "put margin .2mm below gingiva", or ".2 mm below" or "below gingiva"
 marginNAR = relation( [SIDE], [REFFEATURE], RELATION , [FLOATx] )
-margintoothNAR = attribute( ABTFEATURE, [INTx]) # will often score .5
+toothfeatureNAR = attribute( ABTFEATURE, [INTx], [TOOTH]) # will often score .5
 
 M = [
-        NWTopicReader("marginReader", TOOTHSITE, marginNAR),
-        NWTopicReader("margintoothReader", TOOTHSITE, margintoothNAR)
+        NWTopicReader("margR", TOOTHSITE, marginNAR),
+        NWTopicReader("toothfeatureR", TOOTHSITE, toothfeatureNAR)
     ]
 
 MarginTopic = NWTopic( TOOTHSITE, M)
 
+#-------------------------------------------------------
+toothnumNAR = attribute( [TOOTH], INTx) # will often score .5
+
+T = [
+        NWTopicReader("toothnumR", TOOTHSITE, toothnumNAR),
+    ]
+
+ToothNumTopic = NWTopic( TOOTHSITE, T)
 
 
 
