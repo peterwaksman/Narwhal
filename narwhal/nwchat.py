@@ -155,7 +155,7 @@ class NWTopic():
                 # Cause is a tree with different nodes matching the token. Inserting
                 # makes the indexing be out of sync between tokens and VARs in the segment
         if len(segment) > len(tokens ):
-            print("warning: several VARs match one token")
+            #print("warning: several VARs match one token")
             bInsertSafe = False
         else:
             bInsertSafe = True
@@ -284,6 +284,20 @@ class DefaultResponder( NWTopicResponder ):
 
  
 ###########################
+
+# "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
+#
+# Derived classes will implement data, and its modification by input text
+#
+# TChat's streamiled API of Read/Write/GOF score might be visualized
+# as a box with an input wire, an output wire, and a light bulb that
+# is bright or dim according to the GOF - colored accoring to the
+# completion state of the data. 
+#
+# NO. A chatbot community will be structured like the data that is 
+# central to its topics. Note the NWTopicChat, does not implement SetData()
+
+
 class TChat:
     # public API
     def __init__(self):
@@ -295,6 +309,29 @@ class TChat:
     def Write(self):
         x = 2
 
+    """ update()
+    To be overridden in derived classes. Assuming a derived class contains a data object "data"
+    and a narrative narX, we might call data.updateX( narX ) after a read() and consider accessing 
+    these sorts of values. Mostly these are on the screen after a read, due to the printing
+    functions. So you can see what you have to work with.
+        - is narX==None?
+        - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
+        - is narX.polarity True or False? (False means a negative of some kind)
+        - is len( narX.eventRecord )>0?
+        for event in narX.eventRecord:
+        access event[0], the event GOF 
+        access event[1] content with Thing(event[1]), Action(event[1]), 
+        Relation(event[1]), or Value(event[1]) 
+    access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
+    """
+    def update(self):
+        self.responder.extratext = ''
+        x=2 # do nothing. override in derived classes
+
+        # override in derived classes. This is called after a read()
+        # it sets a response and a responseVARs slot.
+    def write( self ):
+        return self.responder.getStageResponse()
        
         #  Derived classes can reference the same data
     def SetData(self, data):
@@ -350,21 +387,11 @@ class CompositeChat( TChat ):
             return ''
 
     def SetData(self, data):
+        self.data = data # why not keep a reference.
         for chat in self.chats:
            chat.SetData(data)
 
 
-# "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
-#
-# Derived classes will implement data, and its modification by input text
-#
-# TChat's streamiled API of Read/Write/GOF score might be visualized
-# as a box with an input wire, an output wire, and a light bulb that
-# is bright or dim according to the GOF - colored accoring to the
-# completion state of the data. 
-#
-# NO. A chatbot community will be structured like the data that is 
-# central to its topics. Note the NWTopicChat, does not implement SetData()
 
 class NWTopicChat(TChat):
     def __init__(self, topic, responder): 
@@ -380,7 +407,7 @@ class NWTopicChat(TChat):
         
     def Read(self, text ):  
         self.caveat = ''
-        self.prevdata = self.data # keep copy
+        self.prevdata = self.data # keep (deep) copy
             
         self.topic.read( text )  
         self.gof = self.topic.maxGOF
@@ -398,26 +425,3 @@ class NWTopicChat(TChat):
 
         ### Private implementation for an topic chat ######
 
-    """ update()
-    To be overridden in derived classes. Assuming a derived class contains a data object "data"
-    and a narrative narX, we might call data.updateX( narX ) after a read() and consider accessing 
-    these sorts of values. Mostly these are on the screen after a read, due to the active printing
-    funcitons. So you can see what you have to work with.
-        - is narX==None?
-        - is narX.GOF>=0.5? (The goodness of fit of the narX to the text)
-        - is narX.polarity True or False? (False means a negative of some kind)
-        - is len( narX.eventRecord )>0?
-        for event in narX.eventRecord:
-        access event[0], the event GOF 
-        access event[1] content with Thing(event[1]), Action(event[1]), 
-        Relation(event[1]), or Value(event[1]) 
-    access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
-    """
-    def update(self):
-        self.responder.extratext = ''
-        x=2 # do nothing. override in derived classes
-
-        # override in derived classes. This is called after a read()
-        # it sets a response and a responseVARs slot.
-    def write( self ):
-        return self.responder.getStageResponse()

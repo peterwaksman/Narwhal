@@ -334,10 +334,14 @@ def cleanDecimals(text):
     return newtext    
 
 ####################################################
-def isPureDigits(tok):
+def isInteger(tok):
     if len(tok)==0:
         return False
-    for c in tok:
+    if tok[0]=='+' or tok[0]=='-':
+        tmp = tok[1:]
+    else:
+        tmp = tok
+    for c in tmp:
         if not c.isdigit():
             return False
     return True
@@ -345,7 +349,7 @@ def ensureFloatBeforeMM(tokens):
     for i in range(1, len(tokens)):
         tok = tokens[i]
         prev = tokens[i-1]
-        if tok=='mm' and isPureDigits(prev):
+        if tok=='mm' and isInteger(prev):
             tokens[i-1] = prev + ".0"
     return tokens
 

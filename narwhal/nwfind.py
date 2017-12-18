@@ -1,20 +1,28 @@
 """
 nwfind.py implements matching keywords to tokens in a window of text.
 
-Matching keywords from a KList uses special symbols to help disambiguate, 
-in terms of what comes before or after the match in the text. This is 
-primitive type of , built-in regular expression matching.
+THE FOLLOWING DOCUMENTS HOW TO BUILD A TREE. NOTE VERY SPECIAL CAUTION
+IS NEEDED WITH SPACES BEFORE AND AFTER SYNONYMS IN A KEYWORD LIST.
+
+A KList uses a comma separate string of synonyms. Thus if 'abc' occurs
+in the list it will match "abc" in the text. For example 'tee' matches
+"teeth" or "tee". But ' tee' only matches "tee" but could match "stee". 
+Thus unless you want to deliberately take advantage of this ambiguity,
+put spaces around your synonyms. I use ' par' for all the versions of
+"parallel" and ' opp' for versions of "opposing".
+
+Matching keywords from a KList also uses special symbols to help disambiguate, 
+in terms of what comes before or after the match in the text.  
  
 Thus an entry like this from a KList:
     abc # X
-means text with "abc X" will not be matched by that item from the KList.
-Hence abc followed by X is excluded.
+means text with "abc X" will not match. Hence abc followed by X is excluded.
  
 Similarly, this notation excludes being preceded by X:
     X $ abc
-means text with "X abc" will not be matched by that item from the KList
+means text with "X abc" will not be matched by that item from the KList.
  
-In both those cases, "abc", without the X, DOES match
+In both those cases, "abc" matches otheries, if not followed by "X".
 
 EG "tooth numbers" might be a pattern you want to match, separately from "tooth" or 
 "numbers" occurring alone. Those patterns are 
@@ -28,7 +36,7 @@ like the following excludes several things at once:
 So text with any of X, Y, or Z after abc will not be a match for this
 item of the KList. You can use '|'  with the '$' and can put as many
 un-quoted substrings in the exlusion as you like.
-NOTE: this is a different use of the'|' character than when or'ing VARs
+[NOTE: this is a different use of the'|' character than when or'ing VARs]
  
 Also you are supposed to ignore wildcards so
     abc * def
@@ -274,7 +282,7 @@ def findInText(klist, tokens, itok, ifound):
             ret = tok
             x = 2
             # NOTE this return value is ignored on the client side
-            # [No it isn't it's length is used]
+            # [No it isn't, it's length is used]
     return ret
 ###############################################################
 ###############################################################

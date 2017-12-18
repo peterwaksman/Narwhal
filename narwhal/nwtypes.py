@@ -405,6 +405,7 @@ class VAR:
     # operator '|'    # to match text against just one KList
     # matching text in more than one is considered a coding error but
     # it could be a contradiction in the text. We'll see.
+    # Note this is why knames is plural.
     def __or__(self, other):
         Z = VAR()
         Z.knames += self.knames
