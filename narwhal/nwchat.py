@@ -209,7 +209,8 @@ class NWTopic():
                 self.maxGOF= reader.GOF
 
     def summary(self):
-        out = self.tree.knames[0] + ":\n"
+        out = "|----" + self.tree.knames[0] + "---\n"
+        #out = "|---------\n"
         for reader in self.readers:
             out += reader.summary() + "\n"
         return out
@@ -267,7 +268,7 @@ AOK = 0 # agree
 ANOK = 1 # apologize but "no"
 AQU = 2 # ask clarifaction
 aResponse = {
-    AOK : "ok",
+    AOK : "ok {}",
     ANOK: "I {}",
     AQU : "please clarify {}"
     }
@@ -296,14 +297,16 @@ class DefaultResponder( NWTopicResponder ):
 #
 # NO. A chatbot community will be structured like the data that is 
 # central to its topics. Note the NWTopicChat, does not implement SetData()
-
+RESPONSE_CUTOFF = 0.3
 
 class TChat:
     # public API
     def __init__(self):
         self.gof = 0.0
+        self.caveat = ''
 
     def Read(self, text):
+        self.caveat = ''
         x = 2
 
     def Write(self):
@@ -331,7 +334,7 @@ class TChat:
         # override in derived classes. This is called after a read()
         # it sets a response and a responseVARs slot.
     def write( self ):
-        return self.responder.getStageResponse()
+        return self.responder.getStageResponse().format(self.caveat)
        
         #  Derived classes can reference the same data
     def SetData(self, data):
@@ -346,6 +349,9 @@ class TChat:
     # Implements tchat1 + tchat2
 class CompositeChat( TChat ):
     def __init__(self, A, B):
+
+        TChat.__init__(self)
+
         if isinstance(A, CompositeChat ):
             a = A.chats
         else:
@@ -359,32 +365,39 @@ class CompositeChat( TChat ):
         self.gof = 0.0
 
     def Read( self, text ):
+        self.caveat = ''
+
         for chat in self.chats:
             chat.Read( text )
 
-    def Write(self):
-        s = ''
         maxGOF = 0.0
-        first = True
         for chat in self.chats:
             if maxGOF<chat.GOF():
                 maxGOF = chat.GOF()
+        self.gof = maxGOF
+
+        if maxGOF<RESPONSE_CUTOFF:
+            self.caveat = 'hmm?'
+
+    def Write(self):
+        s = ''
+        first = True
+
+        x = 2
+        for chat in self.chats:
             w = chat.Write() 
             if chat.GOF()<0.5:
                 continue         
-            if len(w)>0:
+            if len(w)>0 and chat.GOF()==self.gof:
                 if first:
                     first = False
                 else:
-                    s += '\n'
+                    s += '...'
                 s += w 
 
-        self.gof = maxGOF
-
-        if maxGOF>=0.5 : # cutoff on response
-            return s
-        else:
-            return ''
+        if self.gof>=0.5 and len(s)>0: # cutoff on response
+            self.caveat = s
+        return self.caveat
 
     def SetData(self, data):
         self.data = data # why not keep a reference.
@@ -395,6 +408,8 @@ class CompositeChat( TChat ):
 
 class NWTopicChat(TChat):
     def __init__(self, topic, responder): 
+        TChat.__init__(self)
+
         self.topic = topic
         self.responder = responder
         self.gof = 0

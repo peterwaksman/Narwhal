@@ -324,6 +324,8 @@ def separateMM(text):
 
 
 def cleanDecimals(text):
+    if len(text)==0:
+        return
     newtext = ""
     for i in range(0, len(text)-1):
         if text[i]=='.' and text[i+1].isdigit():
@@ -357,6 +359,8 @@ def ensureFloatBeforeMM(tokens):
 
 #######################################################
 def prepareTokens(text):
+    if len(text)==0:
+        return ''
     """
     An important method. It is "hiding" here in nwcontrol.py. This is
     the opportunity for "pre-processing".
