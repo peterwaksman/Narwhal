@@ -10,20 +10,31 @@ sys.path.insert(0, narwhal_dir)
 from narwhal.nwtypes import *
 from narwhal.nwchat import *
 
+from abtSketch2 import AbutmentSketch
 
 class EmergenceProfile:
     def __init__(self):
-        self.value = "off" # also known as a straight emergence profile
+        self.value = '' # also known as a straight emergence profile
                            # will use name of EPSTYPE VAR
     def __eq__(self, other):
         self.value = other.value
 
+    def hasData(self):
+        if value:
+            return True
+        else:
+            return False
+
 class TissuePressure():
     def __init__(self):
-        self.value = 0.0 # positive value means TOWARDS/INTO the tissue
+        self.value = None # positive value means TOWARDS/INTO the tissue
     def __eq__(self, other):
         self.value = other.value
-
+    def hasData(self):
+        if self.value:
+            return True
+        else:
+            return False
 class AbutmentBase:
     def __init__(self):
         self.eps = EmergenceProfile()    
@@ -31,13 +42,23 @@ class AbutmentBase:
     def __eq__(self, other):
         self.eps = other.eps
         self.pressure = other.pressure
-
+    def hasData(self):
+        if self.eps.hasData() or self.pressure.hasData():
+            return True
+        else:
+            return False
 #---------------------------------------
 class MarginSpec:
-    def __init__(self, relation='low', reffeature = 'gum', value=0.2 ):
+    def __init__(self, relation='', reffeature = '', value=0.0 ):
         self.relation = relation  
         self.reffeature = reffeature  
         self.value = value    
+
+    def hasData(self):
+        if self.relation or self.reffeature:
+            return True
+        else:
+            return False
 
     def __eq__(self, other):
         self.relation = other.relation
@@ -50,6 +71,12 @@ class MarginData:
         self.D = MarginSpec()
         self.F = MarginSpec()
         self.L = MarginSpec()
+
+    def hasData(self):
+        if self.M.hasData() or self.D.hasData() or self.F.hasData() or self.L.hasData():
+            return True
+        else:
+            return False
 
     def __eq__(self, other):
         self.M = other.M 
@@ -74,3 +101,18 @@ class AllAbutments:
 class ToothSites:
     def __init__(self):
         self.abutments = AllAbutments()
+
+    def draw(self, abtSketch):
+        # decide about redrawing cuz a margin spec
+        toothno = -1
+        for n in range(0, 33):
+            if self.abutments.margin[n].hasData():
+                toothno = n
+
+        if toothno<0 :
+            return
+                
+        # decide about redrawing cuz a base spec
+        # [here]
+        
+

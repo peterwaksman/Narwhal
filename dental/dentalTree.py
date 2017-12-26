@@ -3,7 +3,7 @@ from narwhal.nwchat import *
 
 from stdtrees.quantities import *
 from stdtrees.geometry import * 
-
+ 
 """
 
 
@@ -13,7 +13,6 @@ MISCELLANEOUS= KList(
     BOW= KList(  "face bow, bow, facebow"
     ARTICULATOR = KList(
 
-    STOCK= KList( "stock"
     DOCS= KList( "document"
         RX= KList( "Rx, document, paper,written, external doc"
         DRAWING= KList( "draw, diagram"
@@ -33,27 +32,13 @@ MISCELLANEOUS= KList(
     SHOWING = KList("showing"
     CONICAL = KList("conical, conicity"
 
-ACTIONS = KList( 
-    SEND= KList( "send, resubmit, submit"
-    SHIP = KLIst("ship"
-    HOLD= KList( "hold, remake, redo"
-    DO= KList( " place , show , mimic, mirror, copy, match, ignore, remake, redo, \
-            soften, seat, connect, extract, mill, mold, mould, lap, fill, \
-            trim, scoop, allow, fit, adjust, reverse, sculpt, flare the, can, get"
-    NOTDO= KList( "leave, ignore"
-    AUTOMATE= KList( "automate"
-    MOVE= KList( "move, make, bring, tilt, lean, pull, push, close the, open the, expand, extend, toward"
-    ANGULATE= KList(  "angle, align"    
-    CANTILEVER= KList(  
-    ROTATE = KLst(
-
-
 PERIDENTAL
     MYORDER = nwt.KList( "myorder", ' my order , my * order , order , the order  , an order , case , a case , the case ').var()
-    ACCOUNT = nwt.KList( "account", ' account , payment , amount due , much , cost ' ).var()
+    ACCOUNT = nwt.KList( "account", ' account , payment , amount due , cost , pay , finance' ).var()
 
 DENTAL= KList( 
     CAST= KList(  "cast, study, study model, provisional, diagnostic"
+    SCAN = KList("scan", "scan").var()
     JAW= KList(  " jaw" 
         UPPER " upper , maxil"
         LOWER " lower, mandib" 
@@ -79,6 +64,8 @@ DENTAL= KList(
 
 
     PRODUCT= KList( 
+        STOCK= KList( "stock"
+
         PART= KList( " unit, part "
         CAP= KList( "cap, healing cap, healing abutment, healingabut"               
         ABUTMENT= KList(
@@ -97,41 +84,35 @@ DENTAL= KList(
             SURG "surgical guide"
 """
 
-################ SIDE ####
 
-SIDE = KList("side","").var()
+#----------------SIDE --------------
 ALL = KList( "all",  "all sides, all around, 360, circumferential, around, other values").var()
-REMAINING= KList( "remainder", "remainder, rest of, other, other values").var() # as in "the rest of the margins
+REMAINING= KList( "remainder", "remainder, rest of, other").var() # as in "the rest of the margins
 BF= KList("bf",  " b/f, f/b, buccal/facial, b&f").var()
 BUCCAL= KList("buccal", " b , buccal, baccal, buc, buck, bucca").var()
 FACIAL= KList( "facial"," f , facial").var()
 BF.sub(BUCCAL)
 BF.sub(FACIAL)
 
-MD= KList("md", " m/d, d/m, mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
+MD= KList("md", " m/d , d/m , mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
 MESIAL= KList( "mesial", " m , mesial , mesail , mes , meaisl , mesial").var()
-DISTAL= KList("d",  " d , distal , dist, distall ").var()
+DISTAL= KList("distal",  " d , distal , dist , distall ").var()
 MD.sub(MESIAL)
 MD.sub(DISTAL)
 
-LABIAL= KList("labial",  " labial").var()
-LINGUAL= KList("lingual",  "lingual, ling, lin, l").var()
-PALATAL= KList( "palatal", "palat").var()
-OCCLUSAL= KList("occlusal",  "occ").var()
-INCISAL= KList( "incisal", "incisal, inc").var()
-OPPOSING=KList("opposing", "opp").var()
+LABIAL= KList("labial",  "labial").var()
+LINGUAL= KList("lingual",  "lingual, ling, lin, l ").var()
 
+#PALATAL= KList( "palatal", "palat").var()
+
+SIDE = KList("side","").var() 
 SIDE.sub(ALL)
 SIDE.sub(REMAINING)
 SIDE.sub(BF)
 SIDE.sub(MD)
 SIDE.sub(LABIAL)
 SIDE.sub(LINGUAL)
-SIDE.sub(PALATAL)
-SIDE.sub(OCCLUSAL)
-SIDE.sub(INCISAL)
-SIDE.sub(ALL)
-SIDE.sub(OPPOSING)
+ 
 
 ############# TOOTHGROUP ##################
 
@@ -168,7 +149,7 @@ ADJACENT = KList("adjacent","adjacent, adjacent tooth, adjacent teeth, adjecent,
 MARK = KList("mark", "mark, line").var()
 CEJ = KList("cej", "cej, cement enamel junction").var()
 CONTRALATERAL = KList("contralateral", "contralateral").var()
-#-------------------------------------
+
 REFFEATURE = KList("reffeature","").var()
 REFFEATURE.sub(SOFTTISSUE)
 REFFEATURE.sub(GUM)
@@ -178,8 +159,53 @@ REFFEATURE.sub(ADJACENT)
 REFFEATURE.sub(MARK)
 REFFEATURE.sub(CEJ)
 REFFEATURE.sub(CONTRALATERAL)
-#------------------------------------
-ABTFEATURE = KList("abtfeature", "").var()
+# useful subset (excludes OPPOSING, and CONTRALATERAL)
+MREF = KList("marginreference", "").var() 
+MREF.sub(SOFTTISSUE)
+MREF.sub(GUM)
+MREF.sub(INTERFACE)
+MREF.sub(ADJACENT)
+MREF.sub(MARK)
+MREF.sub(CEJ)
+
+#----------------------------------------------------
+kCROWN = 'temporary|temp|janus|cutback|regular|normal|standard $ crown'
+CROWN = KList( "crown", kCROWN).var()
+
+CROWNTYPE = KList("crowntype", "crowntype").var()
+TEMP = KList("temp", "temp, temp crown, temporary, temporary crown").var()
+FULL = KList("full", " full, full crown,full contoured, full contoured crown,\
+regular, regular crown, normal, normal crown, standard, standard crown").var()
+JANUSCROWN = KList("janus", "janus # abutment, janus crown" ).var()
+CUTBACK = KList("cutback", "cutback, cut back, cutback crown, cut back crown").var()
+CROWNTYPE.sub( TEMP )
+CROWNTYPE.sub( FULL )
+CROWNTYPE.sub( JANUSCROWN )
+CROWNTYPE.sub( CUTBACK )
+
+#--------CROWN SURFACE
+OCCLUSAL= KList("occlusal",  "occ").var()
+INCISAL= KList( "incisal", "incisal, inc").var()
+SURFACE = KList("surface","").var()
+SURFACE.sub(OCCLUSAL)
+SURFACE.sub(INCISAL)
+#---------------CROWNFEATURE
+HOLE= KList("hole","hole, screw hole, screwhole").var()
+WALL = KList("wall", "wall").var()
+#CUSPS
+#FOSSA
+#VESTIBULE
+#CINGULUM
+CROWNFEATURE = KList("crownfeature","").var()
+CROWNFEATURE.sub(HOLE)
+CROWNFEATURE.sub(WALL)
+
+CROWN.sub(CROWNTYPE)
+CROWN.sub(CROWNFEATURE)
+CROWN.sub(SURFACE)
+
+
+#------------------ABTFEATURE-----------
 MARGIN = KList("margin", "margin, collar, outline").var()
 BASE = KList("base", "base, between interface and margin").var()      
 CORE = KList("core","core # file, post").var()
@@ -187,6 +213,7 @@ SHOULDER = KList("shoulder","shoulder, sholder, chamfer, chamf, \
                    champfer, champ, flar, flair" ).var()   
 BEVEL = KList("bevel", "bevel, occlusal bevel").var()
 GROOVE = KList("groove", "groove, retention groove, retentive groove").var()
+ABTFEATURE = KList("abtfeature", "").var()
 ABTFEATURE.sub(MARGIN)
 ABTFEATURE.sub(BASE)
 ABTFEATURE.sub(MARGIN)
@@ -194,21 +221,23 @@ ABTFEATURE.sub(CORE)
 ABTFEATURE.sub(SHOULDER)
 ABTFEATURE.sub(BEVEL)
 ABTFEATURE.sub(GROOVE)
-#-------------------------------------
-ABTMATERIAL = KList("material", " material ").var() #1st is the name, 2nd is a list
-ZIRC = KList("zirconia"," zircomium, zirconia, zr , zi , z ").var()
-TITN = KList("titanium"," titanium, titania, ti , t ").var()
+
+#------------------ABTMATERIAL-------------------
+ZR = KList("zirconia"," zircomium, zirconia, zr , zi , z ").var()
+TI = KList("titanium"," titanium, titania, ti , t ").var()
 GOLDTI = KList("goldTi", "gold, gold hue").var()
-ABTMATERIAL.sub(ZIRC)
-ABTMATERIAL.sub(TITN)
+ABTMATERIAL = KList("abtmaterial", "").var()
+ABTMATERIAL.sub(ZR)
+ABTMATERIAL.sub(TI)
 ABTMATERIAL.sub(GOLDTI)
+
 #-------------------------------------
     # BASE values
 EPS = KList("eps", "eps, esp, ets, profile, emergence, emergense, emergency, emmergence").var()      
 PRESSURE =  KList("pressure", "press, presure, blanch, blaching, push, push on, support, \
                    expand,tissue pressure,compression, displace,displacement,\
                    diplace, impinge, impingement").var()        
-    # value values:
+    # 'value' values:
 STRAIGHT = KList("off", "off, straight, striaght, srtaight").var()
 CONCAVE = KList("concave", "concave, convave").var()
 CONVEX = KList("convex", "convex").var()
@@ -225,37 +254,34 @@ BASE.sub(EPSTYPE)
 BASE.sub(PRESSURE)
 #------------------------------
 
-ABUTMENT = KList("abutment", "abutment, abut").var()
-ABTMATERIAL = KList("abtmaterial", "").var()
-ZR= KList( "zirconia", "zirconia, zirconium, zr").var()
-TI= KList( "titanium", "titanium, ti, titania").var()
-GOLDTI = KList("goldhue","gold, gold hue").var()
-ABTMATERIAL.sub(TI)
-ABTMATERIAL.sub(GOLDTI)
-
 ABTTYPE = KList("abttype", "").var()
 HEALING = KList("healingabut","healing abutment").var()
 SMOOTH = KList("smoothabut", "smooth abutment").var()
+JANUSABT = KList("janusabut","janus # crown").var()
+STOCK= KList( "stock", "stock").var()
+
 ABTTYPE.sub(HEALING)
 ABTTYPE.sub(SMOOTH)
+ABTTYPE.sub(JANUSABT)
+ABTTYPE.sub(STOCK)
 
+ABUTMENT = KList("abutment", "abutment, abut").var()
 ABUTMENT.sub(ABTFEATURE)
 ABUTMENT.sub(ABTMATERIAL)
 ABUTMENT.sub(ABTTYPE)
 
+
 # FINAL DENTAL TREE----------------------
 TOOTHSITE = KList("dentaltree", "").var()
 TOOTHSITE.sub(TOOTHGROUP)
-TOOTHSITE.sub(REFFEATURE)
-TOOTHSITE.sub(SIDE)
-#TOOTHSITE.sub(ABUTMENT)
-TOOTHSITE.sub(ABTFEATURE)
+TOOTHSITE.sub(REFFEATURE) # eg gingiva
+TOOTHSITE.sub(SIDE)       # eg mesial
+TOOTHSITE.sub(ABUTMENT)   # abt feature, material, type
 
 # ADD THE INCLUDED TREES
 TOOTHSITE.sub(GEN_QUANTITY)
 TOOTHSITE.sub(GEN_GEOMETRY)
 #------------------------------
-
 
  # BASE topic
 # "make base convex" or "convex EPS please"
@@ -275,7 +301,8 @@ BaseTopic = NWTopic( TOOTHSITE, B )
 #-----------------------------------------------
  # MARGIN topic
  # "put margin .2mm below gingiva", or ".2 mm below" or "below gingiva"
-marginNAR = relation( [SIDE], [REFFEATURE], RELATION , [FLOATx] )
+#marginNAR = relation( [SIDE], [REFFEATURE], LO_HI , [FLOATx] )
+marginNAR = relation( [SIDE], [MREF], RELATION , [FLOATx] )
 toothfeatureNAR = attribute( ABTFEATURE, [INTx], [TOOTH]) # will often score .5
 
 M = [
@@ -286,13 +313,23 @@ M = [
 MarginTopic = NWTopic( TOOTHSITE, M)
 
 #-------------------------------------------------------
-toothnumNAR = attribute( [TOOTH], INTx) # will often score .5
+toothNAR = attribute( [TOOTH], INTx) # will often score .5
 
 T = [
-        NWTopicReader("toothnumR", TOOTHSITE, toothnumNAR),
+        NWTopicReader("toothnumR", TOOTHSITE, toothNAR),
     ]
 
-ToothNumTopic = NWTopic( TOOTHSITE, T)
+ToothTopic = NWTopic( TOOTHSITE, T)
+
+#------------------------------------------------------
+MYORDER = KList( "order", ' my order , my * order , order , the order  , an order , case , a case , the case ').var()
+MYACCOUNT = KList( "account", ' account , payment , amount due , cost , pay , finance' ).var()
+
+TOPIC = KList( "topic", "" ).var()
+TOPIC.sub(TOOTHSITE)
+TOPIC.sub(MYORDER)
+TOPIC.sub(MYACCOUNT)
+x = 2
 
 
 

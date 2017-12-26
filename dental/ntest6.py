@@ -25,9 +25,15 @@ from PIL import ImageTk, Image
 
 #from narwhal.nwchat import NWTopicChat
 from stdtrees.tchats import *
-from abutmentChats import BaseChat, MarginChat , DentalChat
+from dentalChats import BaseChat, MarginChat , DentalChat
 
-Q = DentalChat()
+from abtSketch2 import drawReferenceFeatures
+
+A = AboutChat()
+D = DentalChat()  
+Q  = D + A
+
+
 #Q = AboutChat()  + BaseChat()
 #Q = BaseChat()
 #Q = MarginChat()  + BaseChat() + AboutChat()
@@ -40,10 +46,11 @@ def initImage():
 
     h = Image.new("RGB",(IMGHWIDTH,IMGHEIGHT), "white")    
 
-    #drawReferenceFeatures(h)
+    drawReferenceFeatures(h)
 
-    #K = ABT.sketch
-    #K.Draw(h)  
+    D.draw()
+    K = D.sketch
+    K.Draw(h)  
 
     img = ImageTk.PhotoImage(h)
     panel = Label(root, image = img)
@@ -59,10 +66,11 @@ def readText(event):
 
     h = Image.new("RGB",(IMGHWIDTH,IMGHEIGHT), "white")    
 
-    #drawReferenceFeatures(h)
+    drawReferenceFeatures(h)
 
-    #K = ABT.sketch
-    #K.Draw(h)  
+    D.draw()
+    K = D.sketch
+    K.Draw(h)  
      
     img = ImageTk.PhotoImage(h)
 
@@ -91,7 +99,8 @@ initImage()
 
 response = StringVar()
 e = Entry(root, textvariable=response)
-e.config(width=60)
+e.config(width=60, font="Courier 12 bold")
+
 e.grid()
 response.set("")
 
