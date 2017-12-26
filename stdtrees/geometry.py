@@ -112,12 +112,8 @@ HI= KList("above",  " positive, pos , hi , high,  raise, above, over, sup, supra
           super, super-, super_, positive, up, hi as possible, high as possible, up ").var()
 LO= KList("below",  " negative, neg , lo , low, deep, lower, drop, below, sub, sub-, sub_, under, \
           depth , down , lo as possible, low as possible, down ").var()
-LO_HI= LO | HI  
-
 NEAR= KList("near",  "near, near to").var()
 FAR= KList( "far", "far, far from, away, out, away from, out from").var()
-NEAR_FAR = NEAR|FAR 
-
 
 RELATION.sub(AT)
 RELATION.sub(CLOSEST)
@@ -125,8 +121,10 @@ RELATION.sub(BETWEEN)
 RELATION.sub(OFFSET)
 #RELATION.sub(PARALLEL) #part of MATCH
 RELATION.sub(MATCH)
-RELATION.sub(LO_HI)
-RELATION.sub(NEAR_FAR)
+RELATION.sub(HI)
+RELATION.sub(LO)
+RELATION.sub(NEAR)
+RELATION.sub(FAR)
 
 #------------------------
 

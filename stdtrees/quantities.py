@@ -14,7 +14,7 @@ from narwhal.nwtypes import KList
 # NOTE INCOMPLETE. ONLY #7 is correct
 
 kZERO = ' none , zero , 0 '
-kONE  = ' tooth|number|_hash_ $ one , an , a , tooth|number|_hash_ $ 1 ' #introduces a small bug, since 'a'  is also DULL
+kONE  = ' tooth|number|_hash_ $ one , tooth|number|_hash_ $ 1 ' #introduces a small bug, since 'a'  is also DULL
 kTWO = ' tooth|number|_hash_ $ two , couple , _tooth|number|_hash_ $ 2 '
 kTHREE = ' tooth|number|_hash_ $ three , tooth|number|_hash_ $ 3 '
 kFOUR  = ' tooth|number|_hash_ $ four , tooth|number|_hash_ $ 4 '

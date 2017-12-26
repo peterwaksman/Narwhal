@@ -65,8 +65,8 @@ cancel, cancel that, not right, not what I want, redo, redo that"
 
 kUNREQUEST += kUNDO
 
-
 REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var()
+
 
 #########################################
 # not really quantities but what the heck
@@ -99,3 +99,39 @@ HELLO = KList("hello", kHELLO).var()
 
 
 THANKS = KList("thanks", "thanks, thx, thank you").var()
+
+#######################################
+#######################################
+ACTION   = KList("actions", "").var()
+# subs:
+SEND     = KList("send", "send, resubmit, submit , ship " ).var()
+HOLD     = KList( "hold", " hold, wait").var()
+DO       = KList("do", " place , show , mimic, mirror, copy, match,\
+        soften, seat, connect, extract, mill, mold, mould, lap, fill, \
+        trim, scoop, allow, fit, adjust, reverse, sculpt, flare the, can, get").var()
+REDO     =  KList("redo", "remake, redo").var()
+NOTDO    = KList("notdo", "leave, ignore")
+AUTOMATE = KList( "automate","automate").var()
+MOVE     = KList("move","move, bring, tilt, lean, pull, push, close the,\
+             open the, expand, extend, toward").var()
+MAKE     = KList("make", "make # contact, make it, turn, turn it").var()
+ANGULATE = KList("angle",  "angle, angulate, align").var()    
+CANTILEVER= KList("cantilever", "cantilever").var()  
+ROTATE   = KList("rotate", "rotate, rot ").var()
+CONTACT = KList("contact", "contact, make contact").var()
+
+ACTION.sub(ACTION)
+ACTION.sub(SEND)
+ACTION.sub(HOLD)
+ACTION.sub(DO)
+ACTION.sub(REDO)
+ACTION.sub(NOTDO)
+ACTION.sub(AUTOMATE)
+ACTION.sub(MOVE)
+ACTION.sub(MAKE)
+ACTION.sub(ANGULATE)
+ACTION.sub(CANTILEVER )
+ACTION.sub(ROTATE)
+ACTION.sub(CONTACT)
+################################### 
+###################################

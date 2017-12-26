@@ -11,6 +11,9 @@ from narwhal.nwtypes import *
 from narwhal.nwcontext import *
 
 from stdtrees.ask import *
+# don't  like it but need to include app stuff. Could avoid with
+# if TOPIC was a ctor argument.
+from dentalTree import TOPIC
 
 SENSE_CUTOFF = 0.3
 
@@ -21,19 +24,21 @@ SENSE_CUTOFF = 0.3
 ###VARS
 CLIENTASK = KList( "clientask", ' i , me , we ').var()
 CLIENTASK.sub(QUESTION) 
+CLIENTASK.sub(REQUEST) 
 CLIENTASK.sub(YOU)  
 CLIENTASK.sub(HELLO)
 CLIENTASK.sub(YES_NO) #this ensures YES_NO is used when the CLIENTASK tree is used.
 CLIENTASK.sub(THANKS)
 
-TOPIC = KList( "topic", "put a list here" ).var()
+#TOPIC = KList( "topic", "" ).var() # use TOPIC.sub() elsewhere
 CLIENTASK.sub(TOPIC)
 
 ###NARS
-about = attribute(QUESTION,[TOPIC],YOU)
+about = attribute(QUESTION,YOU)
 hello = attribute(HELLO,HELLO) 
 # have yesno defined in ask.py
 asktopic = attribute(QUESTION, TOPIC )
+requesttopic = attribute(REQUEST, TOPIC )
 thankyou = attribute(THANKS, YOU)
  
 
@@ -42,6 +47,7 @@ Q = [
         NWTopicReader('about', CLIENTASK, about ), 
         NWTopicReader('hello', CLIENTASK, hello ),  
         NWTopicReader('asktopic', CLIENTASK, asktopic ),
+        NWTopicReader('requesttopic', CLIENTASK, requesttopic ),
         NWTopicReader('thankyou', CLIENTASK, thankyou ),
     ]  
 
@@ -53,14 +59,16 @@ QUERYNONE = 0
 QUERYHI = 1
 QUERYABOUT = 2
 QUERYTOPIC = 3 
-QUERYTHANKS = 4
+QUERYTOPIC2 = 4 
+QUERYTHANKS = 5
 
 # qchatR[i] is singular qchatRVs[i] is a list, hence the plural
 qchatR = { 
     QUERYNONE : "-sigh-",
     QUERYHI : "Hi, Hello, Good morning",
     QUERYABOUT: "A chatbot",
-    QUERYTOPIC: "Yes I can help you with that",
+    QUERYTOPIC: "Yes I can help you with {} information",
+    QUERYTOPIC2: "Yes I can help with your request for {}(s)",
     QUERYTHANKS: "You are welcome"
     }
 qchatRVs = {
@@ -68,11 +76,13 @@ qchatRVs = {
     QUERYHI : [HELLO],
     QUERYABOUT : [YOU],
     QUERYTOPIC : [TOPIC],
+    QUERYTOPIC2 : [TOPIC],
     QUERYTHANKS : []
     }
 
 QueryResponder = NWTopicResponder( qchatR, qchatRVs )
 #########################################
+
 class AboutChat( NWTopicChat ):
     def __init__(self ):
         NWTopicChat.__init__(self, QueryTopic, QueryResponder)
@@ -82,12 +92,17 @@ class AboutChat( NWTopicChat ):
 
         if self.gof<=SENSE_CUTOFF:
             self.responder.stage = QUERYNONE
+            self.gof = 0.0 # maybe not a good habit?
             return
 
         reader = self.topic.getBestReader()
         if reader :
             id = reader.id
             if id=='about':
+                if self.gof<= 0.5:
+                    self.responder.stage = QUERYNONE
+                    self.gof = 0.0 # maybe not a good habit?
+
                 self.responder.stage = QUERYABOUT
                 t = Thing(reader.lastEvent[1])
                 if t=='how':
@@ -100,8 +115,23 @@ class AboutChat( NWTopicChat ):
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()
             elif id=='asktopic':
+                if self.gof<= 0.5:
+                    self.responder.stage = QUERYNONE
+                    self.gof = 0.0 # maybe not a good habit?
+                    return
+                v = reader.getLastValue()
                 self.responder.stage = QUERYTOPIC       
-                self.responder.extratext = self.responder.getStageResponse()
+                self.responder.extratext = self.responder.getStageResponse().format(v)
+
+            elif id=='requesttopic':
+                if self.gof<= 0.5:
+                    self.responder.stage = QUERYNONE
+                    self.gof = 0.0 # maybe not a good habit?
+                    return
+                v = reader.getLastValue()
+                self.responder.stage = QUERYTOPIC2       
+                self.responder.extratext = self.responder.getStageResponse().format(v)
+
             elif id=='thankyou':
                 self.responder.stage = QUERYTHANKS
                 self.responder.extratext = self.responder.getStageResponse()
@@ -208,7 +238,6 @@ class ConfirmChat( NWTopicChat ):
                     if self.isYes:
                         self.value = temp
                         self.responder.stage = CONFIRM3
-
                 
     def write(self):
         if self.responder.stage==CONFIRM1:
