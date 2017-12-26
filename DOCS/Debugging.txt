@@ -1,3 +1,12 @@
+
+Very useful when setting up trees: go to PrepareSegment(), put a breakpoint at the last line "return seg"
+and use the debugging method printSEG( seg ) to get a list of the elements of the segmemted text. It will often show you something being identified that is not intended - allowing you to go fix the tree.
+
+Another useful thing is to use VAR.PrintSimple() to see the full contents of a tree. It is useful after PrepareSegment(), to see what has been found and what not.
+
+
+
+-----------------------------------------------------------------------
 I know I will forget everthing soon enough. I already am vague about some of the details of the NarReadData and which responsibities go with which piece of sub data. Anyway, some tips for debugging.
 
 Here are things I frequently do:
@@ -33,8 +42,6 @@ Here the readText() method is central and I put a breakpoint at the line:
 At this place, we are reading through sections of text between istart and CD.ictrl. In the previous line we did a readMany() and have just changed nar's and ifound's in each NarReadData. Now, if we step into applyControl(), we enter a space cleanly divided into different nightmares. Each one involves deciding how to update things for this control. This is some of the most difficult code and relates to what information in the NarReadData needs to be cleared and re-used in the next section of text reading, and which information gets rolled over and added to, without being cleared. I have tried to keep the ABReader up to date and this may be easier to use.
 
 The theory is that the slots of a nar are filled progressively, while the 'ifound' token indices are reset within each section of text between controls. Part of clearing a nar is the "contract" of not clearing the nar's 'used' slots until they have had a chance to be converted to a NarRecord and vaulted. That should happen on a period '.' or and end of text, unless the nar is abandoned for being sub threshold.
-
-
 
 
 
