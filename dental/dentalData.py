@@ -20,7 +20,7 @@ class EmergenceProfile:
         self.value = other.value
 
     def hasData(self):
-        if value:
+        if self.value:
             return True
         else:
             return False
@@ -101,18 +101,48 @@ class AllAbutments:
 class ToothSites:
     def __init__(self):
         self.abutments = AllAbutments()
-
-    def draw(self, abtSketch):
+ 
+       # later...dude
+    def updateSketch(self, abtSketch):
         # decide about redrawing cuz a margin spec
         toothno = -1
         for n in range(0, 33):
-            if self.abutments.margin[n].hasData():
+            if self.abutments.margin[n].hasData() or self.abutments.base[n].hasData():
                 toothno = n
+                break
 
         if toothno<0 :
             return
-                
-        # decide about redrawing cuz a base spec
-        # [here]
         
+        margin = self.abutments.margin[toothno]
+        base = self.abutments.base[toothno]
+        if base.hasData():
+            if base.eps.hasData():
+                x = base.eps.value
+                if x=='convex':
+                    abtSketch.makeConvex()
+                elif x=='off':
+                    abtSketch.makeStraight()
+                elif x=='concave':
+                    abtSketch.makeConcave()
+                elif x=='ankylos':
+                    abtSketch.makeAnkylos()
+            # tissue pressure not sketched 
+        if margin.hasData():
+            M = margin.M
+            D = margin.D
+            F = margin.F
+            L = margin.L
+            if M.relation=='below' or D.relation=='below' or \
+               F.relation=='below' or L.relation=='below':
+                abtSketch.makeSubG()
+            elif M.relation=='above' or D.relation=='above' or \
+               F.relation=='above' or L.relation=='above':
+                abtSketch.makeSupraG()
+
+
+
+
+                
+       
 

@@ -86,7 +86,7 @@ DENTAL= KList(
 
 
 #----------------SIDE --------------
-ALL = KList( "all",  "all sides, all around, 360, circumferential, around, other values").var()
+ALL = KList( "all",  "all sides, all around, 360, circumferential, all the way around, around, other values").var()
 REMAINING= KList( "remainder", "remainder, rest of, other").var() # as in "the rest of the margins
 BF= KList("bf",  " b/f, f/b, buccal/facial, b&f").var()
 BUCCAL= KList("buccal", " b , buccal, baccal, buc, buck, bucca").var()
@@ -206,17 +206,16 @@ CROWN.sub(SURFACE)
 
 
 #------------------ABTFEATURE-----------
-MARGIN = KList("margin", "margin, collar, outline").var()
+MARGIN = KList("margin", "shoulder $ margin, collar, outline").var()
 BASE = KList("base", "base, between interface and margin").var()      
 CORE = KList("core","core # file, post").var()
-SHOULDER = KList("shoulder","shoulder, sholder, chamfer, chamf, \
+SHOULDER = KList("shoulder","shoulder, sholder, shoulder * margin, chamfer, chamf, \
                    champfer, champ, flar, flair" ).var()   
 BEVEL = KList("bevel", "bevel, occlusal bevel").var()
 GROOVE = KList("groove", "groove, retention groove, retentive groove").var()
 ABTFEATURE = KList("abtfeature", "").var()
 ABTFEATURE.sub(MARGIN)
 ABTFEATURE.sub(BASE)
-ABTFEATURE.sub(MARGIN)
 ABTFEATURE.sub(CORE)
 ABTFEATURE.sub(SHOULDER)
 ABTFEATURE.sub(BEVEL)
@@ -270,22 +269,35 @@ ABUTMENT.sub(ABTFEATURE)
 ABUTMENT.sub(ABTMATERIAL)
 ABUTMENT.sub(ABTTYPE)
 
-
-# FINAL DENTAL TREE----------------------
-TOOTHSITE = KList("dentaltree", "").var()
-TOOTHSITE.sub(TOOTHGROUP)
-TOOTHSITE.sub(REFFEATURE) # eg gingiva
-TOOTHSITE.sub(SIDE)       # eg mesial
-TOOTHSITE.sub(ABUTMENT)   # abt feature, material, type
+#---------------------------------------
+PERTOOTH = KList("pertooth","unit").var()
+PERTOOTH.sub(ABUTMENT)
+PERTOOTH.sub(CROWN)
 
 #--------------------
 PRODUCT= KList("product","").var()
-PRODUCT.sub(TOOTHSITE)
+PRODUCT.sub(PERTOOTH)
+
+# ----------------------
+MOUTH = KList("mouth", "").var()
+MOUTH.sub(TOOTHGROUP)
+MOUTH.sub(REFFEATURE) # eg gingiva
+MOUTH.sub(SIDE)       # eg mesial
+
+#FINAL DENTAL TREE---------------------------------------
+DENTAL = KList("dental","").var()
+DENTAL.sub(MOUTH)
+DENTAL.sub(PRODUCT)
 
 # ADD THE INCLUDED TREES
-TOOTHSITE.sub(GEN_QUANTITY)
-TOOTHSITE.sub(GEN_GEOMETRY)
+ALLWORDS = DENTAL.copy()
+ALLWORDS.sub(GEN_QUANTITY)
+ALLWORDS.sub(GEN_GEOMETRY)
 #------------------------------
+toothNAR = attribute( [TOOTH], INTx) # will often score .5
+toothfeatureNAR = attribute( ABTFEATURE, [INTx], [TOOTH]) # will often score .5
+
+#--------------------------------------
 
  # BASE topic
 # "make base convex" or "convex EPS please"
@@ -296,44 +308,45 @@ tisspressNAR = attribute( PRESSURE, FLOATx, [MM] )
 tisspressNAR2 = attribute( PRESSURE, STRENGTH, [SOFTTISSUE] )
 
 B = [
-        NWTopicReader("epsReader", TOOTHSITE , epsNAR ),
-        NWTopicReader("tpReader",  TOOTHSITE , tisspressNAR ),
-        NWTopicReader("tpReader2", TOOTHSITE , tisspressNAR2 )
+        NWTopicReader("epsReader", ALLWORDS , epsNAR ),
+        NWTopicReader("tpReader",  ALLWORDS , tisspressNAR ),
+        NWTopicReader("tpReader2", ALLWORDS , tisspressNAR2 ),
+        NWTopicReader("toothfeatureR", ALLWORDS, toothfeatureNAR)
     ]
-BaseTopic = NWTopic( TOOTHSITE, B ) 
+BaseTopic = NWTopic( MOUTH, B ) 
 
 #-----------------------------------------------
  # MARGIN topic
  # "put margin .2mm below gingiva", or ".2 mm below" or "below gingiva"
 #marginNAR = relation( [SIDE], [REFFEATURE], LO_HI , [FLOATx] )
 marginNAR = relation( [SIDE], [MREF], RELATION , [FLOATx] )
-toothfeatureNAR = attribute( ABTFEATURE, [INTx], [TOOTH]) # will often score .5
 
 M = [
-        NWTopicReader("margR", TOOTHSITE, marginNAR),
-        NWTopicReader("toothfeatureR", TOOTHSITE, toothfeatureNAR)
+        NWTopicReader("margR", ALLWORDS, marginNAR),
+        NWTopicReader("toothfeatureR", ALLWORDS, toothfeatureNAR)
     ]
 
-MarginTopic = NWTopic( TOOTHSITE, M)
+MarginTopic = NWTopic( ALLWORDS, M)
 
 #-------------------------------------------------------
-toothNAR = attribute( [TOOTH], INTx) # will often score .5
 
-T = [
-        NWTopicReader("toothnumR", TOOTHSITE, toothNAR),
-    ]
+#T = [
+#        NWTopicReader("toothnumR", TOOTHSITE, toothNAR),
+#    ]
 
-ToothTopic = NWTopic( TOOTHSITE, T)
+#ToothTopic = NWTopic( ALLWORDS, T)
 
 #------------------------------------------------------
 MYORDER = KList( "order", ' my order , my * order , order , the order  , an order , case , a case , the case ').var()
 MYACCOUNT = KList( "account", ' account , payment , amount due , cost , pay , finance' ).var()
+#-------------------------------------
+TOPIC = KList( "topic", "" ).var()  
+#TOPIC.sub(ALLWORDS)
+#TOPIC.sub(PERTOOTH)
+#TOPIC.sub(MYORDER)
+#TOPIC.sub(MYACCOUNT)
 
-TOPIC = KList( "topic", "" ).var()
-TOPIC.sub(TOOTHSITE)
-TOPIC.sub(MYORDER)
-TOPIC.sub(MYACCOUNT)
-x = 2
+ 
 
 
 

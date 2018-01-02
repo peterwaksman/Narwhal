@@ -25,14 +25,17 @@ from PIL import ImageTk, Image
 
 #from narwhal.nwchat import NWTopicChat
 from stdtrees.tchats import *
-from dentalChats import BaseChat, MarginChat , DentalChat
+from dentalChats import BaseChat, MarginChat , DentalChat, AppChat
 
 from abtSketch2 import drawReferenceFeatures
 
 A = AboutChat()
 D = DentalChat()  
-Q  = D + A
+Q  = A + D
+Q = D
 
+
+GETA = AppChat()
 
 #Q = AboutChat()  + BaseChat()
 #Q = BaseChat()
@@ -48,9 +51,9 @@ def initImage():
 
     drawReferenceFeatures(h)
 
-    D.draw()
-    K = D.sketch
-    K.Draw(h)  
+     
+    D.sketch.Draw(h)
+     
 
     img = ImageTk.PhotoImage(h)
     panel = Label(root, image = img)
@@ -62,16 +65,16 @@ def initImage():
 
 def readText(event):
     text = T.get()
+    GETA.Read(text)
     Q.Read(text)
 
     h = Image.new("RGB",(IMGHWIDTH,IMGHEIGHT), "white")    
 
     drawReferenceFeatures(h)
 
-    D.draw()
-    K = D.sketch
-    K.Draw(h)  
-     
+    D.sketch.Draw(h)
+ 
+
     img = ImageTk.PhotoImage(h)
 
     panel = Label(root, image = img)
@@ -80,7 +83,8 @@ def readText(event):
     panel.configure( image=img )
     panel.image = img
  
-    s = Q.Write()#''#ABT.responder.getStageResponse()
+    #s = Q.Write()#''#ABT.responder.getStageResponse()
+    s = GETA.Write()
     response.set(s)
 
 #This creates the main root of an application
@@ -93,16 +97,17 @@ root.configure(background='grey')
 T = Entry(root, width=80)
 T.bind("<Return>", readText)
 T.grid(row=1, column=0) 
- 
+
 # display blank background for starters
 initImage()
 
 response = StringVar()
-e = Entry(root, textvariable=response)
-e.config(width=60, font="Courier 12 bold")
 
+e = Label(root, background='white', anchor=W, textvariable=response)
+e.config(width=60, font="Courier 12 bold")
 e.grid()
-response.set("")
+
+response.set("How can I help you?")
 
 
 root.mainloop()
