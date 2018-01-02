@@ -54,8 +54,8 @@ QUESTION.sub(WHAT)
 
 ########################################
 ########################################
-kREQUEST = ' you get, please , use , build , ask for , sell me , fabricate , produce , provide ,\
- provide me , make #an , make me , to make , my|the|an $ order , to order ,\
+kREQUEST = ' you get, pls , please , use , build , ask for , sell me , fabricate , produce , provide ,\
+ provide me ,make sure, make #an , make me , to make , my|the|an $ order , to order ,\
  want , want to , want you to, need ,need to , need you to, give me ,add,'
 
 kUNREQUEST = "remove, unselect, deselect"

@@ -13,7 +13,7 @@ from narwhal.nwcontext import *
 from stdtrees.ask import *
 # don't  like it but need to include app stuff. Could avoid with
 # if TOPIC was a ctor argument.
-from dentalTree import TOPIC
+#from dentalTree import * #TOPIC getTopicPrompt
 
 SENSE_CUTOFF = 0.3
 
@@ -31,14 +31,14 @@ CLIENTASK.sub(YES_NO) #this ensures YES_NO is used when the CLIENTASK tree is us
 CLIENTASK.sub(THANKS)
 
 #TOPIC = KList( "topic", "" ).var() # use TOPIC.sub() elsewhere
-CLIENTASK.sub(TOPIC)
+#CLIENTASK.sub(TOPIC)
 
 ###NARS
 about = attribute(QUESTION,YOU)
 hello = attribute(HELLO,HELLO) 
 # have yesno defined in ask.py
-asktopic = attribute(QUESTION, TOPIC )
-requesttopic = attribute(REQUEST, TOPIC )
+#asktopic = attribute(QUESTION, TOPIC )
+#requesttopic = attribute(REQUEST, TOPIC )
 thankyou = attribute(THANKS, YOU)
  
 
@@ -46,8 +46,8 @@ thankyou = attribute(THANKS, YOU)
 Q = [ 
         NWTopicReader('about', CLIENTASK, about ), 
         NWTopicReader('hello', CLIENTASK, hello ),  
-        NWTopicReader('asktopic', CLIENTASK, asktopic ),
-        NWTopicReader('requesttopic', CLIENTASK, requesttopic ),
+        #NWTopicReader('asktopic', CLIENTASK, asktopic ),
+        #NWTopicReader('requesttopic', CLIENTASK, requesttopic ),
         NWTopicReader('thankyou', CLIENTASK, thankyou ),
     ]  
 
@@ -65,18 +65,18 @@ QUERYTHANKS = 5
 # qchatR[i] is singular qchatRVs[i] is a list, hence the plural
 qchatR = { 
     QUERYNONE : "-sigh-",
-    QUERYHI : "Hi, Hello, Good morning",
+    QUERYHI : "Hi, Hello, Good morning\nCan I help you?",
     QUERYABOUT: "A chatbot",
     QUERYTOPIC: "Yes I can help you with {} information",
-    QUERYTOPIC2: "Yes I can help with your request for {}(s)",
+    QUERYTOPIC2: "Yes I can help with {}(s). What do you need?",
     QUERYTHANKS: "You are welcome"
     }
 qchatRVs = {
     QUERYNONE : [],
     QUERYHI : [HELLO],
     QUERYABOUT : [YOU],
-    QUERYTOPIC : [TOPIC],
-    QUERYTOPIC2 : [TOPIC],
+    QUERYTOPIC : [],
+    QUERYTOPIC2 : [],
     QUERYTHANKS : []
     }
 
@@ -107,10 +107,12 @@ class AboutChat( NWTopicChat ):
                 t = Thing(reader.lastEvent[1])
                 if t=='how':
                     self.responder.extratext = "Good thank you. I finally got my mood swings under control"
+                elif t=='can' or t=='does':
+                    self.responder.extratext = "I can help you order dental products and services"
                 elif t=='where':
                     self.responder.extratext = "I am a program, ghosting around in your machine"
                 else: #if t=='who':
-                    self.responder.extratext = "I am an 'about' chatbot written by Peter Waksman"
+                    self.responder.extratext = "I am v1.0 of a 'dental' chatbot, written by Peter Waksman"
             elif id=='hello':                  
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()
@@ -127,8 +129,10 @@ class AboutChat( NWTopicChat ):
                 if self.gof<= 0.5:
                     self.responder.stage = QUERYNONE
                     self.gof = 0.0 # maybe not a good habit?
-                    return
+                    return               
                 v = reader.getLastValue()
+                #V = reader.getLastValueVAR()
+
                 self.responder.stage = QUERYTOPIC2       
                 self.responder.extratext = self.responder.getStageResponse().format(v)
 
