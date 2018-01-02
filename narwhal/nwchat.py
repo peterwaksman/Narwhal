@@ -39,6 +39,7 @@ class NWTopicReader():
         self.lastConst = ''
         self.GOF = 0.0
         self.eventrecord = ''
+        self.tree.clear()
 
         # deprecated
     def read( self, text ):
@@ -123,7 +124,7 @@ class NWTopicReader():
         e = self.eventGOF
         L = self.getEvents()
         ID = self.id.ljust(15)
-        out = ID +  "g=" + str(g).ljust(5) + " " + "    e=" + str(e).ljust(5) + "    events=" + L
+        out = ID +  "g=" + str(g).ljust(5) + " " + "    e=" + str(e).ljust(5) + "    events= " + L
         return out
 
 
@@ -369,6 +370,7 @@ class CompositeChat( TChat ):
 
         for chat in self.chats:
             chat.Read( text )
+            x = 2
 
         maxGOF = 0.0
         for chat in self.chats:
@@ -376,7 +378,7 @@ class CompositeChat( TChat ):
                 maxGOF = chat.GOF()
         self.gof = maxGOF
 
-        if maxGOF<RESPONSE_CUTOFF:
+        if maxGOF<RESPONSE_CUTOFF: 
             self.caveat = 'hmm?'
 
     def Write(self):
@@ -392,7 +394,7 @@ class CompositeChat( TChat ):
                 if first:
                     first = False
                 else:
-                    s += '...'
+                    s += '\n'
                 s += w 
 
         if self.gof>=0.5 and len(s)>0: # cutoff on response
