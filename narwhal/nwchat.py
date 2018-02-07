@@ -305,6 +305,7 @@ class TChat:
     def __init__(self):
         self.gof = 0.0
         self.caveat = ''
+        self.responder = None
 
     def Read(self, text):
         self.caveat = ''
@@ -439,6 +440,4 @@ class NWTopicChat(TChat):
         outtext = self.write() # also changes the responseVARs 
         self.topic.Context.addSegment( self.responder.getResponseVARs() )
         return outtext
-
-        ### Private implementation for an topic chat ######
 

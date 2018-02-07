@@ -204,3 +204,5 @@ DIFF = KList("diff", kDIFF).var(get2)
 kBOTH = "both, the pair , the two"
 #BOTH = KList("both", kBOTH).var(get2Ints)
 BOTH = KList("both", kBOTH).var(get2)
+
+IT = KList("it"," it , that").var(get1)
