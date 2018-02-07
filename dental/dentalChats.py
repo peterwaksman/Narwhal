@@ -125,11 +125,6 @@ class MarginChat( NWTopicChat ):
 
             side = Thing(lc)
 
-            amount = Action(lc)
-            if amount and float(amount):
-                a = float(amount)
-            else:
-                a = 2.0 # or use customer pref
 
             r = Relation(lc) # stores the relation
             f = Value(lc) # stores the reference feature
@@ -141,6 +136,15 @@ class MarginChat( NWTopicChat ):
 
             if len(r)*len(f)==0 and side=='': # yu need something
                 return outtext
+
+            amount = Action(lc)
+            if amount and float(amount):
+                a = float(amount)
+            elif r=='at':
+                a = 0.0
+            else:
+                a = 2.0 # or use customer pref
+
 
             if len(r)*len(f)==0 and spec.hasData():
                 spec.value = a
@@ -269,23 +273,45 @@ class DentalChat(  NWTopicChat ):
     def draw(self):
         self.sites.updateSketch( self.sketch )
 
+
+"""
+Handle questions. 
+"""
+class DentalQuestionChat( NWTopicChat ):
+    def __init__(self):
+        NWTopicChat.__init__(self, DentalQuestionTopic , DefaultResponder())
+    def Read(self, text):
+        NWTopicChat.Read(self, text)    
+        self.update() 
+          
+    def update(self):
+        NWTopicChat.update(self)
+        if self.gof==0:
+            self.responder.stage = AQU  
+            return
+        
+        subject = self.topic.readers[0].getLastValue()
+
+        # either we think subject is incompletely specified - so ask for clarification  
+        # or
+        # the subject is  specified and we have a good answer.
+
+        x = 2
+
+
 #######################################################
 # Nars for getting the agenda
-DTREE = KList("dtree","").var()
-DTREE.sub(PRODUCT) 
-DTREE.sub(CLIENTASK)
 
-dentalAgenda1 = attribute(QUESTION, PRODUCT)
-dentalAgenda2 = attribute(REQUEST, PRODUCT)
-DentalAgendaTopic = [ NWTopicReader("dask",DTREE, dentalAgenda1),
-                      NWTopicReader("dreq",DTREE, dentalAgenda2)
-                    ]
+
  
 #######################################################
 ACTREE = KList("acctree","").var()
 ACTREE.sub(CLIENTASK)
 ACTREE.sub(MYACCOUNT)
-accountAgenda = attribute(QUESTION, MYACCOUNT)
+accountAsk = attribute(QUESTION, MYACCOUNT)
+AccountAgendaReaders = [
+                        NWTopicReader("account", ACTREE, accountAsk)
+                     ]
 
 #################################################
 APP_HUH = 0
@@ -296,7 +322,7 @@ APP_ACCOUNT = 3
 appR = { 
     APP_HUH :  "hmm?",
     APP_HELLO : "{}",
-    APP_DENTAL : "Yes I can help you with that...\n{}",
+    APP_DENTAL : "I can help you with that...\n{}",
     APP_ACCOUNT : "For account info phone (978)xxx-xxxx"
     }
 appRVs = {
@@ -306,38 +332,93 @@ appRVs = {
     APP_ACCOUNT : []
     }
 
+##################################################
+"""
+For now an "agenda" can be supported either with an NWTopicReader 
+without response mechanisms - which is informational, or an
+agenda can be supported by a TChat
+"""
+##################################################
+
+"""
+ Agendas are:
+        Unknown (hun...what?)
+        Social (hello)
+        Account question (call...)
+        Dental question or request (I can help with that...)
+
+Why have a separate agenda for determining dental, why not just get right to it?
+Answer is: because setting a dental context is separate and can be included in a
+statement but needs some acknowledgement, because it sets the context of discussion.
+"""
 class AppChat( TChat ):
     def __init__(self):
-        self.agendaResponder = NWTopicResponder( appR, appRVs )
-        self.dentalAgenda = NWTopic( DTREE, DentalAgendaTopic ) 
-        self.accountAgenda = NWTopicReader("accountagendaR",ACTREE,accountAgenda)
-        self.aboutAgenda = AboutChat()
-        self.dentalChat = DentalChat()
+        TChat.__init__(self)
+
+        self.appResponder = NWTopicResponder( appR, appRVs )
+
+                # includes questions and requests
+        self.dentalAgenda = NWTopic( DTREE, DentalAgendaReaders ) 
+
+        self.accountAgenda = NWTopic(ACTREE, AccountAgendaReaders)
+
+        self.about = AboutChat()
+        self.dental = DentalChat()
+        self.dentalQ = DentalQuestionChat()
+
         self.outtext = ''
+
+        self.currentChat = self # can switch to self.dental, or to ...
+
     def Read(self, text):
+        # this allows me to spawn a sub-chat
+        if self.currentChat != self:
+            self.currentChat.Read(text) 
+
+            # The sub-chat can retain control by manipulating its gof
+            # But otherwise, control returns to 'self', and reading is done below
+            g = self.currentChat.gof
+            if g >= 0.5: # use '>' ?
+                self.gof = g
+                self.outtext = self.currentChat.Write()
+                return
+            else:
+                self.currentChat = self
+              
+
+
         self.dentalAgenda.read(text)
         self.accountAgenda.read(text)
-        self.aboutAgenda.Read(text)  
+        self.about.Read(text)  
  
         v = ''
-        if self.dentalAgenda.maxGOF>= 0.5:
-           self.agendaResponder.stage = APP_DENTAL
-           ###
-           self.dentalChat.Read(text)
-           v = self.dentalChat.Write()
 
-        elif self.aboutAgenda.gof>=0.5:
+        if self.accountAgenda.maxGOF > 0.5:
+           self.appResponder.stage = APP_ACCOUNT
 
-          self.agendaResponder.stage = APP_HELLO 
-          v = self.aboutAgenda.Write()
+        elif self.about.gof >= 0.5:
+          self.appResponder.stage = APP_HELLO 
+          v = self.about.Write()
 
-        elif self.accountAgenda.GOF>=0.5:
-           self.agendaResponder.stage = APP_ACCOUNT
+        elif self.dentalAgenda.maxGOF > 0.3:
+           self.appResponder.stage = APP_DENTAL
+
+           self.dental.Read(text)
+           self.dentalQ.Read(text)
+           if self.dental.gof > self.dentalQ.gof:
+               dchat = self.dental           
+           else:
+               dchat = self.dentalQ 
+
+           self.currentChat = dchat
+           v = dchat.Write()
 
         else:
-            self.agendaResponder.stage = APP_HUH
+            self.appResponder.stage = APP_HUH
 
-        self.outtext = self.agendaResponder.getStageResponse().format(v)
+        self.outtext = self.appResponder.getStageResponse().format(v)
 
     def Write(self):
         return self.outtext
+    
+ 

@@ -29,13 +29,10 @@ from dentalChats import BaseChat, MarginChat , DentalChat, AppChat
 
 from abtSketch2 import drawReferenceFeatures
 
-A = AboutChat()
-D = DentalChat()  
-Q  = A + D
-Q = D
-
+ 
 
 GETA = AppChat()
+D = GETA.dental 
 
 #Q = AboutChat()  + BaseChat()
 #Q = BaseChat()
@@ -66,7 +63,7 @@ def initImage():
 def readText(event):
     text = T.get()
     GETA.Read(text)
-    Q.Read(text)
+    D.Read(text)
 
     h = Image.new("RGB",(IMGHWIDTH,IMGHEIGHT), "white")    
 
@@ -104,7 +101,7 @@ initImage()
 response = StringVar()
 
 e = Label(root, background='white', anchor=W, textvariable=response)
-e.config(width=60, font="Courier 12 bold")
+e.config(width=60, font="Courier 14 bold")
 e.grid()
 
 response.set("How can I help you?")
