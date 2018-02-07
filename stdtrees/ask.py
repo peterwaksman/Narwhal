@@ -71,7 +71,7 @@ REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var(
 #########################################
 # not really quantities but what the heck
 
-kYOU = ' you # get, dentsply, person , your '
+kYOU = ' you # get, dentsply, person , your , program, chatbot, bot '
 YOU =  KList( "you", kYOU ).var()
 #########################################
 kYES = ' yes , ok , y , done , no problem'
@@ -120,6 +120,9 @@ CANTILEVER= KList("cantilever", "cantilever").var()
 ROTATE   = KList("rotate", "rotate, rot ").var()
 CONTACT = KList("contact", "contact, make contact").var()
 
+STOP  = KList("stop", "stop, quit").var()
+
+
 ACTION.sub(ACTION)
 ACTION.sub(SEND)
 ACTION.sub(HOLD)
@@ -133,5 +136,6 @@ ACTION.sub(ANGULATE)
 ACTION.sub(CANTILEVER )
 ACTION.sub(ROTATE)
 ACTION.sub(CONTACT)
+ACTION.sub(STOP)
 ################################### 
 ###################################

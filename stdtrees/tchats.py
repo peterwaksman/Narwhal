@@ -11,9 +11,7 @@ from narwhal.nwtypes import *
 from narwhal.nwcontext import *
 
 from stdtrees.ask import *
-# don't  like it but need to include app stuff. Could avoid with
-# if TOPIC was a ctor argument.
-#from dentalTree import * #TOPIC getTopicPrompt
+
 
 SENSE_CUTOFF = 0.3
 
@@ -112,7 +110,7 @@ class AboutChat( NWTopicChat ):
                 elif t=='where':
                     self.responder.extratext = "I am a program, ghosting around in your machine"
                 else: #if t=='who':
-                    self.responder.extratext = "I am v1.0 of a 'dental' chatbot, written by Peter Waksman"
+                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot,\n written by Peter Waksman"
             elif id=='hello':                  
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()
