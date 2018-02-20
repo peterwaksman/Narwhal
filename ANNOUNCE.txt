@@ -1,3 +1,6 @@
+Feb 22 2018
+Added a folder 'order' containing an order status chatbot. No need to privatize this yet - he he.
+
 Dec 13
 Did a checkin "synch to home" that did several things:
  - added a new kind of NAR - the four part relation()
