@@ -140,14 +140,14 @@ had the time to name all the numbers I might encounter. :)
 
 kINT = " __d__ "
 INTx = KList('int', kINT).var()
-# See the connection to the asInt() method in nwutils.pw
+# See the connection to the asInt() method in nwutils.py
 
 kFLOAT = " __fl__ "
 FLOATx = KList('float', kFLOAT).var()
-# See the connection to the asFloat() method in nwutils.pw
+# See the connection to the asFloat() method in nwutils.py
 
 """
-I realize that my handling of this is inconsistent. I cannot look 
+I realize that my handling of this is inconsistent. I cannot  
 look for a generic variable string. But I can allow prefix and 
 suffix matching with the remainder generic and variable. Also, sadly, 
 only lower case letters are handled.
@@ -155,7 +155,7 @@ only lower case letters are handled.
 To match things with a prefix, use something like this:
 PARTNO = KList("STR_[YOUR LISTNAME HERE]", "__prfx__[YOUR PREFIX HERE]").var()
 example:
-P = KList("STR_parts","__prfx__ABC_.var()
+P = KList("STR_parts","__prfx__ABC").var()
 matches anything of the form ABCxxxxxx and the whole token is returned from findInText()
 
 Make sure to include STR_ as the beginning of the list name; and

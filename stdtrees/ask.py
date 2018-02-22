@@ -16,15 +16,15 @@ kQUESTION = " ? , ask # about, question, question about , questions about , prob
 
 kWHO = " who , who are" #asking for a person
 kHOW = " how # did|much|often, not sure how , do I " #asking for instructions
-kWHEN = " when , how long , how long until , how long will it take " #asking for a time
+kWHEN = " when , when will, how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
 
-kWHAT = " what , what about , how|where $ are , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , how|where|who|why $ are , see, to see , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information, tell me about " #asking for information
 
-kWHY = " why " #asking for a story
+kWHY = " why , why are" #asking for a story
 kDOES = " do you , does it , can it " #asking about possibility
-kCAN = " can I , may I , will , can " # asking permission for an action
+kCAN = " can I , may I , when $ will , can " # asking permission for an action
 kAMOUNT = " how much , how often , how well , how many " #asking for a quantity
 
 

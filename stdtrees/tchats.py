@@ -1,7 +1,7 @@
 """ 
-A "tchat" is a NWTopicChat with data in it.
+A "tchat" is a NWDataChat with data in it.
 
-Implementing some basic NWTopicChat's: an AboutChat that answers questions and a ConfirmChat
+Implementing some basic NWDataChat's: an AboutChat that answers questions and a ConfirmChat
 that gets confirmation from the client.
 """
 
@@ -81,12 +81,12 @@ qchatRVs = {
 QueryResponder = NWTopicResponder( qchatR, qchatRVs )
 #########################################
 
-class AboutChat( NWTopicChat ):
+class AboutChat( NWDataChat ):
     def __init__(self ):
-        NWTopicChat.__init__(self, QueryTopic, QueryResponder)
+        NWDataChat.__init__(self, QueryTopic, QueryResponder)
 
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
 
         if self.gof<=SENSE_CUTOFF:
             self.responder.stage = QUERYNONE
@@ -106,11 +106,13 @@ class AboutChat( NWTopicChat ):
                 if t=='how':
                     self.responder.extratext = "Good thank you. I finally got my mood swings under control"
                 elif t=='can' or t=='does':
-                    self.responder.extratext = "I can help you order dental products and services"
+                    self.responder.extratext = "I can order dental products and check the status of orders"
                 elif t=='where':
                     self.responder.extratext = "I am a program, ghosting around in your machine"
+                elif t=='why':
+                    self.responder.extratext = "Geez! That's a tough one... I guess cuz it is a win-win"
                 else: #if t=='who':
-                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot,\n written by Peter Waksman"
+                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot, written by Peter Waksman"
             elif id=='hello':                  
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()
@@ -177,9 +179,9 @@ confRVs = {
     }
 ConfirmResponder = NWTopicResponder( confR, confRVs )
 
-class ConfirmChat( NWTopicChat ):
+class ConfirmChat( NWDataChat ):
     def __init__(self ):
-        NWTopicChat.__init__(self, ConfirmTopic, ConfirmResponder)
+        NWDataChat.__init__(self, ConfirmTopic, ConfirmResponder)
         self.confirm = NULL_VAR #or set to YES or NO
         self.label = ''  # name of value to confirm
         self.value = '' # value to confirm 
@@ -192,7 +194,7 @@ class ConfirmChat( NWTopicChat ):
 
     def Read(self, text):
         self.rawtext = text
-        NWTopicChat.Read(self, text)
+        NWDataChat.Read(self, text)
 
     def Confirm(self, label):
         self.label = label
@@ -225,7 +227,7 @@ class ConfirmChat( NWTopicChat ):
         if self.responder.stage == CONFIRM4 or self.responder.stage ==CONFIRM3:
             self.responder.stage = CONFIRM0
 
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.responder.stage == CONFIRM1:
             self.responder.stage = CONFIRM2
             self.value = self.rawtext # this may be temporary
