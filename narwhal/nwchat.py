@@ -200,6 +200,7 @@ class NWTopic():
                         ext = var.contextFn( a2 )
                          
                         newseg.extend( ext ) #insert or append
+                        
                         for var1 in ext:
                             newtokens.append( var1.lastConst )
 
@@ -284,7 +285,28 @@ class DefaultResponder( NWTopicResponder ):
         NWTopicResponder.__init__( self, aResponse, aResponseV)
          
 
- 
+ #################################################
+APP_HUH = 0
+APP_HELLO = 1
+APP_TOPIC = 2
+APP_ACCOUNT = 3 
+# qchatR[i] is singular qchatRVs[i] is a list, hence the plural
+appR = { 
+    APP_HUH :  "hmm?",
+    APP_HELLO : "{}",
+    APP_TOPIC : "I can help you with that...\n{}",
+    APP_ACCOUNT : "For account info phone (978)xxx-xxxx"
+    }
+appRVs = {
+    APP_HUH :  [],
+    APP_HELLO : [],
+    APP_TOPIC : [],
+    APP_ACCOUNT : []
+    }
+class DefaultAppResponder( NWTopicResponder ):
+    def __init__(self):
+        NWTopicResponder.__init__( self, appR, appRVs)
+
 ###########################
 
 # "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
@@ -297,7 +319,7 @@ class DefaultResponder( NWTopicResponder ):
 # completion state of the data. 
 #
 # NO. A chatbot community will be structured like the data that is 
-# central to its topics. Note the NWTopicChat, does not implement SetData()
+# central to its topics. Note the NWDataChat, does not implement SetData()
 RESPONSE_CUTOFF = 0.3
 
 class TChat:
@@ -336,6 +358,7 @@ class TChat:
         # override in derived classes. This is called after a read()
         # it sets a response and a responseVARs slot.
     def write( self ):
+        t = self.responder.getStageResponse() # for debug
         return self.responder.getStageResponse().format(self.caveat)
        
         #  Derived classes can reference the same data
@@ -407,9 +430,16 @@ class CompositeChat( TChat ):
         for chat in self.chats:
            chat.SetData(data)
 
+""" 
+NWDataChat is your basic TChat plus data. It is understood that
+the states of the responder should correspond to states of the data.
+The data should implement __eq__() as a deep copy and hasData() to 
+indicate when data is available
+"""
 
+DEBUGSILENCE = 0
 
-class NWTopicChat(TChat):
+class NWDataChat(TChat):
     def __init__(self, topic, responder): 
         TChat.__init__(self)
 
@@ -429,7 +459,10 @@ class NWTopicChat(TChat):
             
         self.topic.read( text )  
         self.gof = self.topic.maxGOF
-        print( self.topic.summary() )
+
+        if DEBUGSILENCE:
+            print( self.topic.summary() )
+
                 # transfer info from subreaders of the topic into the data structure
         self.update()
 
@@ -438,6 +471,7 @@ class NWTopicChat(TChat):
 
     def Write( self ):
         outtext = self.write() # also changes the responseVARs 
+        h = self.responder.getResponseVARs() 
         self.topic.Context.addSegment( self.responder.getResponseVARs() )
         return outtext
 

@@ -185,7 +185,7 @@ def get2( segment ):
     return getN(segment,2)
 
 def get1( segment ):
-    getN(segment,1) 
+    return getN(segment,1) 
 
 
 

@@ -1,7 +1,7 @@
 """
 nwsegment.py implements utilities associated with a "segment" which is
 just a plain lists of VARs, without any wrapping. The most important are
-    PrepareSegement() -  to convert text-to-tokens-VARs 
+    PrepareSegment() -  to convert text-to-tokens-VARs 
     ReadSegment() - the "inner loop" which reads all the text, recursively
     per the hierarchy inside each nar.
 The relation between indices in the original tokens of text and indices in
@@ -451,7 +451,7 @@ def ReadSegmentAsSequential(nar, seg):
         if maxab < (t + 1) * (v + 1):
             maxab = (t + 1) * (v + 1)
             imax = i
-    # implement the max
+    # implement the max - split the segment optimally
     segA = seg[:imax]
     segB = seg[imax:]
 
