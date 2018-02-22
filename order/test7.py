@@ -30,14 +30,10 @@ cvLoc = "c:\\temp\\" # a location is needed for Load/Save
 OChat = OrderAppChat( cvID )
 
 
-
-
 OChat.Load( cvLoc )
 
 s = OChat.GetID()
 
-#g = OChat.order.responder.getStageResponse()
-#print( g ) 
 if s:
     print("I can help you with order " + s)
 else:
@@ -45,6 +41,8 @@ else:
 
 
 while True:
+    print("\n")
+
     text = getinput("> ") 
 
     # backdoors
@@ -56,7 +54,6 @@ while True:
     OChat.Read(text)
     s = OChat.Write()
     
-    print("\n")
     print( s )
 
     OChat.Save(cvLoc)
