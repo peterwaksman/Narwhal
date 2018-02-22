@@ -17,7 +17,7 @@ ORDER_READY = 3
 orderStage = {  
                 ORDER_NONE : "none",
                 ORDER_HASID : "hasid", 
-                ORDER_UPDATED: "notready",
+                ORDER_UPDATED: "not ready",
                 ORDER_READY : "ready"
               }
 
@@ -35,9 +35,14 @@ class OrderData():
             return True
         else:
             return False
-  
+    def setID( self, text ):
+        self.id = text
+        self.status = ORDER_HASID
 
     def show(self):
-        s = "Order: " + self.id + "\n"
-        s += "Status: " + orderStage[ self.status ]
+        s = "\nOrder: " + self.id + "\n"
+        s += "Status: " + orderStage[ self.status ] + "\n"
+        s += "Ship by: tomorrow am\n"
+        s += "UPS id: -n/a-"
+
         return s

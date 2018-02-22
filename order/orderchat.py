@@ -23,7 +23,7 @@ class AccountChat( NWDataChat ):
 ######################################
 
 ochatR = { 
-    ORDER_NONE : "I don't have an order number.\nPlease enter your ORDER #:",
+    ORDER_NONE : "But I don't have an order number.\nPlease enter your ORDER #:",
     ORDER_HASID : "Order number {} ... checking status\n",# gets appended to
     ORDER_UPDATED : "{}",
     ORDER_READY: "It is ready for you."
@@ -51,8 +51,9 @@ class OrderChat( NWDataChat ):
                 self.caveat = text
                 self.responder.stage = ORDER_HASID
                 self.stringmode = False
-                self.data.id = text
-                self.data.status = ORDER_HASID
+                self.data.setID( text )
+                #self.data.id = text
+                #self.data.status = ORDER_HASID
                 return
             NWDataChat.Read(self,text)
 
@@ -65,7 +66,7 @@ class OrderChat( NWDataChat ):
             data = self.data #for convenience
             for reader in self.topic.readers:
                 id = reader.id
-                if not id=='orderinfo': #necessary dependency?
+                if not id=='orderask' and not id=="productask" and not id=="delayask": 
                     return
 
                 if not self.data.hasData():
@@ -84,8 +85,12 @@ class OrderChat( NWDataChat ):
                          # here get the status
                 if t=='what':
                     self.caveat = self.data.show()
+                elif t=='when':
+                    self.caveat = "The order ships tomorrow morning"
+                elif t=='why' and v=='delay':
+                    self.caveat = "I don't know. I'll ask operations to contact you."
                 else:
-                    self.caveat = "NOT READY"
+                    self.caveat = "The order is not ready"
                 if self.gof>= 0.3 :
                    self.responder.stage = ORDER_UPDATED
                    self.data.status = ORDER_UPDATED
@@ -139,23 +144,37 @@ class OrderAppChat( TChat ):
         self.orderchat.data = self.orderdata # needs renewal
 
         f.close()
-        
+    
+    def GetID(self):
+        return self.orderchat.data.id    
 
     def Read(self, text):
         self.outtext = ''
 
+        self.aboutchat.Read(text)  
+        if self.aboutchat.gof >= 0.5:
+          self.appResponder.stage = APP_HELLO 
+          v = self.aboutchat.Write()
+          self.outtext += self.appResponder.getStageResponse().format(v)
+          self.currentChat = self
+          return
+
+ 
         # this allows me to spawn a sub-chat
+
         if self.currentChat != self:
-            wasstringmode = self.currentChat.stringmode # save
+            # a distraction from the achitecture
+            wasstringmode = self.currentChat.stringmode
+
             self.currentChat.Read(text) 
             g = self.currentChat.gof
             if g >= 0.5: # use '>' ?
                 self.gof = g
                 self.outtext = self.currentChat.Write()
 
-                ### A kind of hack: the readers may not have been cleared since 
+                ### A kind of hack: the 'readers' may not have been cleared since 
                 # before the order number was entered, so go ahead and answer the 
-                # question now, if they can
+                # question now, if you can
                 if wasstringmode:
                     self.currentChat.update()
                     self.outtext += self.currentChat.Write()
@@ -165,7 +184,7 @@ class OrderAppChat( TChat ):
                 self.currentChat = self
               
 
-        self.aboutchat.Read(text)  
+        #self.aboutchat.Read(text)  
         self.orderchat.Read(text)
         self.accountchat.Read(text)
  
@@ -174,9 +193,9 @@ class OrderAppChat( TChat ):
         if self.accountchat.gof> 0.5:
            self.appResponder.stage = APP_ACCOUNT
 
-        elif self.aboutchat.gof >= 0.5:
-          self.appResponder.stage = APP_HELLO 
-          v = self.aboutchat.Write()
+        #elif self.aboutchat.gof >= 0.5:
+        #  self.appResponder.stage = APP_HELLO 
+        #  v = self.aboutchat.Write()
 
         elif self.orderchat.gof > 0.3:
            self.appResponder.stage = APP_TOPIC

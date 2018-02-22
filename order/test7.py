@@ -31,11 +31,17 @@ OChat = OrderAppChat( cvID )
 
 
 
+
 OChat.Load( cvLoc )
+
+s = OChat.GetID()
 
 #g = OChat.order.responder.getStageResponse()
 #print( g ) 
-print("HELLO CLIENT. HOW CAN I HELP YOU?\n\n")
+if s:
+    print("I can help you with order " + s)
+else:
+    print("HELLO CLIENT. HOW MAY I HELP YOU?\n\n")
 
 
 while True:
@@ -53,9 +59,5 @@ while True:
     print("\n")
     print( s )
 
-    #h = OChat.orderdata.status
-    #print("status is " + str(h))
-
-
     OChat.Save(cvLoc)
-    #x = 2
+    x = 2
