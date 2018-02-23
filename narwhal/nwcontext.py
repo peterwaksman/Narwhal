@@ -37,7 +37,13 @@ class SegmentBuffers:
             self.buffer[i] = [NULL_VAR] 
 
     def addSegment(self, segment):
-        self.buffer[ self.next ] = segment
+        newseg = []
+        for var in segment:
+            if var!= NULL_VAR:
+                h = var.copy() 
+                h.ifound = [] # protect against bogus indexing
+                newseg.append(h)
+        self.buffer[ self.next ] = newseg 
         self.next = (self.next+1)%self.N
 
     def getAll( self ):

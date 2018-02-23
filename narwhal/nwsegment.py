@@ -516,7 +516,7 @@ def scanNextControl2(segment, istart):
     for i in range(istart, L):
         var = segment[i]
         if var <= LOGIC_OP and not var<=DULL_OP:
-            CD.set(OPERATOR_CTRLTYPE, var, i)
+            CD.set(PUNCTUATION_CTRLTYPE, var, i)
             return CD
         elif var <= PUNCTUATION_OP:
             CD.set(PUNCTUATION_CTRLTYPE, var, i)

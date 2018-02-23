@@ -196,8 +196,10 @@ class NWTopic():
                         itok += 1
 
                     if var.contextFn:
-                        
                         ext = var.contextFn( a2 )
+                        # moved to nwcontext addSegment()
+                        #for var1 in ext:
+                        #    var1.ifound = []                    
                          
                         newseg.extend( ext ) #insert or append
                         
@@ -437,7 +439,7 @@ The data should implement __eq__() as a deep copy and hasData() to
 indicate when data is available
 """
 
-DEBUGSILENCE = 0
+DEBUGSILENCE = 1
 
 class NWDataChat(TChat):
     def __init__(self, topic, responder): 
@@ -460,7 +462,7 @@ class NWDataChat(TChat):
         self.topic.read( text )  
         self.gof = self.topic.maxGOF
 
-        if DEBUGSILENCE:
+        if DEBUGSILENCE>0:
             print( self.topic.summary() )
 
                 # transfer info from subreaders of the topic into the data structure
