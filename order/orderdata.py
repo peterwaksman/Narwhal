@@ -18,10 +18,10 @@ ORDER_DELIVERED = 4
 # string for reporting in the order data
 orderStage = {  
                 ORDER_NONE : "none",
-                ORDER_HASID : "hasid", 
-                ORDER_WAITING: "waiting",
-                ORDER_SHIPPED: "shipped",
-                ORDER_DELIVERED : "delivered"
+                ORDER_HASID : "hasID", 
+                ORDER_WAITING: "Waiting",
+                ORDER_SHIPPED: "Shipped",
+                ORDER_DELIVERED : "Delivered"
               }
 
 class OrderData():

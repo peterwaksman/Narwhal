@@ -70,9 +70,19 @@ class OrderChat( NWDataChat ):
 
             for reader in self.topic.readers:
                 id = reader.id
-                if not id=='orderask' and not id=="productask" and not id=="delayask": 
-                    return
-                               
+ 
+                if id=='inputask':
+                    for event in reader.eventrecord:
+                        orderID = reader.getLastValue()
+                        if orderID and event[0]>=0.8: 
+                            # TODO: sanity check the ID is valid
+                            if self.data.status>ORDER_NONE and orderID!=self.data.id:
+                                self.caveat = "Wait...could you please start a new conversation to discuss another order."
+                                return
+                            else:
+                                self.data.setID( orderID )
+                                self.responder.stage = ORDER_HASID
+                            
                             # special mode before an orderID is known
                 if not self.data.hasData():
                     self.stringmode = True
@@ -93,8 +103,8 @@ class OrderChat( NWDataChat ):
                 if self.data.status==ORDER_HASID: # when order exists but has never been updated
                    self.data.status = ORDER_WAITING
 
-                STAT = self.data.status
-                self.responder.stage = STAT
+                STATUS = self.data.status
+                self.responder.stage = STATUS
                 
                 # CAVEATS 
                                 
@@ -102,14 +112,14 @@ class OrderChat( NWDataChat ):
                     self.caveat = self.data.show()
                     return 
 
-                if STAT==ORDER_WAITING:
+                if STATUS==ORDER_WAITING:
                     if t=='why' and v=='delay':
                         self.caveat = "I don't know. I'll ask operations to contact you."
                     elif t=='where':
                         self.caveat = "It is being manufactured"
                     else:
                         self.caveat = "The order is not ready"
-                elif STAT==ORDER_SHIPPED:                
+                elif STATUS==ORDER_SHIPPED:                
                     caveat = "It shipped this morning"
                 else:
                     self.caveat= 'It is delivered'

@@ -247,6 +247,7 @@ def findInText(klist, tokens, itok, ifound):
     ret = ''
     tok = tokens[itok]
     for kword in klist.list:
+        h = kword[:8]
         if kword == ' __d__ ': # spaces for no particular reason
             a = asInt(tok)
             if len(a)>0 :
@@ -257,21 +258,25 @@ def findInText(klist, tokens, itok, ifound):
             if len(a)>0:
                 ifound.append(itok)
             return a
-        elif kword[8:]=='__prfx__': #no spaces dammit!
-            p = kword[:8] # the body of the keyword IS the prefix
+        elif kword[:8]=='__prfx__': #no spaces dammit!
+            # NEEDS DEBUGGING
+            p = kword[8:] # the body of the keyword IS the prefix
                           # match it to prefix of token
             if p==tok[8:]:
                 ifound.append(itok)
                 return tok
             else:
                 return '' #?? prevents finding by matchTOK below
-        elif kword[8:]=='__sufx__':
-            L = len(tok)
-            m = kword[:8] # the body of the keyword IS the suffix
+        elif kword[:8]=='__sufx__':
+            L = len(tokens)
+            m = kword[8:] # the body of the keyword IS the suffix
                           # match it to suffix of token
-            if len(m)<=len(tok) and m==tok[:L-len(m)]: 
+            if m==tok or m==tok + ' ':
                 ifound.append(itok)
-                return tok
+                if itok < L-1:
+                    ifound.append(itok+1)  
+                    # TODO: use raw token, not the version in lower case
+                    return tokens[itok+1]          
             else:
                 return ''           
 

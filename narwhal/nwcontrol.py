@@ -358,7 +358,7 @@ def ensureFloatBeforeMM(tokens):
 
 
 #######################################################
-def prepareTokens(text):
+def prepareTokens(text, rawtokens):
     if len(text)==0:
         return ''
     """
@@ -384,6 +384,7 @@ def prepareTokens(text):
     for tok in tokens:
         if len(tok) > 0:
             newtokens.append(tok)  
+            rawtokens.append(tok)
 
     for i in range(len(newtokens)):
         tok = newtokens[i].lower()

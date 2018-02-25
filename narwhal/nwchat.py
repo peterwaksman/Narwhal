@@ -20,6 +20,9 @@ strDETAILS = "Are there any details you would like to add?"
  (only for NARs of order <=1). 
 
 """
+
+
+
 class NWTopicReader():
     def __init__(self, id, treeroot, nar, cal=False):
         self.id = id
@@ -146,7 +149,8 @@ class NWTopic():
 
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
-        tokens = prepareTokens(text) 
+        rawtokens = []
+        tokens = prepareTokens(text, rawtokens) 
         self.numtokens = len(tokens) #useful
         
         segment = PrepareSegment(self.tree, tokens) 

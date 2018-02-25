@@ -49,12 +49,15 @@ while True:
         break
     if text.lower()=='clear':
         OChat.Clear()
+        OChat.Save(cvLoc)
         continue
     if text.lower()=='ship':
         OChat.SetShipped()
+        OChat.Save(cvLoc)
         continue
     if text.lower()=='ready':
         OChat.SetReady()
+        OChat.Save(cvLoc)
         continue
 
     ############

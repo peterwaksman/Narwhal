@@ -250,7 +250,9 @@ class VAR:
     def isUnknown(self):
         if self.knames[0]=='int' or self.knames[0]=='float':
             return True
-        elif self.knames[0][4:]=='STR_': # sorry about that
+        h = self.knames[0]
+        r = h[:4]
+        if r=='STR_': # sorry about that
             return True
         else:
             return False
