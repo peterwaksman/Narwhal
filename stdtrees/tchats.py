@@ -110,9 +110,9 @@ class AboutChat( NWDataChat ):
                 elif t=='where':
                     self.responder.extratext = "I am a program, ghosting around in your machine"
                 elif t=='why':
-                    self.responder.extratext = "Geez! That's a tough one... I guess cuz it is a win-win"
+                    self.responder.extratext = "Geez! That's a tough one... I guess cuz it's a win-win"
                 else: #if t=='who':
-                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot, written by Peter Waksman"
+                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot, written by Peter Waksman, circa 2018"
             elif id=='hello':                  
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()

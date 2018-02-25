@@ -25,14 +25,16 @@ class AccountChat( NWDataChat ):
 ochatR = { 
     ORDER_NONE : "But I don't have an order number.\nPlease enter your ORDER #:",
     ORDER_HASID : "Order number {} ... checking status\n",# gets appended to
-    ORDER_UPDATED : "{}",
-    ORDER_READY: "It is ready for you."
+    ORDER_WAITING : "{}",
+    ORDER_SHIPPED : "{}",
+    ORDER_DELIVERED: "{}"
     }
 ochatRVs = {
     ORDER_NONE : [],
     ORDER_HASID : [MYORDER],
-    ORDER_UPDATED : [MYORDER],
-    ORDER_READY : [MYORDER]
+    ORDER_WAITING : [MYORDER],
+    ORDER_SHIPPED: [MYORDER], # here maybe want a data-time VAR
+    ORDER_DELIVERED : [MYORDER]
     }
 
 OrderResponder = NWTopicResponder( ochatR,ochatRVs )
@@ -42,59 +44,76 @@ class OrderChat( NWDataChat ):
         def __init__(self, orderdata):
             NWDataChat.__init__(self, OrderAskTopic, OrderResponder)   
             self.data = orderdata       
-            self.caveat = ''   # for out-of-bounds warning 
+            self.caveat = ''    
             self.stringmode = False
 
 
         def Read(self, text):
             if self.stringmode:
-                self.caveat = text
-                self.responder.stage = ORDER_HASID
                 self.stringmode = False
+                self.caveat = text
                 self.data.setID( text )
-                #self.data.id = text
-                #self.data.status = ORDER_HASID
+                self.responder.stage = ORDER_HASID
                 return
             NWDataChat.Read(self,text)
 
-        def update(self):
-            NWDataChat.update(self)
-            if self.gof==0:
-                #self.responder.stage = AQU  
-                return
+        def loadStage( self ):
+            data = self.data
 
-            data = self.data #for convenience
+
+        def update(self):
+            self.outtext = ''
+
+            NWDataChat.update(self)
+            if self.gof<0.3:
+                 return
+
             for reader in self.topic.readers:
                 id = reader.id
                 if not id=='orderask' and not id=="productask" and not id=="delayask": 
                     return
-
+                               
+                            # special mode before an orderID is known
                 if not self.data.hasData():
                     self.stringmode = True
                     self.responder.stage = ORDER_NONE                 
                     return
-
-                self.outtext = ''
-
+     
                 t = reader.getLastThing()
                 a = reader.getLastAction()
                 r = reader.getLastRelation()
                 v = reader.getLastValue()
                 polarity = reader.nar.polarity
 
-                         # here get the status
-                if t=='what':
+                ############################# 
+                # QUERY VENDORS about STATUS  
+                ############################# 
+                self.data.UpdateFromSource() # currently a dummy funciton
+
+                if self.data.status==ORDER_HASID: # when order exists but has never been updated
+                   self.data.status = ORDER_WAITING
+
+                STAT = self.data.status
+                self.responder.stage = STAT
+                
+                # CAVEATS 
+                                
+                if t=='what': # details requested
                     self.caveat = self.data.show()
-                elif t=='when':
-                    self.caveat = "The order ships tomorrow morning"
-                elif t=='why' and v=='delay':
-                    self.caveat = "I don't know. I'll ask operations to contact you."
+                    return 
+
+                if STAT==ORDER_WAITING:
+                    if t=='why' and v=='delay':
+                        self.caveat = "I don't know. I'll ask operations to contact you."
+                    elif t=='where':
+                        self.caveat = "It is being manufactured"
+                    else:
+                        self.caveat = "The order is not ready"
+                elif STAT==ORDER_SHIPPED:                
+                    caveat = "It shipped this morning"
                 else:
-                    self.caveat = "The order is not ready"
-                if self.gof>= 0.3 :
-                   self.responder.stage = ORDER_UPDATED
-                   self.data.status = ORDER_UPDATED
-  
+                    self.caveat= 'It is delivered'
+ 
                   
         def Write( self ):
             outtext = NWDataChat.Write(self)
@@ -124,6 +143,11 @@ class OrderAppChat( TChat ):
         self.outtext = ''
         self.currentChat = self # can switch to self.dental, or to ...
 
+    def SetShipped(self):
+        self.orderdata.status = ORDER_SHIPPED
+    def SetReady(self):
+        self.orderdata.status = ORDER_DELIVERED
+
     def Save(self, cvLoc):
         fname = cvLoc + self.id + ".txt"
         f = open(fname,'w')
@@ -140,9 +164,15 @@ class OrderAppChat( TChat ):
             return
 
         f = open(fname, 'r' )
-        self.orderdata = cPickle.load( f )
-        self.orderchat.data = self.orderdata # needs renewal
+        try:
+            self.orderdata = cPickle.load( f )
+        except: # if corrupt
+            f = open(fname,'w') # re-create the file
+            f.close()
+            return
 
+        self.orderchat.data = self.orderdata # needs renewal
+        self.orderchat.responder.stage = self.orderchat.data.status
         f.close()
     
     def GetID(self):
@@ -151,6 +181,7 @@ class OrderAppChat( TChat ):
     def Read(self, text):
         self.outtext = ''
 
+        # always be on the lookout for polite banter. Cannot defer that to sub-chats.
         self.aboutchat.Read(text)  
         if self.aboutchat.gof >= 0.5:
           self.appResponder.stage = APP_HELLO 
@@ -159,10 +190,11 @@ class OrderAppChat( TChat ):
           self.currentChat = self
           return
 
- 
-        # this allows me to spawn a sub-chat
+        # Enable sub-chat
 
         if self.currentChat != self:
+            #TODO: remove assumption that the currentChat is the orderchat
+
             # a distraction from the achitecture
             wasstringmode = self.currentChat.stringmode
 
@@ -182,9 +214,7 @@ class OrderAppChat( TChat ):
 
             else:
                 self.currentChat = self
-              
-
-        #self.aboutchat.Read(text)  
+      
         self.orderchat.Read(text)
         self.accountchat.Read(text)
  
@@ -192,10 +222,6 @@ class OrderAppChat( TChat ):
 
         if self.accountchat.gof> 0.5:
            self.appResponder.stage = APP_ACCOUNT
-
-        #elif self.aboutchat.gof >= 0.5:
-        #  self.appResponder.stage = APP_HELLO 
-        #  v = self.aboutchat.Write()
 
         elif self.orderchat.gof > 0.3:
            self.appResponder.stage = APP_TOPIC

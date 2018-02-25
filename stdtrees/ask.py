@@ -20,10 +20,10 @@ kWHEN = " when , when will, how long , how long until , how long will it take " 
 kWHERE = " where , where from , where to , where are " #asking for a place
 
 kWHAT = " what , what about , how|where|who|why $ are , see, to see , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
- ask about, ask if, to ask about , information, tell me about " #asking for information
+ ask about, ask if, to ask about , information, tell me , tell me about " #asking for information
 
 kWHY = " why , why are" #asking for a story
-kDOES = " do you , does it , can it " #asking about possibility
+kDOES = " do you , does it , can it , how|where|who|why $ is it , how|where|who|why $ is my " #asking about possibility
 kCAN = " can I , may I , when $ will , can " # asking permission for an action
 kAMOUNT = " how much , how often , how well , how many " #asking for a quantity
 

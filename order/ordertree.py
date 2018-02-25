@@ -9,7 +9,8 @@ from stdtrees.tchats import CLIENTASK
 
 PRODUCT = KList("product", " implant, abutment, crown, denture").var()
 
-DELAY = KList("delay", "delay, late ").var()
+# use of "not" is not recommended but...trying it revealed a deep bug.
+DELAY = KList("delay", "delay, late , not ready ").var()
 
 #------------------------------------------------------
 MYORDER = KList( "order", ' my order , my * order , order , the order  , an order , case , a case , the case ').var()
@@ -46,6 +47,7 @@ OTREE.sub(DELAY)
 OTREE.sub(IT)
 #---------------------------------
 OrderAskTopic = NWTopic(OTREE, ORDERASK)
+OrderAskTopic.seedContext( [MYORDER] )
 AccountAskTopic = NWTopic(OTREE, ACCOUNTASK)
 
  

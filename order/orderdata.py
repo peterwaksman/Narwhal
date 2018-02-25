@@ -12,19 +12,29 @@ from narwhal.nwchat import *
 
 ORDER_NONE = 0
 ORDER_HASID = 1
-ORDER_UPDATED = 2
-ORDER_READY = 3
+ORDER_WAITING = 2
+ORDER_SHIPPED = 3
+ORDER_DELIVERED = 4
+# string for reporting in the order data
 orderStage = {  
                 ORDER_NONE : "none",
                 ORDER_HASID : "hasid", 
-                ORDER_UPDATED: "not ready",
-                ORDER_READY : "ready"
+                ORDER_WAITING: "waiting",
+                ORDER_SHIPPED: "shipped",
+                ORDER_DELIVERED : "delivered"
               }
 
 class OrderData():
     def __init__(self):
         self.id = ""
         self.status = ORDER_NONE
+
+    def UpdateFromSource(self):
+        if self.status>=ORDER_HASID:
+            x = 2 # call vendor APIs 
+        else:
+            x = 3 # nothing to update
+
     def hasData(self):
         if len(self.id)>0 and self.status>ORDER_NONE :
             return True
@@ -42,7 +52,15 @@ class OrderData():
     def show(self):
         s = "\nOrder: " + self.id + "\n"
         s += "Status: " + orderStage[ self.status ] + "\n"
-        s += "Ship by: tomorrow am\n"
-        s += "UPS id: -n/a-"
+        status = self.status
+        if status<ORDER_SHIPPED:
+            s += "Ship by: tomorrow am\n"
+        else:
+            s += "Ship by: [done]\n"
+
+        if status >= ORDER_SHIPPED:
+            s += "UPS id: 8802"
+        else:
+            s += "UPS id: -n/a-"
 
         return s

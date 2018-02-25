@@ -141,7 +141,9 @@ class NWTopic():
                 # 4 exchanges - a short term context
         self.Context = SegmentBuffers(8)  
      
-  
+    def seedContext(self, segment):
+        self.Context.addSegment(segment)
+
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
         tokens = prepareTokens(text) 

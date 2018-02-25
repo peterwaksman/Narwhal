@@ -28,18 +28,17 @@ cvID = '111211311' # conversation id is REQUIRED
 cvLoc = "c:\\temp\\" # a location is needed for Load/Save
 
 OChat = OrderAppChat( cvID )
-
-
+# load previous state
 OChat.Load( cvLoc )
-
+# check for an order ID
 s = OChat.GetID()
-
+#Greet:
 if s:
     print("I can help you with order " + s)
 else:
     print("HELLO CLIENT. HOW MAY I HELP YOU?\n\n")
 
-
+#Start listening
 while True:
     print("\n")
 
@@ -50,7 +49,17 @@ while True:
         break
     if text.lower()=='clear':
         OChat.Clear()
- 
+        continue
+    if text.lower()=='ship':
+        OChat.SetShipped()
+        continue
+    if text.lower()=='ready':
+        OChat.SetReady()
+        continue
+
+    ############
+    # READ/WRITE
+    ############
     OChat.Read(text)
     s = OChat.Write()
     
