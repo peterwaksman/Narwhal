@@ -149,8 +149,7 @@ class NWTopic():
 
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
-        rawtokens = []
-        tokens = prepareTokens(text, rawtokens) 
+        tokens = prepareTokens(text) 
         self.numtokens = len(tokens) #useful
         
         segment = PrepareSegment(self.tree, tokens) 
