@@ -11,17 +11,28 @@ from narwhal.nwtypes import *
 from narwhal.nwchat import *
 
 ORDER_NONE = 0
-ORDER_HASID = 1
-ORDER_WAITING = 2
-ORDER_SHIPPED = 3
-ORDER_DELIVERED = 4
+ORDER_HASID = 1 #order placed
+ORDER_RECEIVED = 2 #materials and data received
+ORDER_INDESIGN = 3 
+ORDER_NEEDAPPROVED = 4 
+ORDER_BEENAPPROVED = 5 
+ORDER_INMANUFCTR = 6
+ORDER_SHIPPED =  7
+ORDER_DELIVERED = 8 
+ORDER_ONHOLD =  9
+
 # string for reporting in the order data
 orderStage = {  
                 ORDER_NONE : "none",
-                ORDER_HASID : "hasID", 
-                ORDER_WAITING: "Waiting",
+                ORDER_HASID : "HasID",  
+                ORDER_RECEIVED: "Received",  
+                ORDER_INDESIGN: "InDesign",
+                ORDER_NEEDAPPROVED: "AwaitsApproval",
+                ORDER_BEENAPPROVED: "Approved",
+                ORDER_INMANUFCTR: "InManufacturing",
                 ORDER_SHIPPED: "Shipped",
-                ORDER_DELIVERED : "Delivered"
+                ORDER_DELIVERED : "Delivered",
+                ORDER_ONHOLD: "OnHold"
               }
 
 class OrderData():
@@ -54,7 +65,7 @@ class OrderData():
         s += "Status: " + orderStage[ self.status ] + "\n"
         status = self.status
         if status<ORDER_SHIPPED:
-            s += "Ship by: tomorrow am\n"
+            s += "Ship by: Tomorrow am\n"
         else:
             s += "Ship by: [done]\n"
 

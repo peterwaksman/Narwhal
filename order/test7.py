@@ -55,10 +55,13 @@ while True:
         OChat.SetShipped()
         OChat.Save(cvLoc)
         continue
-    if text.lower()=='ready':
-        OChat.SetReady()
+    if text.lower()=='deliver':
+        OChat.SetDelivered()
         OChat.Save(cvLoc)
         continue
+    if text.lower()=='design':
+        OChat.SetInDesign()
+        OChat.Save(cvLoc)
 
     ############
     # READ/WRITE

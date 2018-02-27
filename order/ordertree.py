@@ -7,7 +7,11 @@ from stdtrees.ask import *
 from stdtrees.tchats import CLIENTASK 
 
 
-ORDERNO = KList("STR_ORDERNO", "__sufx__order").var()
+ORDERNO1 = KList("STR_ORDERNO1", "__sufx__order").var()
+ORDERNO2  = KList("STR_ORDERNO2", "__sufx__order _hash_").var()
+ORDNOS = KList("ordnos", "").var()
+ORDNOS.sub(ORDERNO1)
+ORDNOS.sub(ORDERNO2)
 
 PRODUCT = KList("product", " implant, abutment, crown, denture").var()
 
@@ -25,7 +29,7 @@ MY.sub(MYACCOUNT)
 
 
 #-----------------------------------------
-inputask = attribute(QUESTION,ORDERNO) #telling the orderno
+inputask = attribute(QUESTION,ORDNOS) #telling the orderno
 orderask = attribute(QUESTION, MYORDER)
 accountask =  attribute(QUESTION, MYACCOUNT)
 productask = attribute(QUESTION,PRODUCT)
@@ -50,7 +54,7 @@ OTREE.sub(MYACCOUNT)
 OTREE.sub(PRODUCT)
 OTREE.sub(DELAY)
 OTREE.sub(IT)
-OTREE.sub(ORDERNO) #does it work?
+OTREE.sub(ORDNOS) #does it work?
 #---------------------------------
 OrderAskTopic = NWTopic(OTREE, ORDERASK)
 OrderAskTopic.seedContext( [MYORDER] )

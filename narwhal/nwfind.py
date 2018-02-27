@@ -276,7 +276,16 @@ def findInText(klist, tokens, itok, ifound):
                 if itok < L-1:
                     ifound.append(itok+1)  
                     # TODO: use raw token, not the version in lower case
-                    return tokens[itok+1]          
+                    return tokens[itok+1]  
+            elif itok<L-2:
+                s = tok + " " + tokens[itok+1]
+                if m==s or m==s+ ' ':
+                    ifound.append(itok) 
+                    ifound.append(itok+1) 
+                    ifound.append(itok+2) 
+                    return tokens[itok+2]
+                else:
+                    return ''     
             else:
                 return ''           
 
