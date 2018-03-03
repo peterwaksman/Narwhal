@@ -46,8 +46,9 @@ class NWTopicReader():
 
         # deprecated
     def read( self, text ):
-        tokens = prepareTokens(text)
-        segment = PrepareSegment(self.tree, tokens) #not efficient, could do this at higher level,
+        rawtokens = []
+        tokens = prepareTokens(text, rawtokens)
+        segment = PrepareSegment(self.tree, tokens, rawtokens) #not efficient, could do this at higher level,
         self.readSegment( segment, tokens)
    
 
@@ -149,10 +150,11 @@ class NWTopic():
 
     def read(self,text):
                 # (inefficient but leaves the door open to tree specific customization)
-        tokens = prepareTokens(text) 
+        rawtokens = []
+        tokens = prepareTokens(text, rawtokens) 
         self.numtokens = len(tokens) #useful
         
-        segment = PrepareSegment(self.tree, tokens) 
+        segment = PrepareSegment(self.tree, tokens, rawtokens) 
          
         self.Context.addSegment(segment)
         

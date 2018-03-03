@@ -347,24 +347,27 @@ def isInteger(tok):
         if not c.isdigit():
             return False
     return True
+
 def ensureFloatBeforeMM(tokens):
     for i in range(1, len(tokens)):
         tok = tokens[i]
         prev = tokens[i-1]
-        if tok=='mm' and isInteger(prev):
+        if (tok=='mm' or tok=='MM') and isInteger(prev):
             tokens[i-1] = prev + ".0"
     return tokens
 
 
 
 #######################################################
-def prepareTokens(text):
-    if len(text)==0:
-        return ''
     """
     An important method. It is "hiding" here in nwcontrol.py. This is
     the opportunity for "pre-processing".
     """
+
+def prepareTokens(text, rawtokens):
+    if len(text)==0:
+        return ''
+ 
 
         # encode special chars
     text = replaceSpecialChars(text)
@@ -384,12 +387,14 @@ def prepareTokens(text):
     for tok in tokens:
         if len(tok) > 0:
             newtokens.append(tok)  
+            rawtokens.append(tok)
 
     for i in range(len(newtokens)):
         tok = newtokens[i].lower()
         newtokens[i] = tok
 
     newtokens = ensureFloatBeforeMM(newtokens)
+    rawtokens = ensureFloatBeforeMM(rawtokens)
 
     return newtokens
 

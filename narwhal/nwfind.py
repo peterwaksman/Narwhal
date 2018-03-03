@@ -221,29 +221,8 @@ def matchWordToToken_star(kpart, itok, ifound, tokens):
 
 
 # ------------------------------------------------
-def findInTextXXX(klist, tokens, itok, ifound):
-    ret = ''
-    for kword in klist.list:
-        if kword == ' __d__ ':
-            a = asInt(tokens[itok])
-            if len(a)>0 :
-                ifound.append(itok)
-            return a
-        elif kword == ' __fl__ ':
-            a = asFloat(tokens[itok])
-            if len(a)>0:
-                ifound.append(itok)
-            return a
-        # look for this kword at itok position in tokens
-        # and return with ifound storing itok and any
-        # adjacent indices used during the matching
-        if matchTOK(kword, itok, ifound, tokens):
-            ret = tokens[itok]
-            x = 2
-            # NOTE this return value is ignored on the client side
-    return ret
 
-def findInText(klist, tokens, itok, ifound):
+def findInText(klist, tokens, rawtokens, itok, ifound):
     ret = ''
     tok = tokens[itok]
     for kword in klist.list:
@@ -276,14 +255,16 @@ def findInText(klist, tokens, itok, ifound):
                 if itok < L-1:
                     ifound.append(itok+1)  
                     # TODO: use raw token, not the version in lower case
-                    return tokens[itok+1]  
+                    #return tokens[itok+1]  
+                    return rawtokens[itok+1]
             elif itok<L-2:
                 s = tok + " " + tokens[itok+1]
                 if m==s or m==s+ ' ':
                     ifound.append(itok) 
                     ifound.append(itok+1) 
                     ifound.append(itok+2) 
-                    return tokens[itok+2]
+                    #return tokens[itok+2]
+                    return rawtokens[itok+1]
                 else:
                     return ''     
             else:

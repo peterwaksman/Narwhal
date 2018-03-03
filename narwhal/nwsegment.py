@@ -28,7 +28,7 @@ of code below.
 
 
 # convert text to a segment
-def PrepareSegment(tree, tokens):
+def PrepareSegment(tree, tokens, rawtokens):
     tree.clear()
     GENERAL_OP.clear()
     seg = []
@@ -42,7 +42,7 @@ def PrepareSegment(tree, tokens):
         #    continue
 
         var = None
-        vars = tree.findInText2(tokens, itok)
+        vars = tree.findInText2(tokens, rawtokens, itok)
         # findInText2() can return a list of all vars matching here.
         if len(vars) > 0:
             for var in vars:
@@ -50,7 +50,7 @@ def PrepareSegment(tree, tokens):
                 newvar = var.copy()
                 seg.append(newvar)
         else:
-            vars = GENERAL_OP.findInText2(tokens, itok)
+            vars = GENERAL_OP.findInText2(tokens, rawtokens, itok)
             if len(vars) > 0:
                 for var in vars:
                     var.ifound = cleanFound(var.ifound)
@@ -58,21 +58,6 @@ def PrepareSegment(tree, tokens):
                     seg.append(newvar)
             else:
                 seg.append(NULL_VAR)
-    return seg
-
-# same as PrepareSegment, but only uses topic tree
-def PrepareSimpleSegment(tree, tokens):
-    tree.clear()
-    seg = []
-    itok = 0
-    for itok in range(len(tokens)):
-        var = None
-        vars = tree.findInText2(tokens, itok)
-        if len(vars) > 0:
-            for var in vars:
-                var.ifound = cleanFound(var.ifound)
-                newvar = var.copy()
-                seg.append(newvar)
     return seg
 
 
@@ -135,7 +120,8 @@ def showList(ifound):
         
 
 def showSEG(segment, text):
-    tokens = prepareTokens(text)
+    rawtokens = []
+    tokens = prepareTokens(text, rawtokens)
     out = ""
     for itok in range(len(tokens)):
         out += tokens[itok].rjust(10) + " "
@@ -160,7 +146,8 @@ def getWords(tokens, ifound):
 
 
 def showSEG2(segment, text):
-    tokens = prepareTokens(text)
+    rawtokens = []
+    tokens = prepareTokens(text, rawtokens)
     out = ""
     for var in segment:
         h = ""

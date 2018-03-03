@@ -39,8 +39,8 @@ class KList:
         # it is the responsibility to the client to pass in ifound
         # This method returns True or False
         # It returns the token that was matched or with ''
-    def findInText(self, tokens, itok, ifound):
-        return nwfind.findInText(self, tokens, itok, ifound)
+    def findInText(self, tokens, rawtokens, itok, ifound):
+        return nwfind.findInText(self, tokens, rawtokens, itok, ifound)
 
 
 NULL_KLIST = KList("nullK", "")
@@ -259,7 +259,7 @@ class VAR:
 
         # Finds VAR matching at itok. Only visit
         # children if no direct match is found
-    def findInText2(self, tokens, itok):
+    def findInText2(self, tokens, rawtokens, itok):
         self.lastConst = ""
 
         ikname = 0
@@ -270,7 +270,7 @@ class VAR:
             j+=1
             klist = KList.instances[kname]
                                     # get last matched token
-            f = klist.findInText(tokens, itok, self.ifound)
+            f = klist.findInText(tokens, rawtokens, itok, self.ifound)
             if len(f)>0:
                 self.found = True  
                 # this can switch frequently and reflects the last found token
@@ -298,7 +298,7 @@ class VAR:
 
         vars = []
         for child in self.children:
-            foundC = child.findInText2(tokens, itok)
+            foundC = child.findInText2(tokens, rawtokens, itok)
             if len(foundC) > 0:
                 self.foundInChildren = True
                 self.ifound.extend(child.ifound)
