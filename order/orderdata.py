@@ -56,9 +56,20 @@ class OrderData():
             return True
         else:
             return False
+
     def setID( self, text ):
-        self.id = text
-        self.status = ORDER_HASID
+        if text and text[0]=='#':
+            self.id = text[1:]
+        else:
+            self.id = text
+        if self.status<=ORDER_HASID:
+            self.status = ORDER_HASID
+
+    def getValidatedID( self, oid ):
+        if oid =='_query_':
+            return ''
+        else: # for now
+            return oid
 
     def show(self):
         s = "\nOrder: " + self.id + "\n"

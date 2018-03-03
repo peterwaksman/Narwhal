@@ -92,12 +92,12 @@ class OrderChat( NWDataChat ):
             for reader in self.topic.readers:
                 id = reader.id
  
-                if id=='inputask':
+                if id=='inputask' and reader.GOF>0.8:
                     for event in reader.eventrecord:
                         orderID = reader.getLastValue()
-                        if orderID and event[0]>=0.8 and reader.GOF>0.8: 
-                            # TODO: sanity check the ID is valid
-                            if self.data.status>ORDER_NONE and orderID!=self.data.id:
+                        orderID = self.data.getValidatedID(orderID)
+                        if orderID : 
+                            if self.data.hasData() and orderID!=self.data.id:
                                 self.caveat = "Wait...could you please start a new conversation to discuss another order."
                                 return
                             else:
