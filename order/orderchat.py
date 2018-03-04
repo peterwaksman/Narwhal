@@ -89,21 +89,29 @@ class OrderChat( NWDataChat ):
             if self.gof<0.3: #<=0.5?
                  return
 
+            otherGOF = 0
+            for reader in self.topic.readers:
+                if reader.id=='inputask':
+                    continue
+                otherGOF = max(otherGOF, reader.GOF)
+
             for reader in self.topic.readers:
                 id = reader.id
- 
-                if id=='inputask' and reader.GOF>0.8:
-                    for event in reader.eventrecord:
-                        orderID = reader.getLastValue()
-                        orderID = self.data.getValidatedID(orderID)
-                        if orderID : 
-                            if self.data.hasData() and orderID!=self.data.id:
-                                self.caveat = "Wait...could you please start a new conversation to discuss another order."
-                                return
-                            else:
-                                self.data.setID( orderID )
-                                self.responder.stage = ORDER_HASID
-                            
+              
+                if id=='inputask' and reader.GOF>0.8:# and reader.GOF>otherGOF:
+                    orderID = reader.getLastValue()
+                    orderID = self.data.getValidatedID(orderID)
+
+                    if orderID:
+                            # trying to change the order number
+                        if reader.GOF>=otherGOF and self.data.hasData() and orderID!=self.data.id:
+                            self.caveat = "Wait...could you please start a new conversation to discuss another order."
+                            return
+                            # or setting the order number
+                        elif reader.GOF>otherGOF:
+                            self.data.setID( orderID )
+                            self.responder.stage = ORDER_HASID
+                             
                             # special mode before an orderID is known
                 if not self.data.hasData():
                     self.stringmode = True
@@ -123,9 +131,10 @@ class OrderChat( NWDataChat ):
 
                 if self.data.status==ORDER_HASID: # when order exists but has never been updated
                    self.data.status = ORDER_RECEIVED
-
-                STATUS = self.data.status
-                self.responder.stage = STATUS
+                   
+                # SYNC responder
+                status = self.data.status
+                self.responder.stage = status
                 
                 # CAVEATS 
                                 
@@ -134,26 +143,26 @@ class OrderChat( NWDataChat ):
                     return 
 
                 # Begin handling questions, per current state
-                if STATUS==ORDER_RECEIVED:
+                if status==ORDER_RECEIVED:
                     if t=='when':
                         self.caveat = "Tomorrrow am"
                     else:
                         self.caveat = "Your order has been placed. It will be in design within 5 minutes"
-                elif STATUS==ORDER_INDESIGN:
+                elif status==ORDER_INDESIGN:
                     if t=='why' and v=='delay':
                         self.caveat = "I don't know. I'll ask operations to contact you."
                     elif t=='where':
                         self.caveat = "It is being manufactured"
                     else:
                         self.caveat = "The order is not ready"
-                elif STATUS==ORDER_RECEIVED:
+                elif status==ORDER_RECEIVED:
                     if t=='why' and v=='delay':
                         self.caveat = "I don't know. I'll ask operations to contact you."
                     elif t=='where':
                         self.caveat = "It is being manufactured"
                     else:
                         self.caveat = "The order is not ready"
-                elif STATUS==ORDER_SHIPPED:                
+                elif status==ORDER_SHIPPED:                
                     self.caveat = "It shipped this morning"
                 else:
                     self.caveat= 'It is delivered'
@@ -167,7 +176,7 @@ class OrderChat( NWDataChat ):
 
 class OrderAppChat( TChat ):
     def __init__(self, id):
-        self.id = id #conversation ID  
+        self.id = id #CONVERSATION ID. NOT ORDER ID
 
         self.appResponder = DefaultAppResponder()      
 
@@ -196,8 +205,6 @@ class OrderAppChat( TChat ):
         self.orderdata.status = ORDER_NEEDAPPROVED
     def SetApproved(self):
         self.orderdata.status = ORDER_BEENAPPROVED
-    def SetInManufacturing(self):
-        self.orderdata.status = ORDER_INMANUFCTR
     def SetInManufacturing(self):
         self.orderdata.status = ORDER_INMANUFCTR
     def SetOnHold(self):
