@@ -15,6 +15,7 @@ from stdtrees.tchats import *
 from ordertree import *
 from orderdata import *
 
+
 #####################################
 AccountResponder = DefaultResponder()
 class AccountChat( NWDataChat ):
@@ -104,11 +105,15 @@ class OrderChat( NWDataChat ):
 
                     if orderID:
                             # trying to change the order number
-                        if reader.GOF>=otherGOF and self.data.hasData() and orderID!=self.data.id:
-                            self.caveat = "Wait...could you please start a new conversation to discuss another order."
-                            return
+                        if reader.GOF>=otherGOF:
+                            if self.data.hasData() and orderID!=self.data.id:
+                                self.caveat = "Wait...could you please start a new conversation to discuss another order."
+                                return
+                            elif self.data.id=='':
+                                self.data.setID( orderID )
+                                self.responder.stage = ORDER_HASID
                             # or setting the order number
-                        elif reader.GOF>otherGOF:
+                        elif reader.GOF>otherGOF or (reader.GOF==otherGOF and not self.data.hasData()):
                             self.data.setID( orderID )
                             self.responder.stage = ORDER_HASID
                              
