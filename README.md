@@ -10,6 +10,7 @@
      * a 'scene editor' using more-or-less structured commands 
      * an 'about chatbot' for greetings and answering questions
      * a 'confirm chatbot' for getting and confirming a string from the client.
+
 And now a CommandChatbot that uses Chat infrastructure to implement an old fashioned commmand interpreter.
 You ask: Why bother? It is so command interpreters and chatbots use the same client architecture 
 
