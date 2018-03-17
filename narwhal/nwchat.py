@@ -219,6 +219,8 @@ class NWTopic():
             if self.maxGOF<reader.GOF: #update
                 self.maxGOF= reader.GOF
 
+        return rawtokens 
+
     def summary(self):
         out = "|----" + self.tree.knames[0] + "---\n"
         #out = "|---------\n"
@@ -292,7 +294,27 @@ aResponseV = {
 class DefaultResponder( NWTopicResponder ):
     def __init__(self):
         NWTopicResponder.__init__( self, aResponse, aResponseV)
+        
+
+
+BUNDEF = 0 #undefined
+BGOOD = 1  # defined and good result
+BBAD = 2   # defined and bad result
          
+bResponse = {
+    BUNDEF : "undef",
+    BGOOD  : "success",
+    BBAD   : "failed"
+    }
+bResponseV = {
+    BUNDEF : [],
+    BGOOD : [], 
+    BBAD : [] 
+    }
+
+class TernaryResponder( NWTopicResponder ):
+    def __init__(self):
+        NWTopicResponder.__init__(self, bResponse, bResponseV)
 
  #################################################
 APP_HUH = 0
@@ -466,7 +488,8 @@ class NWDataChat(TChat):
         self.caveat = ''
         self.prevdata = self.data # keep (deep) copy
             
-        self.topic.read( text )  
+        # rawtokens not used here, see CommandChat
+        rawtokens = self.topic.read( text )  
         self.gof = self.topic.maxGOF
 
         if DEBUGSILENCE>0:
@@ -484,3 +507,71 @@ class NWDataChat(TChat):
         self.topic.Context.addSegment( self.responder.getResponseVARs() )
         return outtext
 
+"""
+CommandChat is a chat initialized from a dictionary having entries of the form:
+                    VAR : executeFn
+When the VAR is spotted in incoming text, one expects the remaining args to be the
+raw tokens that follow. Also one might assume the VAR is the first token encountered.
+Also that VAR is represented by single token keyword synonym.
+
+The 'execute' function takes all the tokens as args and can decide to do something
+and return True, or do nothing and return False
+"""
+
+class CommandsChat( NWDataChat ):
+    def __init__(self, Dict):
+        self.dict = Dict
+
+        # populate tree
+        self.tree = KList("commandtree","").var()
+        for var in Dict:
+            self.tree.sub( var )
+
+        # define nars
+        readers = []
+        for var in Dict:
+            nar = attribute( var, var )
+            readers.append( NWTopicReader(var.knames[0], self.tree, nar) )
+
+        # define topic
+        self.topic = NWTopic(self.tree, readers )
+        NWDataChat.__init__(self, self.topic, TernaryResponder())
+
+        self.args = []
+ 
+        # borrowed from parent and modified 
+    def Read(self, text ):  
+        self.caveat = ''
+        self.prevdata = self.data # keep (deep) copy
+            
+        self.args = self.topic.read( text )  
+        self.gof = self.topic.maxGOF
+
+        if DEBUGSILENCE>0:
+            print( self.topic.summary() )
+
+                # transfer info from subreaders of the topic into the data structure
+        self.update()
+ 
+    def update(self):
+        self.responder.stage = BUNDEF
+
+        if self.gof<0.5:
+            return False
+
+        id = self.topic.getBestReader().id
+        for var in self.dict:
+            h = var.knames[0]
+            if h != id:
+                continue             
+
+            execF = self.dict[var]
+            isok = execF( self.args )
+            if isok:
+                self.responder.stage = BGOOD
+            else:
+                self.responder.stage = BBAD
+
+           
+
+ 

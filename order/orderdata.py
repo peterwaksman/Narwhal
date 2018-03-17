@@ -62,8 +62,8 @@ class OrderData():
             self.id = text[1:]
         else:
             self.id = text
-        if self.status<=ORDER_HASID:
-            self.status = ORDER_HASID
+        #if self.status<=ORDER_HASID:
+        self.status = ORDER_HASID # changing the id resets the chatbot
 
     def getValidatedID( self, oid ):
         if oid =='_query_':

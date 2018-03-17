@@ -6,6 +6,7 @@ from stdtrees.geometry import *
 from stdtrees.ask import * 
 from stdtrees.tchats import CLIENTASK 
 
+from dental.dentalTree import * 
 
 ORDERNO1 = KList("STR_ORDERNO1", "__sufx__order").var()
 ORDERNO2  = KList("STR_ORDERNO2", "__sufx__order _hash_").var()
