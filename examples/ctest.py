@@ -14,8 +14,9 @@ from narwhal.nwutils import *
 from narwhal.nwcontrol import *
 from narwhal.nwsreader import *
 from narwhal.nwapp import *
-
 from narwhal.nwnreader import *
+
+
 
 print("\n\n")
 
@@ -43,8 +44,6 @@ affect = cause(attribute(SOUND, [TOD]), AFFECT)
 proximity = attribute(LOC, SOURCE, PROX)
 letin = event(attribute(BARRIER, [STATE]), SOUND, LETINOUT)
 
-
-
 SENTENCES = [
     #'every word spoken was heard through the walls',
     'My room was far from the elevator and far from the lobby, so it was very quiet.',
@@ -53,7 +52,8 @@ SENTENCES = [
     #'We did find it a bit noisy with the balcony doors open due to the McDonalds next door.',
 ]
 
-G = NWNReader(affect, True) # True means reverse the final polarity
+
+G = NWNReader(proximity, True) # True means reverse the final polarity
 for sent in SENTENCES:
     E.clear()
     text = sent
@@ -61,7 +61,9 @@ for sent in SENTENCES:
     segment = PrepareSegment(E,tokens)
     G.readText(segment,tokens)
      
-    tabulateSEG2(segment,tokens) 
+    s = tabulateSEG(segment,tokens) 
+    p = G.tabulate(len(tokens))
+
     s = G.report(tokens ) 
     print(s)
 x = 2

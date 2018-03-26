@@ -52,9 +52,9 @@ BouncyResponder = NWTopicResponder(bResponse, bResponseV)
 
 ###################################################
 
-class BouncyChat( NWTopicChat ):
+class BouncyChat( NWDataChat ):
     def __init__(self, bdata):
-        NWTopicChat.__init__(self, BouncyTopic, BouncyResponder)
+        NWDataChat.__init__(self, BouncyTopic, BouncyResponder)
         # get yourself 2 instances of empty scene data
         self.data = BouncySceneData()
         self.data.copy(bdata) 
@@ -65,11 +65,11 @@ class BouncyChat( NWTopicChat ):
     def Read(self, text):
         self.caveat = ''
         self.prevdata.copy(self.data) # keep copy
-        NWTopicChat.Read(self, text)
+        NWDataChat.Read(self, text)
 
 
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.gof==0:
             self.responder.stage = BQU  
             return

@@ -4,6 +4,7 @@ from math import sqrt
 IMGWIDTH = 320
 IMGHEIGHT = 320
 Oxy = (100,230) # origin is left and low
+#Oxy = (160,160) # origin is left and low
 
 def DIFF( xyA, xyB):
     a = xyA[0] - xyB[0]

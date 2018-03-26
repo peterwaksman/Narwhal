@@ -5,6 +5,7 @@ from narwhal.nwvault import *
 from narwhal.nwnreader import *
 from narwhal.nwcontext import *
 from narwhal.nwsegment import *
+from narwhal.nwlog import NWLog
 
 from narwhal.nwlog import NWLog
 
@@ -297,9 +298,9 @@ class DefaultResponder( NWTopicResponder ):
         
 
 
-BUNDEF = 0 #undefined
-BGOOD = 1  # defined and good result
-BBAD = 2   # defined and bad result
+BUNDEF = 0 # undefined
+BGOOD  = 1 # defined and good result
+BBAD   = 2 # defined and bad result
          
 bResponse = {
     BUNDEF : "undef",
@@ -515,7 +516,8 @@ raw tokens that follow. Also one might assume the VAR is the first token encount
 Also that VAR is represented by single token keyword synonym.
 
 The 'execute' function takes all the tokens as args and can decide to do something
-and return True, or do nothing and return False
+and return True or False, or do nothing and return False. It is responsible for arg validation
+for example if the above assumptions are not correct it is up to the 'execute' to deal with it.
 """
 
 class CommandsChat( NWDataChat ):
@@ -560,12 +562,14 @@ class CommandsChat( NWDataChat ):
             return False
 
         id = self.topic.getBestReader().id
+
         for var in self.dict:
             h = var.knames[0]
             if h != id:
                 continue             
 
             execF = self.dict[var]
+
             isok = execF( self.args )
             if isok:
                 self.responder.stage = BGOOD

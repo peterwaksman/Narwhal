@@ -9,7 +9,7 @@ the new "segmented text" is an unhappy one. Various methods try to
 coordinate them: getHi(), getLo(), wordReadRange
 """
 # nwsegment.py for handling text segmentation utilities.
-# used by the NWSReader. Contains utilities and the inner loop read() methods
+# used by the NWNReader. Contains utilities and the inner loop read() methods
 from narwhal.nwtypes import *
 from narwhal.nwutils import *
 from narwhal.nwcontrol import *
@@ -181,15 +181,16 @@ def tabulateSEG2( segment, tokens):
         out += tokens[i].rjust(8) + " " + x[i].rjust(8) + "\n"
     print( out )
     return out
-################################################
-################### inner read loop ############
+
+
 def isNullSegment(seg):
     for var in seg:
         if var != NULL_VAR:
             return False
     return True
             
-
+################################################
+################### inner read loop ############
 def ReadSegment(nar, seg):
     nar.lastConst = "" # may get set in a sub ReadXXX
                        # redundant in the current code
@@ -493,90 +494,4 @@ def ReadSegmentAsRelation(nar, seg):
  
 ################################
 
-
-def scanNextControl2(segment, istart):
-    CD = ControlData()
-    L = len(segment)
-    if istart > L - 1:
-        CD.set(END_CTRLTYPE, NULL_VAR, L)
-        return CD
-    for i in range(istart, L):
-        var = segment[i]
-        if var <= LOGIC_OP and not var<=DULL_OP:
-            CD.set(OPERATOR_CTRLTYPE, var, i)
-            return CD
-        elif var <= PUNCTUATION_OP:
-            CD.set(PUNCTUATION_CTRLTYPE, var, i)
-            return CD
-    CD.set(END_CTRLTYPE, NULL_VAR, L)
-    return CD
-
-
-def OpIFound(segment, op, imin, imax):
-    ifound = []
-    for var in segment:
-        if var <= op:
-            ifound.extend(var.ifound)
-
-    # only keep those in [imin,imax]
-    jfound = []
-    for j in ifound:
-        if imin <= j and j <= imax:
-            jfound.append(j)
-    cleanFound(jfound)
-    return jfound
-
-
-def getControlIFound(segment, imin, imax):
-    dullI = OpIFound(segment, DULL_OP, imin, imax)
-    logicI = OpIFound(segment, LOGIC_OP, imin, imax)
-    skipI = OpIFound(segment, SKIP_OP, imin, imax)
-
-    ifound = []
-    ifound.extend(dullI)
-    ifound.extend(logicI)
-    ifound.extend(skipI)
-    cleanFound(ifound)
-    return ifound
-
-
-def opCount(segment, op, imin, imax):
-    ifound = OpIFound(segment, op, imin, imax)
-    return len(ifound)
-
-
-def wordReadCount(segment, ifound, imin, imax):
-    #ifound = nar.getIFound()
-    foundMin = max(imin, minITOK(ifound))
-    foundMax = min(imax, maxITOK(ifound))
-
-    # get all the words read
-    cfound = getControlIFound(segment, foundMin, foundMax)
-    ifound.extend(cfound)
-    ifound = cleanFound(ifound)
-    # limit between imin and imax
-    jfound = ifound
-    ifound = []
-    for j in jfound:
-        if foundMin <= j and j <= foundMax:
-            ifound.append(j)
-
-    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax)
-
-    # remove any punctuations
-    final = len(ifound) - pcount
-
-#    ifound = cleanIFound(ifound)
-
-    return max(0, final)
-
-
-def wordReadRange(segment, ifound, imin, imax):
-    #ifound = nar.getIFound()
-    foundMin = max(imin, minITOK(ifound))
-    foundMax = min(imax, maxITOK(ifound))
-    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax)
-    final = (foundMax - foundMin + 1) - pcount
-    # remove any punctuations
-    return max(0, final)
 

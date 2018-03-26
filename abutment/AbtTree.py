@@ -87,7 +87,7 @@ FEATURE.sub(OPPOSING)
 ################## AMOUNTS
 JUST = KList("just", "just, slightlye").var()
 ASPOSS = KList("possible", "possible, as possible, as * as possible, as much as possible").var()
-RELAMOUNT = KList("amount", "amoount").var()
+RELAMOUNT = KList("amount", "amount").var()
 RELAMOUNT.sub(JUST)
 RELAMOUNT.sub(ASPOSS)
 RELAMOUNT.sub(FLOATx)

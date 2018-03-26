@@ -18,34 +18,11 @@ SENSE_CUTOFF = 0.3
 ## Build a TChat for basic questions from the client
 # final grouping
 
-################# VARS NARS AND CLIENTASK TREE ################
-###VARS
-CLIENTASK = KList( "clientask", ' i , me , we ').var()
-CLIENTASK.sub(QUESTION) 
-CLIENTASK.sub(REQUEST) 
-CLIENTASK.sub(YOU)  
-CLIENTASK.sub(HELLO)
-CLIENTASK.sub(YES_NO) #this ensures YES_NO is used when the CLIENTASK tree is used.
-CLIENTASK.sub(THANKS)
-
-#TOPIC = KList( "topic", "" ).var() # use TOPIC.sub() elsewhere
-#CLIENTASK.sub(TOPIC)
-
-###NARS
-about = attribute(QUESTION,YOU)
-hello = attribute(HELLO,HELLO) 
-# have yesno defined in ask.py
-#asktopic = attribute(QUESTION, TOPIC )
-#requesttopic = attribute(REQUEST, TOPIC )
-thankyou = attribute(THANKS, YOU)
- 
 
  
 Q = [ 
         NWTopicReader('about', CLIENTASK, about ), 
         NWTopicReader('hello', CLIENTASK, hello ),  
-        #NWTopicReader('asktopic', CLIENTASK, asktopic ),
-        #NWTopicReader('requesttopic', CLIENTASK, requesttopic ),
         NWTopicReader('thankyou', CLIENTASK, thankyou ),
     ]  
 

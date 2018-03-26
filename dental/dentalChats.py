@@ -21,9 +21,9 @@ SENSE_CUTOFF = 0.3
 BaseResponder = DefaultResponder() #NWTopicResponder(aResponse, aResponseV)
 
 ###################################################
-class BaseChat( NWTopicChat ):
+class BaseChat( NWDataChat ):
     def __init__(self):
-        NWTopicChat.__init__(self, BaseTopic, BaseResponder)
+        NWDataChat.__init__(self, BaseTopic, BaseResponder)
         
         self.data = None       
         self.caveat = ''   # for out-of-bounds warning 
@@ -35,7 +35,7 @@ class BaseChat( NWTopicChat ):
             self.data = data #??
 
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.gof==0:
             self.responder.stage = AQU  
             return
@@ -83,15 +83,15 @@ class BaseChat( NWTopicChat ):
 
 ################################################
 
-class MarginChat( NWTopicChat ):
+class MarginChat( NWDataChat ):
     def __init__(self):
-        NWTopicChat.__init__(self, MarginTopic , DefaultResponder())
+        NWDataChat.__init__(self, MarginTopic , DefaultResponder())
         
         # don't implement data ownership
         self.data     = None
          
     def Read(self, text):
-        NWTopicChat.Read(self,text)
+        NWDataChat.Read(self,text)
                 # implement a policy for 0.5
         if self.gof==0.5:
             self.gof = 0 # so many implicits, when down to .5 you got nothin
@@ -197,7 +197,7 @@ class MarginChat( NWTopicChat ):
         return outtext
 
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.gof==0:
             self.responder.stage = AQU  
             return
@@ -244,7 +244,7 @@ class MarginChat( NWTopicChat ):
 
 
  
-class DentalChat(  NWTopicChat ):
+class DentalChat(  NWDataChat ):
     def __init__(self):
  
         # root piece of data
@@ -277,15 +277,15 @@ class DentalChat(  NWTopicChat ):
 """
 Handle questions. 
 """
-class DentalQuestionChat( NWTopicChat ):
+class DentalQuestionChat( NWDataChat ):
     def __init__(self):
-        NWTopicChat.__init__(self, DentalQuestionTopic , DefaultResponder())
+        NWDataChat.__init__(self, DentalQuestionTopic , DefaultResponder())
     def Read(self, text):
-        NWTopicChat.Read(self, text)    
+        NWDataChat.Read(self, text)    
         self.update() 
           
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.gof==0:
             self.responder.stage = AQU  
             return
@@ -306,31 +306,15 @@ class DentalQuestionChat( NWTopicChat ):
  
 #######################################################
 ACTREE = KList("acctree","").var()
-ACTREE.sub(CLIENTASK)
-ACTREE.sub(MYACCOUNT)
+ACTREE.subs( [CLIENTASK, MYACCOUNT] )
+
 accountAsk = attribute(QUESTION, MYACCOUNT)
 AccountAgendaReaders = [
                         NWTopicReader("account", ACTREE, accountAsk)
                      ]
 
 #################################################
-APP_HUH = 0
-APP_HELLO = 1
-APP_DENTAL = 2
-APP_ACCOUNT = 3 
-# qchatR[i] is singular qchatRVs[i] is a list, hence the plural
-appR = { 
-    APP_HUH :  "hmm?",
-    APP_HELLO : "{}",
-    APP_DENTAL : "I can help you with that...\n{}",
-    APP_ACCOUNT : "For account info phone (978)xxx-xxxx"
-    }
-appRVs = {
-    APP_HUH :  [],
-    APP_HELLO : [],
-    APP_DENTAL : [],
-    APP_ACCOUNT : []
-    }
+
 
 ##################################################
 """
@@ -351,11 +335,11 @@ Why have a separate agenda for determining dental, why not just get right to it?
 Answer is: because setting a dental context is separate and can be included in a
 statement but needs some acknowledgement, because it sets the context of discussion.
 """
-class AppChat( TChat ):
+class DentalAppChat( TChat ):
     def __init__(self):
         TChat.__init__(self)
 
-        self.appResponder = NWTopicResponder( appR, appRVs )
+        self.appResponder = DefaultAppResponder() 
 
                 # includes questions and requests
         self.dentalAgenda = NWTopic( DTREE, DentalAgendaReaders ) 
@@ -384,9 +368,7 @@ class AppChat( TChat ):
                 return
             else:
                 self.currentChat = self
-              
-
-
+             
         self.dentalAgenda.read(text)
         self.accountAgenda.read(text)
         self.about.Read(text)  
@@ -401,7 +383,7 @@ class AppChat( TChat ):
           v = self.about.Write()
 
         elif self.dentalAgenda.maxGOF > 0.3:
-           self.appResponder.stage = APP_DENTAL
+           self.appResponder.stage = APP_TOPIC
 
            self.dental.Read(text)
            self.dentalQ.Read(text)

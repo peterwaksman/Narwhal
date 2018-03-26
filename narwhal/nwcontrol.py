@@ -56,11 +56,9 @@ kDULL = " a , the , an , did "
 dullD = KList("DU", kDULL)
 DULL_OP = dullD.var()
 
-
 # these are separators of sequence
 # '-' and '.' may need to be pre-cleaned in the text. YEP
 kCONJUNCTIONS = " and , also , then , but also ,but more "
-
 
 kNEGATIONS = "isn't,wasn't,barely,hardly,unfounded, is not,isnt,don't, do not, doesn't, does not,"
 kNEGATIONS += "avoid,rather than,not so,not true,false,nothing # too|being|was|but,"
@@ -139,7 +137,6 @@ ATTRIB_OP = attribD.var()
 designatorD = KList("IT", kDESIGNATORS)
 DESIGNATOR_OP = designatorD.var()
 
-
 gennegD = KList("NEG", kNEGATIONS)
 GENNEGATION_OP = gennegD.var()
 
@@ -164,33 +161,12 @@ LOGIC_OP = logicD.var()
 skipD = KList("SKIP", "")
 SKIP_OP = skipD.var()
 
-####################### Tree of VARs ##################
-#
-BLOCK_OP.sub(GENNEGATION_OP)
-BLOCK_OP.sub(GENHEDGE_OP)
-#
-FWDBLOCK_OP.sub(FWDNEGATION_OP)
-FWDBLOCK_OP.sub(FWDHEDGE_OP)
-#
-#PRECONJ_OP = VAR()
-PRECONJ_OP.sub(IF_OP)
-PRECONJ_OP.sub(NOTONLY_OP)
-PRECONJ_OP.sub(IFNOT_OP)
-########################
-LOGIC_OP.sub(AND_OP)
-# LOGIC_OP.sub(SO_OP)
-# LOGIC_OP.sub(ATTRIB_OP)
-LOGIC_OP.sub(BLOCK_OP)
-LOGIC_OP.sub(FWDBLOCK_OP)
-LOGIC_OP.sub(PRECONJ_OP)
-
-
-#######################################################
-# SKIP_OP.sub(AND_OP)
-SKIP_OP.sub(SO_OP)
-SKIP_OP.sub(ATTRIB_OP)
-SKIP_OP.sub(DESIGNATOR_OP)
-
+####################### Tree of LOGIC VARs ##################
+BLOCK_OP.subs([GENNEGATION_OP, GENHEDGE_OP])
+FWDBLOCK_OP.subs([FWDNEGATION_OP, FWDHEDGE_OP])
+PRECONJ_OP.subs([IF_OP, NOTONLY_OP, IFNOT_OP])
+LOGIC_OP.subs([AND_OP, BLOCK_OP, FWDBLOCK_OP, PRECONJ_OP])
+SKIP_OP.subs([SO_OP, ATTRIB_OP, DESIGNATOR_OP])
 
 #######################################################
 # PUNCTUATION (and other)
@@ -232,7 +208,6 @@ def replaceSpecialChars(text):
     return newtext
 
 
-
 kPERIOD = KList("PERIOD", "_period_")
 kCOMMA = KList("COMMA", "_comma_")
 kSEMI = KList("SEMICOLON", "_semi_")
@@ -249,35 +224,18 @@ QUERY_OP = kQUERY.var()
 EXCLM_OP = kEXCLM.var()
 OPAREN_OP = kOPENPAREN.var()
 CPAREN_OP = kCLOSEPAREN.var()
-DASH_OP = kDASH.var()
+DASH_OP = kDASH.var()  # defined here but not included in PUNCTUATION
 
-kPUNCT = KList("PUNCTUATION", "")
-PUNCTUATION_OP = kPUNCT.var()
-PUNCTUATION_OP.sub(PERIOD_OP)
-PUNCTUATION_OP.sub(COMMA_OP)
-PUNCTUATION_OP.sub(SEMI_OP)
-PUNCTUATION_OP.sub(QUERY_OP)
-PUNCTUATION_OP.sub(EXCLM_OP)
-PUNCTUATION_OP.sub(OPAREN_OP)
-PUNCTUATION_OP.sub(CPAREN_OP)
-#PUNCTUATION_OP.sub(DASH_OP )
+PUNCTUATION_OP = KList("PUNCTUATION", "").var()
+PUNCTUATION_OP.subs([PERIOD_OP, COMMA_OP, SEMI_OP, QUERY_OP, EXCLM_OP, OPAREN_OP, CPAREN_OP ])
 
 
+########## GENERAL OPERATOR TREE #########################
+GENERAL_OP = KList("GENERAL", " GEN ").var()
+GENERAL_OP.subs([LOGIC_OP, DULL_OP, SKIP_OP, PUNCTUATION_OP])
 
 
-
-#######################################################
-# put it together
-
-kGENERAL = KList("GENERAL", " GEN ")
-
-GENERAL_OP = kGENERAL.var()
-GENERAL_OP.sub(LOGIC_OP)
-GENERAL_OP.sub(DULL_OP)
-GENERAL_OP.sub(SKIP_OP)
-GENERAL_OP.sub(PUNCTUATION_OP)
-
-
+######################################################
 #######################################################
 # Control types.
 NO_CTRLTYPE = 0
@@ -302,6 +260,67 @@ class ControlData:
         self.ctrl = ctrl
         self.ictrl = ictrl
 
+
+def getControlIFound(segment, imin, imax):
+    dullI = OpIFound(segment, DULL_OP, imin, imax)
+    logicI = OpIFound(segment, LOGIC_OP, imin, imax)
+    skipI = OpIFound(segment, SKIP_OP, imin, imax)
+
+    ifound = []
+    ifound.extend(dullI)
+    ifound.extend(logicI)
+    ifound.extend(skipI)
+    cleanFound(ifound)
+    return ifound
+
+
+def opCount(segment, op, imin, imax):
+    ifound = OpIFound(segment, op, imin, imax)
+    return len(ifound)
+
+
+def wordReadCount(segment, ifound, imin, imax):
+    #ifound = nar.getIFound()
+    foundMin = max(imin, minITOK(ifound))
+    foundMax = min(imax, maxITOK(ifound))
+
+    # get all the words read
+    cfound = getControlIFound(segment, foundMin, foundMax)
+    ifound.extend(cfound)
+    ifound = cleanFound(ifound)
+    # limit between imin and imax
+    jfound = ifound
+    ifound = []
+    for j in jfound:
+        if foundMin <= j and j <= foundMax:
+            ifound.append(j)
+
+    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax)
+
+    # remove any punctuations
+    final = len(ifound) - pcount
+
+#    ifound = cleanIFound(ifound)
+
+    return max(0, final)
+
+
+def wordReadRange(segment, ifound, imin, imax):
+    #ifound = nar.getIFound()
+    foundMin = max(imin, minITOK(ifound))
+    foundMax = min(imax, maxITOK(ifound))
+    pcount = opCount(segment, PUNCTUATION_OP, foundMin, foundMax)
+    final = (foundMax - foundMin + 1) - pcount
+    # remove any punctuations
+    return max(0, final)
+
+
+######################################################
+############## PARSING TEXT #####################
+######################################################
+######################################################
+ 
+
 def separateMM(text):
     h = len(text)
     if h < 3:
@@ -323,6 +342,35 @@ def separateMM(text):
     return newtext       
 
 
+def cleanAMPM(text):
+    L = len(text)
+    newtext = ""
+    i = 0
+    while i < L:
+        c = text[i]
+        # test for "I am"
+        if c == 'I' and i < L - 3 and text[i + 1] == ' ' and text[i + 2] == 'a' and text[i + 3] == 'm':
+            newtext += "I_am"
+            i += 4
+        elif c.isdigit() and i < L - 2:
+            d = text[i + 1]
+            e = text[i + 2]
+
+            if d.lower() == 'a' and e.lower() == 'm':
+                newtext += c + ' ' + 'a' + 'm'
+                i += 3
+            elif d.lower() == 'p' and e.lower() == 'm':
+                newtext += c + ' ' + 'p' + 'm'
+                i += 3
+            else:
+                newtext += c
+                i += 1
+        else:
+            newtext += c
+            i += 1
+
+    return newtext
+
 def cleanDecimals(text):
     if len(text)==0:
         return
@@ -335,7 +383,6 @@ def cleanDecimals(text):
     newtext += text[len(text)-1]
     return newtext    
 
-####################################################
 def isInteger(tok):
     if len(tok)==0:
         return False
@@ -360,14 +407,14 @@ def ensureFloatBeforeMM(tokens):
 
 #######################################################
     """
-    An important method. It is "hiding" here in nwcontrol.py. This is
-    the opportunity for "pre-processing".
+    An important method. This is the opportunity for "pre-processing".
+     For now my excuse for putting it in nwcontrol is the use of 
+     replaceSpecialChars() which is tightly related to _OP processing above.
     """
 
 def prepareTokens(text, rawtokens):
     if len(text)==0:
         return ''
- 
 
         # encode special chars
     text = replaceSpecialChars(text)
@@ -398,3 +445,35 @@ def prepareTokens(text, rawtokens):
 
     return newtokens
 
+
+def scanNextControl2(segment, istart):
+    CD = ControlData()
+    L = len(segment)
+    if istart > L - 1:
+        CD.set(END_CTRLTYPE, NULL_VAR, L)
+        return CD
+    for i in range(istart, L):
+        var = segment[i]
+        if var <= LOGIC_OP and not var<=DULL_OP:
+            CD.set(OPERATOR_CTRLTYPE, var, i)
+            return CD
+        elif var <= PUNCTUATION_OP:
+            CD.set(PUNCTUATION_CTRLTYPE, var, i)
+            return CD
+    CD.set(END_CTRLTYPE, NULL_VAR, L)
+    return CD
+
+
+def OpIFound(segment, op, imin, imax):
+    ifound = []
+    for var in segment:
+        if var <= op:
+            ifound.extend(var.ifound)
+
+    # only keep those in [imin,imax]
+    jfound = []
+    for j in ifound:
+        if imin <= j and j <= imax:
+            jfound.append(j)
+    cleanFound(jfound)
+    return jfound

@@ -21,13 +21,13 @@ narwhal_dir = os.path.normpath(narwhal_dir)
 sys.path.insert(0, narwhal_dir)
  
 from stdtrees.tchats import ConfirmChat
-from orderchat import OrderAppChat
+from orderchat import OrderDentalAppChat
 #from orderdata import OrderData
  
 cvID = '111211311' # conversation id is REQUIRED
 cvLoc = "c:\\temp\\" # a location is needed for Load/Save
 
-OChat = OrderAppChat( cvID )
+OChat = OrderDentalAppChat( cvID )
 # load previous state
 OChat.Load( cvLoc )
 # check for an order ID
@@ -73,3 +73,6 @@ while True:
 
     OChat.Save(cvLoc)
     x = 2
+
+
+ 

@@ -55,6 +55,64 @@ particular token index 'itok'.
 
 from narwhal.nwutils import *
 
+#useful sometimes, eg for printouts
+def TOKS(text):
+    tokens = text.split(' ')
+    return tokens
+
+    # T = numTokens. It is assume ifound is list of indices from
+    # in [0, T)
+
+
+#related to int unknowns
+def asInt(token):
+    """ true if token is digits, optionally preceeded with a '+' or '-' """
+    if len(token)<1 :
+        return ''
+    if token[0]=='-' or token[0]=='+':
+        tmp = token[1:]
+        if tmp.isdigit():
+            if token[0] == '-':
+                return token # preserve the minus
+            else:
+                return tmp   # strip off the plus
+        return ''
+    elif token.isdigit():
+        return token
+    else:
+        return ''
+
+# assume utoken has no sign prefix
+def isdigitFL(token):
+    pcount = 0 #count periods
+    for i in range( len(token) ) :
+        if token[i]=='.':
+            pcount += 1
+        elif not token[i].isdigit():
+            return False
+    if pcount==1:
+        return True
+    else:
+        return False
+
+
+def asFloat(token):
+        """ Same as asInt() except we allow one decimal before the
+        last digit """
+        if len(token)<1 :
+            return ''
+        if token[0]=='-' or token[0]=='+':
+            tmp = token[1:]
+            if isdigitFL(tmp):
+                if token[0] == '-':#if it begins with a minus
+                    return token   # preserve the minus  
+                else:
+                    return tmp     # strip off the plus
+        elif isdigitFL(token):
+            return token
+        else:
+            return ''
+
 def kwordLen(kword):
     if len(kword) < 1:
         return 0
@@ -246,7 +304,7 @@ def findInText(klist, tokens, rawtokens, itok, ifound):
                 #return tok
                 return rawtokens[itok]
             else:
-                return '' #?? prevents finding by matchTOK below
+                return '' # prevents finding by matchTOK below
         elif kword[:8]=='__sufx__':
             L = len(tokens)
             m = kword[8:] # the body of the keyword IS the suffix

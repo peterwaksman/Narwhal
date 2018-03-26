@@ -43,6 +43,19 @@ class KList:
         return nwfind.findInText(self, tokens, rawtokens, itok, ifound)
 
 
+        # utility used to define var1<=var2
+        # I was not able to use a recursive definition inside the VAR.__le__()
+def recursiveLE(self, other):
+#if isinstance(self, NAR) or isinstant(other,NAR):
+    #x = 2
+    if self.knames == other.knames:
+        return True
+    for child in other.children:
+        if recursiveLE(self, child):
+            return True
+    return False
+
+
 NULL_KLIST = KList("nullK", "")
 
 # design pattern is a bit strange: relatively concrete containers are used
@@ -60,10 +73,11 @@ class VAR:
     By definition, the first alternative means good and second means bad. 
     (You can change this with calibrations later.)
 
-    explicit   - refers to when the VAR can be missing from a narrative
+    explicit   - refers to when the VAR can be missing ("implicit") from a narrative
     parent, and children. (The VAR tree is fundamental to the app)
 
     Various volatile sctachpads and summaries used during reading:
+
     found - whether this VAR was found in the input text
     polarity - whether this is a good thing or a bad thing (per "exclusive" above)
     ifound[] - a list of token indices where VAR matched
@@ -106,11 +120,12 @@ class VAR:
         #become set to last read var<=this
         self.lastConst = "" 
 
-       
+       # utility used to define var1<=var2
+        # I was not able to use a recursive definition inside the VAR.__le__()
 
     def __le__(self, other):
         """ typically a "var<=nar" means the var is a child or itself"""
-        return nwutils.recursiveLE(self, other)
+        return recursiveLE(self, other)
 
     # this version of filtering returns a result shorter than the input segment
     # you can create a different filtering that inserts NULL_VARs to keep length constant.
@@ -421,6 +436,9 @@ class VAR:
         other.parent = self
         self.children.append(other)
 
+    def subs( self, others ):
+        for other in others:
+            self.sub(other)
 
     def numSlots(self):
         if self == NULL_VAR:

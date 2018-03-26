@@ -47,7 +47,7 @@ DIMENSION.sub(DIRECTION) # modifiers of movement
 
 ####################### ACTIONS ##############################
 SHOW = KList("show", "show").var()
-HIDE = KList("hide", "hide").var()
+HIDE = KList("hide", "hide, get rid of").var()
 DISPLAY = SHOW | HIDE
 
 ZOOMIN = KList("zoomin","zoom in, go in, magnify").var()  

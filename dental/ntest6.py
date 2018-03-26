@@ -23,15 +23,16 @@ sys.path.insert(0, narwhal_dir)
 from Tkinter import *
 from PIL import ImageTk, Image
 
-#from narwhal.nwchat import NWTopicChat
+#from narwhal.nwchat import NWDataChat
 from stdtrees.tchats import *
-from dentalChats import BaseChat, MarginChat , DentalChat, AppChat
+#from dentalChats import BaseChat, MarginChat , DentalChat, DentalAppChat
+from dentalChats import DentalAppChat
 
 from abtSketch2 import drawReferenceFeatures
 
  
 
-GETA = AppChat()
+GETA = DentalAppChat()
 D = GETA.dental 
 
 #Q = AboutChat()  + BaseChat()

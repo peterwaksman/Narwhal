@@ -9,7 +9,7 @@
 ##    ROOM( roomD )
 ##    HOTEL( hotelD )
 ##    PROX( nearD | farD )
-# INSULATION()
+##  INSULATION()
 ##    BARRIER( windowD + wallD )
 ##    STATE( openD | closedD )
 ##    TRANSPARENCY( letInD | keepOutD )

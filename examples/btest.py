@@ -59,6 +59,10 @@ nars = [problem, sound, affect, proximity, letin]
 calibs = [True,  True,  True,   True,      True]
 thresholds = [0.6,     0.6,   0.6,    0.6,  0.6]
 
+#nars = [problem]
+#calibs = [True]
+#thresholds = [0.6]
+
 nwa = NWApp(E, nars, calibs, thresholds)
 for sent in SENTENCES:
     text = sent

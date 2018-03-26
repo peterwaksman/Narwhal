@@ -13,7 +13,6 @@ from narwhal.nwchat import *
 from AbtTree import *  
 from AbtSketch import *
 
-
 SENSE_CUTOFF = 0.3
 
 AOK = 0 # agree
@@ -22,7 +21,7 @@ AQU = 2 # ask clarifaction
 
 
 aResponse = {
-    AOK : "ok",
+    AOK : "ok {}",
     ANOK: "I {}",
     AQU : "please clarify {}"
     }
@@ -38,9 +37,9 @@ AbutmentResponder = NWTopicResponder(aResponse, aResponseV)
 ###################################################
 # Design is that you change the abtstate to change the scene data
 
-class AbutmentChat( NWTopicChat ):
+class AbutmentChat( NWDataChat ):
     def __init__(self):
-        NWTopicChat.__init__(self, AbutmentTopic, AbutmentResponder)
+        NWDataChat.__init__(self, AbutmentTopic, AbutmentResponder)
         
         self.data     = AbutmentState()
         self.prevdata = AbutmentState()
@@ -51,11 +50,11 @@ class AbutmentChat( NWTopicChat ):
     def Read(self, text):
         self.caveat = ''
         self.prevdata.copy(self.data) # keep copy
-        NWTopicChat.Read(self, text)
+        NWDataChat.Read(self, text)
 
 
     def update(self):
-        NWTopicChat.update(self)
+        NWDataChat.update(self)
         if self.gof==0:
             self.responder.stage = AQU  
             return
@@ -88,6 +87,9 @@ class AbutmentChat( NWTopicChat ):
 
                 data.setEPSParams( self.sketch )
 
+                self.responder.stage = AOK
+                self.caveat = 'setting eps'
+
             elif id=='relationReader' and reader.GOF>=0.75: 
                 if r=='above':
                     data.mamt = ABOVEAMT 
@@ -107,6 +109,9 @@ class AbutmentChat( NWTopicChat ):
                    
                 data.setMarginReference( self.sketch ) 
 
+                self.responder.stage = AOK
+                self.caveat = 'setting margins'
+
             elif id == 'coreReader' and reader.GOF>=0.75:
                 if v=='thick':
                     data.core = FATCORE
@@ -117,11 +122,8 @@ class AbutmentChat( NWTopicChat ):
 
                 data.setCoreThickness( self.sketch, data.core )
 
+                self.responder.stage = AOK
+                self.caveat = 'setting eps'
 
     def write(self):
-        return self.responder.getStageResponse()
-
-
-###########################################
-###########################################
-###########################################
+        return self.responder.getStageResponse().format( self.caveat )

@@ -23,16 +23,14 @@ sys.path.insert(0, narwhal_dir)
 from Tkinter import *
 from PIL import ImageTk, Image
 
-from narwhal.nwchat import NWTopicChat
+from narwhal.nwchat import NWDataChat
 from AbtSketch import *
 from AbtChat import AbutmentChat
-from stdtrees.tchats import *
 
  
 ABT = AbutmentChat( )
-Q = ABT
-#Q = ABT + AboutChat()  
-#Q = AboutChat()  
+
+
 
 def initImage():
     h = Image.new("RGB",(IMGWIDTH,IMGHEIGHT), "white")    
@@ -52,8 +50,7 @@ def initImage():
 
 def readText(event):
     text = T.get()
-    #ABT.Read(text)
-    Q.Read(text)
+    ABT.Read(text)
 
     h = Image.new("RGB",(IMGWIDTH,IMGHEIGHT), "white")    
 
@@ -70,7 +67,7 @@ def readText(event):
     panel.configure( image=img )
     panel.image = img
  
-    s = Q.Write()#''#ABT.responder.getStageResponse()
+    s = ABT.write()
     response.set(s)
 
 #This creates the main root of an application
@@ -88,9 +85,14 @@ T.grid(row=1, column=0)
 initImage()
 
 response = StringVar()
-e = Entry(root, textvariable=response)
-e.config(width=60)
+
+#e = Entry(root, textvariable=response)
+#e.config(width=60, font="Courier 12 bold")
+#e.grid()
+e = Label(root, background='white', anchor=W, textvariable=response)
+e.config(width=60, font="Courier 14 bold")
 e.grid()
+
 response.set("")
 
 

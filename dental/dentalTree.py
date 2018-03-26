@@ -97,58 +97,42 @@ DENTAL= KList(
 #----------------------------------------------------
 #----------------------------------------------------
 
-############# SIDE ##################
+############# SIDE (TOOTHSURFACE)##################
 ALL = KList( "all",  "all sides, all around, 360, circumferential, around, other values").var()
 REMAINING= KList( "remainder", "remainder, rest of, other").var() # as in "the rest of the margins
-BF= KList("bf",  " b/f, f/b, buccal/facial, b&f").var()
 BUCCAL= KList("buccal", " b , buccal, baccal, buc, buck, bucca").var()
 FACIAL= KList( "facial"," f , facial").var()
-BF.sub(BUCCAL)
-BF.sub(FACIAL)
-
-MD= KList("md", " m/d , d/m , mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
+BF= KList("bf",  " b/f, f/b, buccal/facial, b&f").var()
+BF.subs([BUCCAL, FACIAL] )
+ 
 MESIAL= KList( "mesial", " m , mesial , mesail , mes , meaisl , mesial").var()
 DISTAL= KList("distal",  " d , distal , dist , distall ").var()
-MD.sub(MESIAL)
-MD.sub(DISTAL)
+MD= KList("md", " m/d , d/m , mesial/distal, distal/mesial, m&d, proximal, interproximal").var()
+MD.subs([MESIAL ,DISTAL])
 
 LABIAL= KList("labial",  "labial").var()
 LINGUAL= KList("lingual",  "lingual, ling, lin, l ").var()
-
-#PALATAL= KList( "palatal", "palat").var()
-
+PALATAL= KList( "palatal", "palat").var()
 SIDE = KList("side","").var() 
-SIDE.sub(ALL)
-SIDE.sub(REMAINING)
-SIDE.sub(BF)
-SIDE.sub(MD)
-SIDE.sub(LABIAL)
-SIDE.sub(LINGUAL)
- 
+SIDE.subs( [ALL, REMAINING, BF, MD, LABIAL, LINGUAL, PALATAL] )
 
 ############# TOOTHGROUP ##################
-
-TOOTHGROUP = KList("toothgroup","").var()
-ANTERIOR= KList("anterior",  "anterior, ant").var()
 INCISOR= KList("incisor",  "incisor, central, lateral").var()
 CENTRAL = KList("central","central").var()
 LATERAL = KList("lateral","lateral").var()
 CANINE= KList( "canine", "canine, eye tooth, eye teeth").var()
-ANTERIOR.sub(INCISOR)
-ANTERIOR.sub(CENTRAL)
-ANTERIOR.sub(LATERAL)
-ANTERIOR.sub(CANINE)
+ANTERIOR= KList("anterior",  "anterior, ant").var()
+ANTERIOR.subs( [INCISOR, CENTRAL, LATERAL, CANINE] )
 
-POSTERIOR= KList( "posterior", "posterior, post").var()
 MOLAR= KList( "molar", "molar").var()
 PREMOLAR= KList("premolar", "premolar, pre-molar, primolar,\
                  bicuspid, bi-cuspid, bi-suspid").var()
-POSTERIOR.sub(MOLAR)
-POSTERIOR.sub(PREMOLAR)
+POSTERIOR= KList( "posterior", "posterior, post").var()
+POSTERIOR.subs([MOLAR, PREMOLAR])
 
-TOOTHGROUP.sub(ANTERIOR)
-TOOTHGROUP.sub(POSTERIOR)
-
+TOOTHGROUP = KList("toothgroup","").var()
+TOOTHGROUP.subs( [ANTERIOR, POSTERIOR] )
+ 
 ############### REFFEATURE ######################
 SOFTTISSUE = KList("softtissue", "soft tissue, softtissue, support tissue, tissue").var()
 GUM= KList("gum", "gingiva, gingival, gigival , subgingival, subginival, gum, supra_g,sub_g,ridge, gm crest, \
@@ -161,66 +145,40 @@ ADJACENT = KList("adjacent","adjacent, adjacent tooth, adjacent teeth, adjecent,
 MARK = KList("mark", "mark, line").var()
 CEJ = KList("cej", "cej, cement enamel junction").var()
 CONTRALATERAL = KList("contralateral", "contralateral").var()
-
 REFFEATURE = KList("reffeature","").var()
-REFFEATURE.sub(SOFTTISSUE)
-REFFEATURE.sub(GUM)
-REFFEATURE.sub(INTERFACE)
-REFFEATURE.sub(OPPOSING)
-REFFEATURE.sub(ADJACENT)
-REFFEATURE.sub(MARK)
-REFFEATURE.sub(CEJ)
-REFFEATURE.sub(CONTRALATERAL)
-
+REFFEATURE.subs( [SOFTTISSUE, GUM, INTERFACE, OPPOSING, ADJACENT, MARK, CEJ, CONTRALATERAL] )
 # useful subset (excludes OPPOSING, and CONTRALATERAL)
 MREF = KList("marginreference", "").var() 
-MREF.sub(SOFTTISSUE)
-MREF.sub(GUM)
-MREF.sub(INTERFACE)
-MREF.sub(ADJACENT)
-MREF.sub(MARK)
-MREF.sub(CEJ)
-# END OF "MOUTH" TREE
-# ----------------------
+MREF.subs([SOFTTISSUE, GUM, INTERFACE, ADJACENT, MARK, CEJ])
+
 MOUTH = KList("mouth", "").var()
-MOUTH.sub(TOOTHGROUP)
-MOUTH.sub(REFFEATURE) # eg gingiva
-MOUTH.sub(SIDE)
+MOUTH.subs([TOOTHGROUP, REFFEATURE, SIDE])
 
 #----------------------------------------------------
 #------------------PRODUCT TREE ---------------------
 #----------------------------------------------------
 #----------------------------------------------------
-kCROWN = 'temporary|temp|janus|cutback|regular|normal|standard $ crown'
-CROWN = KList( "crown", kCROWN).var()
-
-CROWNTYPE = KList("crowntype", "crowntype").var()
 TEMP = KList("temp", "temp, temp crown, temporary, temporary crown").var()
 FULL = KList("full", " full, full crown,full contoured, full contoured crown,\
 regular, regular crown, normal, normal crown, standard, standard crown").var()
 JANUSCROWN = KList("janus", "janus # abutment, janus crown" ).var()
 CUTBACK = KList("cutback", "cutback, cut back, cutback crown, cut back crown").var()
-CROWNTYPE.sub( TEMP )
-CROWNTYPE.sub( FULL )
-CROWNTYPE.sub( JANUSCROWN )
-CROWNTYPE.sub( CUTBACK )
-
+CROWNTYPE = KList("crowntype", "crowntype").var()
+CROWNTYPE.subs([TEMP, FULL, JANUSCROWN, CUTBACK])
+ 
 #--------CROWN SURFACE
 OCCLUSAL= KList("occlusal",  "occ").var()
 INCISAL= KList( "incisal", "incisal, inc").var()
 SURFACE = KList("surface","").var()
-SURFACE.sub(OCCLUSAL)
-SURFACE.sub(INCISAL)
-
+SURFACE.subs([OCCLUSAL, INCISAL])
+ 
 #------------------CROWNMATERIAL
-CROWNMATERIAL = KList("crownmaterial","").var()
 PFM = KList("pfm","pfm").var()
 EMAX = KList("emax","emax").var()
-PORC = KList("porcelain","porc").var()
-CROWNMATERIAL.sub(PFM)
-CROWNMATERIAL.sub(EMAX)
-CROWNMATERIAL.sub(PORC)
-
+PORCELAIN = KList("porcelain","porc").var()
+CROWNMATERIAL = KList("crownmaterial","").var()
+CROWNMATERIAL.subs([PFM, EMAX, PORCELAIN])
+ 
 #---------------CROWNFEATURE
 HOLE= KList("hole","hole, screw hole, screwhole").var()
 WALL = KList("wall", "wall").var()
@@ -229,42 +187,14 @@ WALL = KList("wall", "wall").var()
 #VESTIBULE
 #CINGULUM
 CROWNFEATURE = KList("crownfeature","").var()
-CROWNFEATURE.sub(HOLE)
-CROWNFEATURE.sub(WALL)
-
-CROWN.sub(CROWNTYPE)
-CROWN.sub(CROWNFEATURE)
-CROWN.sub(SURFACE)
-CROWN.sub(CROWNMATERIAL)
-
+CROWNFEATURE.subs([HOLE, WALL])
+ 
+kCROWN = 'temporary|temp|janus|cutback|regular|normal|standard $ crown'
+CROWN = KList( "crown", kCROWN).var()
+CROWN.subs([CROWNTYPE, CROWNFEATURE, SURFACE, CROWNMATERIAL])
+ 
 
 #------------------ABTFEATURE-----------
-MARGIN = KList("margin", "margin, collar, outline").var()
-BASE = KList("base", "base, between interface and margin").var()      
-CORE = KList("core","core # file, post").var()
-SHOULDER = KList("shoulder","shoulder, sholder, chamfer, chamf, \
-                   champfer, champ, flar, flair" ).var()   
-BEVEL = KList("bevel", "bevel, occlusal bevel").var()
-GROOVE = KList("groove", "groove, retention groove, retentive groove").var()
-ABTFEATURE = KList("abtfeature", "").var()
-ABTFEATURE.sub(MARGIN)
-ABTFEATURE.sub(BASE)
-ABTFEATURE.sub(MARGIN)
-ABTFEATURE.sub(CORE)
-ABTFEATURE.sub(SHOULDER)
-ABTFEATURE.sub(BEVEL)
-ABTFEATURE.sub(GROOVE)
-
-#------------------ABTMATERIAL-------------------
-ZR = KList("zirconia"," zircomium, zirconia, zr , zi , z ").var()
-TI = KList("titanium"," titanium, titania, ti , t ").var()
-GOLDTI = KList("goldTi", "gold, gold hue").var()
-ABTMATERIAL = KList("abtmaterial", "").var()
-ABTMATERIAL.sub(ZR)
-ABTMATERIAL.sub(TI)
-ABTMATERIAL.sub(GOLDTI)
-
-#-------------------------------------
     # BASE values
 EPS = KList("eps", "eps, esp, ets, profile, emergence, emergense, emergency, emmergence").var()      
 PRESSURE =  KList("pressure", "press, presure, blanch, blaching, push, push on, support, \
@@ -275,69 +205,84 @@ STRAIGHT = KList("off", "off, straight, striaght, srtaight").var()
 CONCAVE = KList("concave", "concave, convave").var()
 CONVEX = KList("convex", "convex").var()
 ANKYLOS  = KList("ankylos", "ankylos, golf, tee , option _hash_ 5").var()
-#------------------------------------
 EPSTYPE = KList("epstype", "").var()
-EPSTYPE.sub(STRAIGHT)
-EPSTYPE.sub(CONCAVE)
-EPSTYPE.sub(CONVEX)
-EPSTYPE.sub(ANKYLOS)
+EPSTYPE.subs([STRAIGHT, CONCAVE, CONVEX, ANKYLOS])
+ 
 #-----------------------------
-BASE.sub(EPS)
-BASE.sub(EPSTYPE)
-BASE.sub(PRESSURE)
+BASE = KList("base", "base, between interface and margin").var()     
+BASE.subs([EPS, PRESSURE, EPSTYPE ])
+ 
 #------------------------------
+MARGIN = KList("margin", "margin, collar, outline").var()
+CORE = KList("core","core # file, post").var()
+SHOULDER = KList("shoulder","shoulder, sholder, chamfer, chamf, \
+                   champfer, champ, flar, flair" ).var()   
+BEVEL = KList("bevel", "bevel, occlusal bevel").var()
+GROOVE = KList("groove", "groove, retention groove, retentive groove").var()
+ABTFEATURE = KList("abtfeature", "").var()
+ABTFEATURE.subs([BASE , MARGIN, CORE, SHOULDER, BEVEL, GROOVE])
+
+ #------------------ABTMATERIAL-------------------
+ZR = KList("zirconia"," zircomium, zirconia, zr , zi , z ").var()
+TI = KList("titanium"," titanium, titania, ti , t ").var()
+GOLDTI = KList("goldTi", "gold, gold hue").var()
+ABTMATERIAL = KList("abtmaterial", "").var()
+ABTMATERIAL.subs([ZR, TI, GOLDTI])
+ 
+#-------------------------------------
 
 ABTTYPE = KList("abttype", "").var()
 HEALING = KList("healingabut","healing abutment").var()
 SMOOTH = KList("smoothabut", "smooth abutment").var()
 JANUSABT = KList("janusabut","janus # crown").var()
 STOCK= KList( "stock", "stock").var()
-
-ABTTYPE.sub(HEALING)
-ABTTYPE.sub(SMOOTH)
-ABTTYPE.sub(JANUSABT)
-ABTTYPE.sub(STOCK)
-
-ABUTMENT = KList("abutment", "abutment, abut").var()
-ABUTMENT.sub(ABTFEATURE)
-ABUTMENT.sub(ABTMATERIAL)
-ABUTMENT.sub(ABTTYPE)
-
+ABTTYPE.subs([HEALING, SMOOTH, JANUSABT, STOCK])
+ 
 #---------------------------------------
+ABUTMENT = KList("abutment", "abutment, abut, unit, abutmen").var()
+ABUTMENT.subs([ABTFEATURE, ABTMATERIAL, ABTTYPE])
+ 
+#-------------- retention --------------------
+SCREW = KList("screw","screw").var()
+CEMENT = KList("cement","cement").var()
+RETENTION = KList("retention", "retention, retained").var()
+RETENTION.subs([SCREW,CEMENT])
+
+#-----------------SINGLE UNIT-------------
 PERTOOTH = KList("pertooth","unit").var()
-PERTOOTH.sub(ABUTMENT)
-PERTOOTH.sub(CROWN)
+PERTOOTH.subs([ABUTMENT, CROWN, RETENTION])
 
 
+               
+#----------------MULTIUNIT---------------
+BAR = KList( "bar", " bar ").var()
+BRIDGE = KList( "bridge", " bridge ").var()
+SUPERSTRUCTURE = KList( "superstructure", "superstructure").var()
+GUIDE = KList("guide", "guide, seating guide, drill guide").var()
+IMPLANT = KList("implant", "implant").var()
+KIT = KList("kit","kit").var()
+BOX = KList("box"," box , pack, package").var()
+MULTIUNIT = KList("multiunit", "").var()
+MULTIUNIT.subs([BAR, BRIDGE, SUPERSTRUCTURE, GUIDE, IMPLANT, KIT, BOX])
+ 
 # Dental products are made up of "per tooth" products, "per tooth group" products
 # "per jaw (maxilla or mandible)) products", "generic consumable", ...
-PRODUCT= KList("product","").var()
-PRODUCT.sub(PERTOOTH)
-
-#-----------------------a separate version of the variables---
+PRODUCT= KList("product","product").var()
+PRODUCT.subs([PERTOOTH, MULTIUNIT])
+ 
+#-----------------------a separate version of the variables (not used currently)---
 MATERIAL = KList("material","").var()
-MATERIAL.sub(ABTMATERIAL)
-MATERIAL.sub(CROWNMATERIAL)
-
-# ----------------------
-#MOUTH = KList("mouth", "").var()
-#MOUTH.sub(TOOTHGROUP)
-#MOUTH.sub(REFFEATURE) # eg gingiva
-#MOUTH.sub(SIDE)
-
+MATERIAL.subs([ABTMATERIAL, CROWNMATERIAL])
+ 
 # FINAL DENTAL TREE--------------------
 DENTAL= KList("dental","").var()
-DENTAL.sub(MOUTH)   # this is the flesh of patient
-DENTAL.sub(PRODUCT) # this is what the vendor provides 
-
+DENTAL.subs([MOUTH, PRODUCT])
+ 
 # FINAL VOCAB--------------------
 # add the vocabulary used in NAR definition and reading                  
 DTREE = KList("dtree","").var()
-DTREE.sub(DENTAL)
-DTREE.sub(GEN_QUANTITY)
-DTREE.sub(GEN_GEOMETRY)
-DTREE.sub(CLIENTASK)
-
+DTREE.subs([DENTAL, GEN_QUANTITY, GEN_GEOMETRY, CLIENTASK])
+ 
 ###########################################
 ###########################################
 

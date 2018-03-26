@@ -47,10 +47,6 @@ kTHIRTY = ' thirty # one|two, tooth|number|_hash_ $ 30 '
 kTHIRTYONE = ' thirty one , tooth|number|_hash_ $ 31 '
 kTHIRTYTWO = ' thirty two , tooth|number|_hash_ $ 32 '
 
-kQUANTITY = ' quantity '
-QUANTITY = KList( "quantity", kQUANTITY).var()
-
-
 ZERO = KList("0", kZERO ).var()
 ONE = KList( "1", kONE ).var()
 TWO = KList( "2", kTWO ).var()

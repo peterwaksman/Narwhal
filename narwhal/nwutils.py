@@ -5,6 +5,7 @@ def PythonMajorVersion():
     return int(sys.version[0])
 
 
+
 # Thanks to Gringo Suave:
 # to call a function of one variable and redirect ouput
 def sendToFileA(printFn, a):
@@ -31,13 +32,39 @@ def sendToFileAB(printFn, a, b):
     f.close()
 
 
-def TOKS(text):
-    tokens = text.split(' ')
-    return tokens
 
-    # T = numTokens. It is assume ifound is list of indices from
-    # in [0, T)
+def bool32( ):
+    array = []
+    for i in range(33):
+        array.append(False)
+    return array
 
+def str32():
+    array = []
+    for i in range(33):
+        array.append('')
+    return array
+
+
+
+def countBool(array):
+    return sum(1 for i in array if i)
+
+def countStr(array):
+    ret = 0
+    for val in array:
+        if len(val)>0:
+            ret +=1
+    return ret 
+
+
+################### IFOUND RELATED ################
+"""
+When a VAR is compared to each "itok" position in a list of tokens, the tokens
+involved in the match may include other indices. All are stored in VAR.ifound
+which is cleared before hand and then progressively updated as itok is incremented
+across the range of token indices. These utilities are used in various places.
+"""
 
 def compressFound(T, ifound):
     tmp = [False for _ in range(T)]
@@ -124,16 +151,6 @@ def dullCount(ifound, dull, ithresh):
     return count
 
 
-def countBool(array):
-    return sum(1 for i in array if i)
-
-def countStr(array):
-    ret = 0
-    for val in array:
-        if len(val)>0:
-            ret +=1
-    return ret 
-
 
 def showFound(tokens, ifound):
     T = len(tokens)
@@ -158,109 +175,15 @@ def shiftFoundIndices(ifound, shift):
     cleanFound(ifound)
     return ifound
 
-def replaceCharacter(text, char , replacement):
-    newtext = ""
-    for i in range(len(text)):
-        if text[i] == char:
-            newtext += replacement
-        else:
-            newtext += text[i]
-    return newtext
 
 
-def cleanAMPM(text):
-    L = len(text)
-    newtext = ""
-    i = 0
-    while i < L:
-        c = text[i]
-        # test for "I am"
-        if c == 'I' and i < L - 3 and text[i + 1] == ' ' and text[i + 2] == 'a' and text[i + 3] == 'm':
-            newtext += "I_am"
-            i += 4
-        elif c.isdigit() and i < L - 2:
-            d = text[i + 1]
-            e = text[i + 2]
-
-            if d.lower() == 'a' and e.lower() == 'm':
-                newtext += c + ' ' + 'a' + 'm'
-                i += 3
-            elif d.lower() == 'p' and e.lower() == 'm':
-                newtext += c + ' ' + 'p' + 'm'
-                i += 3
-            else:
-                newtext += c
-                i += 1
-        else:
-            newtext += c
-            i += 1
-
-    return newtext
-
-
-# I was not able to use a recursive definition inside the VAR.__le__()
-def recursiveLE(self, other):
-    #if isinstance(self, NAR) or isinstant(other,NAR):
-        #x = 2
-    if self.knames == other.knames:
-        return True
-    for child in other.children:
-        if recursiveLE(self, child):
-            return True
-    return False
-
-
-#related to int unknowns
-def asInt(token):
-    """ true if token is digits, optionally preceeded with a '+' or '-' """
-    if len(token)<1 :
-        return ''
-    if token[0]=='-' or token[0]=='+':
-        tmp = token[1:]
-        if tmp.isdigit():
-            if token[0] == '-':
-                return token # preserve the minus
-            else:
-                return tmp   # strip off the plus
-        return ''
-    elif token.isdigit():
-        return token
-    else:
-        return ''
-
-# assume utoken has no sign prefix
-def isdigitFL(token):
-    pcount = 0 #count periods
-    for i in range( len(token) ) :
-        if token[i]=='.':
-            pcount += 1
-        elif not token[i].isdigit():
-            return False
-    if pcount==1:
-        return True
-    else:
-        return False
-
-
-def asFloat(token):
-        """ Same as asInt() except we allow one decimal before the
-        last digit """
-        if len(token)<1 :
-            return ''
-        if token[0]=='-' or token[0]=='+':
-            tmp = token[1:]
-            if isdigitFL(tmp):
-                if token[0] == '-':#if it begins with a minus
-                    return token   # preserve the minus  
-                else:
-                    return tmp     # strip off the plus
-        elif isdigitFL(token):
-            return token
-        else:
-            return ''
 
 
 ################ Thing(),Action(),Relation(), and Value() ##############
+# used to decompose and analyze contents of a NAR, where the lastConst is 
+# from its most recent read. One assumes the string is of the form x:y:z:w
+# where x, y, z, w could be paren containing something else of the same 4-part
+# form.
 def separateTARV( str ):
     L = len(str)
     pcount = 0
@@ -287,9 +210,6 @@ def separateTARV( str ):
         temp.append( tmp[ splits[1]+1 : splits[2]] )
         temp.append( tmp[ splits[2]+1 : ] )
     return temp
-    #else:
-    #    return tmp
-
 
 def hasSeparator( lastC ):
         if lastC.find(':') > -1 :
@@ -301,52 +221,32 @@ def Thing(lastConst):
     if lastConst=='':
         return ''
     temp = separateTARV(lastConst)
-    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     else: 
         return temp[0]
+
 def Action(lastConst):
     if lastConst=='':
         return ''
     temp = separateTARV(lastConst)
-#    temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[1]
+
 def Relation(lastConst):
     if lastConst=='':
         return ''
     temp = separateTARV(lastConst)
-    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[2]
+
 def Value(lastConst):
     if lastConst=='':
         return ''
     temp = separateTARV(lastConst)
-    #temp = lastConst.split(':')
     if len(temp)<4 :
         return ''
     return temp[3]
 
-
-def bool32( ):
-    array = []
-    for i in range(33):
-        array.append(False)
-    return array
-
-def str32():
-    array = []
-    for i in range(33):
-        array.append('')
-    return array
-
-
-def printSEG(segment):
-    out = ""
-    for var in segment:
-        out += varstring(var) + " "
-    return out

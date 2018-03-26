@@ -18,18 +18,12 @@ kWHO = " who , who are" #asking for a person
 kHOW = " how # did|much|often, not sure how , do I " #asking for instructions
 kWHEN = " when , when will, how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
-
 kWHAT = " what , what about , how|where|who|why $ are , see, to see , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information, tell me , tell me about " #asking for information
-
 kWHY = " why , why are" #asking for a story
 kDOES = " do you , does it , can it , how|where|who|why $ is it , how|where|who|why $ is my " #asking about possibility
 kCAN = " can I , may I , when $ will , can " # asking permission for an action
 kAMOUNT = " how much , how often , how well , how many " #asking for a quantity
-
-
-QUESTION = KList( "ask" , kQUESTION ).var()
-
 WHO = KList( "who", kWHO ).var()
 HOW = KList( "how", kHOW ).var()
 WHEN = KList( "when", kWHEN ).var()
@@ -39,18 +33,9 @@ WHY = KList( "why", kWHY ).var()
 DOES = KList( "does", kDOES ).var()
 CAN = KList( "can", kCAN ).var()
 AMOUNT = KList("amount", kAMOUNT ).var() 
-
-QUESTION.sub(WHO)
-QUESTION.sub(HOW) 
-QUESTION.sub(WHEN)
-QUESTION.sub(WHERE) 
-  
-QUESTION.sub(WHY) 
-QUESTION.sub(DOES) 
-QUESTION.sub(CAN) 
-QUESTION.sub(AMOUNT)
-QUESTION.sub(DIFF)
-QUESTION.sub(WHAT)
+QUESTION = KList( "question" , kQUESTION ).var()
+QUESTION.subs([ WHO, HOW, WHEN, WHERE, WHY, DOES, CAN, AMOUNT, DIFF, WHAT])
+ 
 
 ########################################
 ########################################
@@ -63,7 +48,7 @@ kUNREQUEST = "remove, unselect, deselect"
 kUNDO = "undo, undo that, not that, no that's not right, no that is not right, wrong,\
 cancel, cancel that, not right, not what I want, redo, redo that"
 
-kUNREQUEST += kUNDO
+kUNREQUEST += kUNDO # ignore distinction for now
 
 REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var()
 
@@ -73,6 +58,7 @@ REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var(
 
 kYOU = ' you # get, dentsply, person , your , program, chatbot, bot '
 YOU =  KList( "you", kYOU ).var()
+
 #########################################
 kYES = ' yes , ok , y , done , no problem'
 YES = KList("YES",kYES).var()
@@ -81,29 +67,19 @@ NO = KList("NO",kNO).var()
 
 #YES_NO = KList("YES",kYES).var() | KList("NO",kNO).var()
 YES_NO = KList("yesno", "yesno" ).var()
-YES_NO.sub(YES)
-YES_NO.sub(NO)
-
-yesno = attribute([YOU], YES_NO )
+YES_NO.subs([YES, NO])
 
 
-######################################
-######################################
+################## POLITENESS ######### 
+#######################################
 
-kHELLO = ' hi , hello , greeting'
-HELLO = KList("hello", kHELLO).var()
-
-
-######################################
-######################################
-
+HELLO = KList("hello", ' hi , hello , greeting').var()
 
 THANKS = KList("thanks", "thanks, thx, thank you").var()
 
+################### ACTIONS ###########
 #######################################
-#######################################
-ACTION   = KList("actions", "").var()
-# subs:
+
 SEND     = KList("send", "send, resubmit, submit , ship " ).var()
 HOLD     = KList( "hold", " hold, wait").var()
 DO       = KList("do", " place , show , mimic, mirror, copy, match,\
@@ -122,20 +98,17 @@ CONTACT = KList("contact", "contact, make contact").var()
 
 STOP  = KList("stop", "stop, quit").var()
 
+ACTION   = KList("actions", "").var()
+ACTION.subs([ACTION ,SEND , HOLD , DO , REDO , NOTDO , AUTOMATE , MOVE , MAKE , ANGULATE , \
+             CANTILEVER, ROTATE , CONTACT , STOP ] ) 
 
-ACTION.sub(ACTION)
-ACTION.sub(SEND)
-ACTION.sub(HOLD)
-ACTION.sub(DO)
-ACTION.sub(REDO)
-ACTION.sub(NOTDO)
-ACTION.sub(AUTOMATE)
-ACTION.sub(MOVE)
-ACTION.sub(MAKE)
-ACTION.sub(ANGULATE)
-ACTION.sub(CANTILEVER )
-ACTION.sub(ROTATE)
-ACTION.sub(CONTACT)
-ACTION.sub(STOP)
-################################### 
-###################################
+
+################# CLIENTASK TREE and related NARs ################
+
+CLIENTASK = KList( "clientask", ' i , me , we ').var()
+CLIENTASK.subs([QUESTION, REQUEST, YOU, HELLO , YES_NO, THANKS])
+
+about = attribute(QUESTION,YOU)
+hello = attribute(HELLO,HELLO) 
+thankyou = attribute(THANKS, YOU)
+yesno = attribute([YOU], YES_NO )

@@ -179,7 +179,7 @@ class OrderChat( NWDataChat ):
             return outtext 
 
 
-class OrderAppChat( TChat ):
+class OrderDentalAppChat( TChat ):
     def __init__(self, id):
         self.id = id #CONVERSATION ID. NOT ORDER ID
 
