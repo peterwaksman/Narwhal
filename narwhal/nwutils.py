@@ -177,6 +177,94 @@ def shiftFoundIndices(ifound, shift):
 
 
 
+######################################################
+############## PARSING TEXT #####################
+######################################################
+######################################################
+ 
+
+def separateMM(text):
+    h = len(text)
+    if h < 3:
+        return text
+    
+    newtext = ""
+    c = text[0]
+    newtext += c
+    for i in range(1, len(text)-1):
+        if text[i]=='m' and text[i+1]=='m' and c.isdigit():
+            newtext += " "   
+        c = text[i]
+        newtext += c
+    newtext += text[len(text)-1]
+
+    # TODO: check for decimal point preceeding an "mm", and insert one if needed
+    # helps disambiguate ints that are intended as floats
+
+    return newtext       
+
+
+def cleanAMPM(text):
+    L = len(text)
+    newtext = ""
+    i = 0
+    while i < L:
+        c = text[i]
+        # test for "I am"
+        if c == 'I' and i < L - 3 and text[i + 1] == ' ' and text[i + 2] == 'a' and text[i + 3] == 'm':
+            newtext += "I_am"
+            i += 4
+        elif c.isdigit() and i < L - 2:
+            d = text[i + 1]
+            e = text[i + 2]
+
+            if d.lower() == 'a' and e.lower() == 'm':
+                newtext += c + ' ' + 'a' + 'm'
+                i += 3
+            elif d.lower() == 'p' and e.lower() == 'm':
+                newtext += c + ' ' + 'p' + 'm'
+                i += 3
+            else:
+                newtext += c
+                i += 1
+        else:
+            newtext += c
+            i += 1
+
+    return newtext
+
+def cleanDecimals(text):
+    if len(text)==0:
+        return
+    newtext = ""
+    for i in range(0, len(text)-1):
+        if text[i]=='.' and text[i+1].isdigit():
+            if i==0 or not text[i-1].isdigit():
+                newtext += '0'  
+        newtext += text[i]
+    newtext += text[len(text)-1]
+    return newtext    
+
+def isInteger(tok):
+    if len(tok)==0:
+        return False
+    if tok[0]=='+' or tok[0]=='-':
+        tmp = tok[1:]
+    else:
+        tmp = tok
+    for c in tmp:
+        if not c.isdigit():
+            return False
+    return True
+
+def ensureFloatBeforeMM(tokens):
+    for i in range(1, len(tokens)):
+        tok = tokens[i]
+        prev = tokens[i-1]
+        if (tok=='mm' or tok=='MM') and isInteger(prev):
+            tokens[i-1] = prev + ".0"
+    return tokens
+
 
 
 ################ Thing(),Action(),Relation(), and Value() ##############

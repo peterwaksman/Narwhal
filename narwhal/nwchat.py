@@ -145,7 +145,18 @@ class NWTopic():
                 # and with response VARs during write(). Saves the last
                 # 4 exchanges - a short term context
         self.Context = SegmentBuffers(8)  
-     
+    
+        # not too useful cuz the nars have no IDs.
+    def fromNARS( self, treeroot, nars ):
+        readers = []
+        i = 0;
+        for nar in nars:
+            reader = NWTopicReader( "reader" + str(i), treeroot, nar )
+            readers.append( reader )
+            i += 1
+        NWTopic.__init__( self, treeroot, readers )
+
+         
     def seedContext(self, segment):
         self.Context.addSegment(segment)
 
@@ -239,6 +250,18 @@ class NWTopic():
               if reader.GOF==self.maxGOF:
                   return reader
 
+    def getBestReader2( self ):
+        bestReader = None
+        maxGOF = 0
+        maxEventGOF = 0
+        for reader in self.readers:
+            if reader.GOF>maxGOF or \
+              (reader.GOF>=maxGOF and reader.eventGOF>maxEventGOF): 
+                maxGOF = reader.GOF
+                maxEventGOF = reader.eventGOF
+                bestReader = reader
+ 
+        return bestReader
 
 #################################
 # This model of data is that of a collection of bins, 
@@ -317,6 +340,14 @@ class TernaryResponder( NWTopicResponder ):
     def __init__(self):
         NWTopicResponder.__init__(self, bResponse, bResponseV)
 
+
+VANILLA = 0
+vanillaR = { VANILLA : "{}" }
+vanillaRV = { VANILLA : [] }
+class VanillaResponder( NWTopicResponder ):
+    def __init__(self):
+         NWTopicResponder.__init__(self, vanillaR, vanillaRV)
+       
  #################################################
 APP_HUH = 0
 APP_HELLO = 1
@@ -339,11 +370,22 @@ class DefaultAppResponder( NWTopicResponder ):
     def __init__(self):
         NWTopicResponder.__init__( self, appR, appRVs)
 
-###########################
+######################################################
+
+######################################################
+
+######################################################
+
+######################################################
+
+######################################################
+
 
 # "tchat" combines NWTopic (a family of NAR readers) and NWResponder  
 #
 # Derived classes will implement data, and its modification by input text
+# But note the TChat does not implement a reader, cuz each derived class will
+# do its own thing.
 #
 # TChat's streamiled API of Read/Write/GOF score might be visualized
 # as a box with an input wire, an output wire, and a light bulb that
@@ -468,8 +510,8 @@ the states of the responder should correspond to states of the data.
 The data should implement __eq__() as a deep copy and hasData() to 
 indicate when data is available
 """
-
-DEBUGSILENCE = 1
+# was DEBUGSILENCE
+DEBUGVERBOSE = 1
 
 class NWDataChat(TChat):
     def __init__(self, topic, responder): 
@@ -493,7 +535,7 @@ class NWDataChat(TChat):
         rawtokens = self.topic.read( text )  
         self.gof = self.topic.maxGOF
 
-        if DEBUGSILENCE>0:
+        if DEBUGVERBOSE>0:
             print( self.topic.summary() )
 
                 # transfer info from subreaders of the topic into the data structure
@@ -549,7 +591,7 @@ class CommandsChat( NWDataChat ):
         self.args = self.topic.read( text )  
         self.gof = self.topic.maxGOF
 
-        if DEBUGSILENCE>0:
+        if DEBUGVERBOSE>0:
             print( self.topic.summary() )
 
                 # transfer info from subreaders of the topic into the data structure

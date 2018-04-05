@@ -59,6 +59,10 @@ REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var(
 kYOU = ' you # get, dentsply, person , your , program, chatbot, bot '
 YOU =  KList( "you", kYOU ).var()
 
+# Added for FAQ
+I_ME = KList("ime"," i , me ").var()
+
+
 #########################################
 kYES = ' yes , ok , y , done , no problem'
 YES = KList("YES",kYES).var()
@@ -106,7 +110,7 @@ ACTION.subs([ACTION ,SEND , HOLD , DO , REDO , NOTDO , AUTOMATE , MOVE , MAKE , 
 ################# CLIENTASK TREE and related NARs ################
 
 CLIENTASK = KList( "clientask", ' i , me , we ').var()
-CLIENTASK.subs([QUESTION, REQUEST, YOU, HELLO , YES_NO, THANKS])
+CLIENTASK.subs([QUESTION, REQUEST, YOU, I_ME, HELLO , YES_NO, THANKS])
 
 about = attribute(QUESTION,YOU)
 hello = attribute(HELLO,HELLO) 

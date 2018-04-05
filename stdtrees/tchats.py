@@ -61,7 +61,8 @@ QueryResponder = NWTopicResponder( qchatR, qchatRVs )
 class AboutChat( NWDataChat ):
     def __init__(self ):
         NWDataChat.__init__(self, QueryTopic, QueryResponder)
-
+        self.version = "I am Version 1.0 of a 'dental' chatbot, written by Peter Waksman, circa 2018"
+        self.capabilities = "I can order dental products and check the status of orders"
     def update(self):
         NWDataChat.update(self)
 
@@ -79,17 +80,20 @@ class AboutChat( NWDataChat ):
                     self.gof = 0.0 # maybe not a good habit?
 
                 self.responder.stage = QUERYABOUT
-                t = Thing(reader.lastEvent[1])
+                if reader.lastEvent:
+                    t = Thing(reader.lastEvent[1])
+                else:
+                    t=''
                 if t=='how':
                     self.responder.extratext = "Good thank you. I finally got my mood swings under control"
                 elif t=='can' or t=='does':
-                    self.responder.extratext = "I can order dental products and check the status of orders"
+                    self.responder.extratext = self.capabilities
                 elif t=='where':
                     self.responder.extratext = "I am a program, ghosting around in your machine"
                 elif t=='why':
                     self.responder.extratext = "Geez! That's a tough one... I guess cuz it's a win-win"
                 else: #if t=='who':
-                    self.responder.extratext = "I am Version 1.0 of a 'dental' chatbot, written by Peter Waksman, circa 2018"
+                    self.responder.extratext = self.version
             elif id=='hello':                  
                 self.responder.stage = QUERYHI
                 self.responder.extratext = self.responder.getStageResponse()
