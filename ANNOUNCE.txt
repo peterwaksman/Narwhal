@@ -1,3 +1,7 @@
+April 5 2018
+Added "template" chatbots for Command Interpreters, and FAQ
+The latter is under development.
+
 Feb 22 2018
 Added a folder 'order' containing an order status chatbot. No need to privatize this yet - he he.
 
