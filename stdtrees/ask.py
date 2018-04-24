@@ -15,10 +15,10 @@ from narwhal.nwcontext import *
 kQUESTION = " ? , ask # about, question, question about , questions about , problem , problem with, need to know , want to know, want to find out, help with , info, information, infomation " 
 
 kWHO = " who , who are" #asking for a person
-kHOW = " how # did|much|often, not sure how , do I " #asking for instructions
+kHOW = " how # did|much|often, not sure how , do I , how do I, how can I" #asking for instructions
 kWHEN = " when , when will, how long , how long until , how long will it take " #asking for a time
 kWHERE = " where , where from , where to , where are " #asking for a place
-kWHAT = " what , what about , how|where|who|why $ are , see, to see , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
+kWHAT = " what , what about , you|how|where|who|why $ are , see, to see , show, show me, to find out, finding out, what is, what's, what are, status , check , to check , verify ,\
  ask about, ask if, to ask about , information, tell me , tell me about " #asking for information
 kWHY = " why , why are" #asking for a story
 kDOES = " do you , does it , can it , how|where|who|why $ is it , how|where|who|why $ is my " #asking about possibility
@@ -41,10 +41,12 @@ QUESTION.subs([ WHO, HOW, WHEN, WHERE, WHY, DOES, CAN, AMOUNT, DIFF, WHAT])
 ########################################
 kREQUEST = ' you get, pls , please , use , build , ask for , sell me , fabricate , produce , provide ,\
  provide me ,make sure, make #an , make me , to make , my|the|an $ order , to order ,\
- want , want to , want you to, need ,need to , need you to, give me ,add,'
+ want , want to , want you to, need ,need to , need you to, give me , add , change, a request'
+
+kCHANGEIT = 'set a , set the, set my, change a , change the, change my, edit'
+kREQUEST += kCHANGEIT
 
 kUNREQUEST = "remove, unselect, deselect"
-
 kUNDO = "undo, undo that, not that, no that's not right, no that is not right, wrong,\
 cancel, cancel that, not right, not what I want, redo, redo that"
 
@@ -60,7 +62,7 @@ kYOU = ' you # get, dentsply, person , your , program, chatbot, bot '
 YOU =  KList( "you", kYOU ).var()
 
 # Added for FAQ
-I_ME = KList("ime"," i , me ").var()
+I_ME = KList("ime"," i , me , my ").var()
 
 
 #########################################

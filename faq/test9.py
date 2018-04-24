@@ -21,12 +21,17 @@ narwhal_dir = os.path.normpath(narwhal_dir)
 sys.path.insert(0, narwhal_dir)
  
 
-from faqchat import *
-from stdtrees.tchats import *
-  
-#OChat =  AboutChat()
+from dsdata import *
 
-OChat = FAQChat()  
+from faqchat import FAQAppChat 
+from faqanswer import *
+from stdtrees.tchats import *
+
+OChat = FAQAboutChat(HRBASEDATA.info,HRBASEDATA.phone, HRBASEDATA.contact)
+
+#OChat = FAQAppChat( HRBASEDATA, HRAnswerChats )
+
+#OChat = ConnectionsChat()
 
 print("HELLO CLIENT. CAN I HELP YOU?\n\n")
 

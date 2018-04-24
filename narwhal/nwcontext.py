@@ -207,6 +207,7 @@ kDIFF = "difference, compare "
 DIFF = KList("diff", kDIFF).var(get2)
 
 
+
 kBOTH = "both, the pair , the two"
 #BOTH = KList("both", kBOTH).var(get2Ints)
 BOTH = KList("both", kBOTH).var(get2)

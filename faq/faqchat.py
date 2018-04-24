@@ -11,63 +11,107 @@ from narwhal.nwtypes import *
 from narwhal.nwchat import *
 from stdtrees.ask import *
 
-from faqtree import *
-from faqdata import *
+from faqabout import *
+from faqanswer import *
 
+class FAQAppChat(TChat):
+    def __init__(self, basedata, subchats = None):
 
+        self.basedata = basedata
+        self.about = FAQAboutChat( basedata.info, basedata.phone, basedata.contact )
+        self.answer = FAQAnswerChat( FAQAnswer(basedata.id, basedata.vocabLists) )
+        self.subchats = subchats
 
-class FAQChat( NWDataChat ):
-    def __init__(self):
-        NWDataChat.__init__(self, FAQTopic, VanillaResponder())
-        self.data = AnswerAnswer()
-        self.answertoggle = True
+        self.currentAnswer = self.answer
+
+    def findAnswerChat(self, val):
+        if not self.subchats:
+            return None
+        return self.subchats.get(val)
+
+    def Read(self, text):
+        about = self.about #for readability
+        #answer = self.answer 
+        answer = self.currentAnswer 
+        answer.topic.clearReaders()
+
+        about.caveat = ''
+        answer.caveat = ''
+
+        if about.questionPending:
+            answer.Read(text)
+            if answer.gof>0.5:
+                self.caveat = answer.Write()
+            else:
+                about.Read(text) 
+                if about.gof>0.5:
+                    self.caveat = about.Write()
+                else:
+                    self.caveat = "I am sorry, I don't know about that"
+            about.questionPending = False
+        else:
+            about.Read(text)
+            if about.questionPending: #handle question this time?
+                answer.Read(text)
+                if answer.gof>0.5:
+                    about.caveat = ''
+                    self.caveat = answer.Write()
+                elif about.gof>0.5:
+                    answer.caveat = ''
+                    self.caveat = about.Write()
+                else:
+                    self.caveat = "I am sorry, I don't know about that"
+            else:
+                self.caveat = about.Write()
+             
+
+        C = self.update()
+        if C:
+            self.currentAnswer = C
+
 
     def update(self):
-        NWDataChat.update(self) # does nothing but seems like a good practice
+        C = None
+        if self.answer==self.currentAnswer and self.answer.gof>0.65:
+            reader = self.answer.topic.getBestReader2()
+            v = reader.getLastValue()
+            C = self.findAnswerChat(v)
+        elif self.answer.gof>=0.65:
+            C = self.answer
+  
+        return C
+        
+    def Write(self):
+        s = self.caveat
+        return s
 
-        self.caveat = "hm?"
+             
+#---------------------------------
+FAQGREET = 0
+FAQASK = 1
+FAQASKDETAIL = 2
 
-        if self.gof <= 0.49:
-            return
+faqResponse = {
+    FAQGREET : "ok",
+    FAQASK: "I {}",
+    FAQASKDETAIL : "please clarify {}"
+    }
 
-        reader = self.topic.getBestReader2()
-        if reader.id=="ruhuman":
-            self.caveat = "I am a chatbot, from PWAX laboratories"
-        elif reader.id=="iwanthuman":
-            if reader.nar.polarity or reader.getLastValue()=='bot':
-                self.caveat = "OK. Here is a phone number: " + self.data.phoneNumber
-            else:
-                self.caveat = "You have come to the right place"
-        elif reader.id=="ihavequestion":
-            self.caveat = "Go ahead and ask, I'll see if I can help"
-        elif reader.id=="ineedhelp":
-            self.caveat = "I can help with" + self.data.generalInfo
-        elif reader.id=="teachme":
-            self.caveat = "I wish I could"
-        elif reader.id=="about":
-            if reader.lastEvent:
-                t = Thing(reader.lastEvent[1])
-            else:
-                t=''
-            if t=='how':
-                self.caveat = "Good thank you. I finally got my mood swings under control"
-            elif t=='can' or t=='does':
-                self.caveat = "I can answer questions about: \n" + self.data.generalInfo
-                self.caveat += "\nBut please ask your question and I'll try to get the answer"
-            elif t=='where':
-                self.caveat = "I am a program, ghosting around in your machine"
-            elif t=='why':
-                self.caveat = "Geez! That's a tough one... I guess cuz it's a win-win"
-            else: #if t=='who':
-                self.caveat = "A chatbot - software designed to be logical if not personal"
-        elif reader.id=="hello":
-            self.caveat = "Hello"
-        elif reader.id=="thankyou":
-            self.caveat = "You are welcome"
-        elif reader.id=="cuss": 
-            if self.answertoggle:
-                self.caveat = "So is your mother"
-            else:
-                self.caveat = "So is your old man"
-            self.answertoggle = not self.answertoggle  
+faqResponseV = {
+    FAQGREET : [],
+    FAQASK: [],
+    FAQASKDETAIL :[],
+    }
 
+faqResponder = NWTopicResponder(bResponse, bResponseV)
+
+
+class FAQChat(NWDataChat):
+    def __init__(self, topic):
+        NWDataChat.__init__(self, topic, faqResponder)
+
+    def Read(self, text):
+        NWDataChat.Read(self,text)
+
+    def update(self):
+        x = 2

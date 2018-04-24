@@ -42,6 +42,8 @@ class NWTopicReader():
         self.nar.clear()
         self.lastConst = ''
         self.GOF = 0.0
+        self.eventGOF = 0.0
+        self.lastEvent = None
         self.eventrecord = ''
         self.tree.clear()
 
@@ -240,6 +242,11 @@ class NWTopic():
             out += reader.summary() + "\n"
         return out
 
+    def clearReaders( self ):
+        for reader in self.readers:
+            reader.clear()
+            
+
     def getReader(self, id ):
         for reader in self.readers:
             if reader.id==id :
@@ -424,6 +431,9 @@ class TChat:
         access event[1] content with Thing(event[1]), Action(event[1]), 
         Relation(event[1]), or Value(event[1]) 
     access narX.lastConst (also via the Thing(), Action(), Relation(), Value() functions
+
+    NOTE: update() is called within the NWDataChat.Read() but other TChats need
+    to implement a call to update()
     """
     def update(self):
         self.responder.extratext = ''
@@ -618,6 +628,15 @@ class CommandsChat( NWDataChat ):
             else:
                 self.responder.stage = BBAD
 
-           
+           # return can be used in subs(), or
+           # in a loop
+def MakeVARs( klists ):
+    T = []
+                # create VARs and add to tree
+    for klist in klists:
+        vocab = klist.split(',') 
+        name = vocab[0].lstrip()
+        var = KList( name, klist ).var()
+        T.append(var)
 
- 
+    return T 
