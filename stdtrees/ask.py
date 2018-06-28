@@ -8,7 +8,21 @@ from narwhal.nwtypes import * #KList, attribute
 from narwhal.nwchat import strAPOLOGY
 from narwhal import nwutils as nwu
 from narwhal import nwvault as nwv
-from narwhal.nwcontext import *
+from narwhal.nwsegment import *
+
+
+######################################################
+######################################################
+kDIFF = "difference, compare "
+
+#DIFF = KList("diff", kDIFF).var(get2Alternatives)
+DIFF = KList("diff", kDIFF).var(get2)
+
+kBOTH = "both, the pair , the two"
+#BOTH = KList("both", kBOTH).var(get2Ints)
+BOTH = KList("both", kBOTH).var(get2)
+
+IT = KList("it"," it , that").var(get1)
 
 
 # in spoken language this can be an inflection 

@@ -192,7 +192,7 @@ def separateMM(text):
     c = text[0]
     newtext += c
     for i in range(1, len(text)-1):
-        if text[i]=='m' and text[i+1]=='m' and c.isdigit():
+        if ((text[i]=='m' and text[i+1]=='m') or (text[i]=='M' and text[i+1]=='M')) and c.isdigit():
             newtext += " "   
         c = text[i]
         newtext += c

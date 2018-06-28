@@ -1,215 +1,154 @@
-""" 
-nwcontext.py is for handling "context" - which is defined as past words implictly used
-in current sentences. By my lights there are a very limited set of such things, excluding
-various personal pronouns that can be assumed absent in a sales-bot application, or can
-be brought in later. For now we have these categories of concept:
-
-Positing and juxtpositing mechanisms bring ideas into mind. 
-And the basic operations that apply
-to one or several postited ideas are:
-group       (for comparable nouns)
-alternate   (for distinct values of an adjective category like color)
-merge       (for adjective values from different categories that apply to the same nouns)
-sequence    (for nouns in sequence)
-
-The goal of nwcontext is to support these operations as CONTEXT_OP vars, as you will see.
-The plan is: label parents with the above identifiers and look in the past context for
-words that share the right sort of parent.
- 
-"""
-
 from narwhal.nwtypes import *
-from narwhal.nwutils import *
 from narwhal.nwcontrol import *
 from narwhal.nwsegment import *
 
 
-class SegmentBuffers:
-    def __init__(self, N):
-        self.N = N
-        self.buffer = []
-        for i in range(0,N):
-            self.buffer.append( [NULL_VAR] )
-        self.next = 0
+""" 
+----------------------------------------------------------
+ContextFrames will be of the form 
+        self.ID = id          # should be unique string
+        self.ENV = env        # None or another ID, could be dynamically assigned
+        self.MODS = modifiers # list of enum vals
+        self.PARTS = parts    # list of IDs
+        self.RELS = relations # tbd
+        self.var =            # a VAR based on KList defining identity of self. 
+                              # var.knames[0] should match id
 
-    def clear(self):
-        for i in range(0,self.N):
-            self.buffer[i] = [NULL_VAR] 
+This can be encoded in a dictionary entry of the form
+ #  id     : [env,   mods ,  parts ,  rels , var]
 
-    def addSegment(self, segment):
-        newseg = []
-        for var in segment:
-            if var!= NULL_VAR:
-                h = var.copy() 
-                h.ifound = [] # protect against bogus indexing
-                newseg.append(h)
-        self.buffer[ self.next ] = newseg 
-        self.next = (self.next+1)%self.N
+Where id and env are strings; mods is a list of predefined constants; 
+parts is a list of strings; rel is a list of tbd-type; and var is a 
+predefinedVAR.
 
-    def getAll( self ):
-        a = []
-        for i in range(0,self.N):
-            s = self.buffer[(self.next + i)%self.N ]
-            if s != [NULL_VAR]:
-                a.extend( s )
-        return a
+A dictionary of such entries is passed to the ContextManager (defined below)
+And it's __init__() creates a collection of ContextFrames linked by shared IDs
 
-""" Some basic methods, followed by increasingly abstract entitiees"""
+Why use int encodings of mods rather than strings? To emphasize that mods
+are not parts and eah one corresponds to a single slot of information filled 
+by one of the "RELS" handler functions. So we use those int constants as 
+keys to a dictionary of handler functions. 
 
-# willforget context after this many vars have gone bye.
-MAXCONTEXTMEM = 30
+The RELS is tbd but it looks like it is a dictionary of handler functions.
 
+"""
 
-def isParent(node, var):
-    for child in node.children :
-        if child.equals(var):
-            return True
-    return False
+class ContextFrame:
+    def __init__(self, id, env, modifiers, parts, relations, var=NULL_VAR):
+        self.ID = id # should be unique
+        self.ENV = env # None or another ID, could be dynamically assigned
+        self.MODS = modifiers # list of enum vals
+        self.PARTS = parts # list of IDs
+        self.RELS = relations # tbd
+            # language related
+        self.var = var
+        
 
-# find the node of tree with isParent(var) True
-def getParent(tree, var):
-
-    if isParent(tree,var):
+    def getMODTree(self, modVARs):
+        tree = KList(self.ID+'MODS', "").var()
+        for mod in self.MODS:
+            tree.sub( modVARs[mod] )
         return tree
-     
-    for node in tree.children:
-        p = getParent(node,var)
-        if  p == NULL_VAR:
-            continue
-        else:
-            return p
 
-    return NULL_VAR
+   
+"""
+ContextRecords will be of the form
+        [ID, val, val, val....] 
+Where the ID is for the context being recorded and where val is 
+None or a string filled by a handler
+"""
+class ContextRecord:
+    def __init__(self, cf ):
+        self.id = cf.id
+        self.val = []
+        for mod in cf.mods: 
+            self.val = ''
 
-##############################
-def get2Alternatives(tree, segment ):
-     revseg = segment[::-1] # reverse the list
-     p = NULL_VAR
-     q = NULL_VAR
-     var0 = NULL_VAR
-     numvars = 0
-     for var in revseg:
+class ContextManager :
 
-         numvars += 1
-         if numvars>MAXCONTEXTMEM:
-             continue
+    # go all levels in
+    def buildSelfTree( self, id ):
+        tree = self.getVar(id) 
+        for part in self.context[id].PARTS:
+            tree.sub( self.buildSelfTree( part ) )
+        return tree       
 
-         # find a parent that is "ALTERNATIV"E
-         p = getParent(tree,var)
-         if not p.contextType == ALTERNATIVE_CONTEXT:
-             continue
+    def  __init__(self, dict, modvars, baseID):
+        self.context = {}
+        
+            # create frames, making self.context a dictionary
+        for id in dict:
+            x = dict[id]
+            self.context[id] = ContextFrame(id, x[0], x[1], x[2], x[3], x[4] )                 
 
-         # if you already saw such a parent
-         if not q==NULL_VAR:
-             if q.equals(p): #and it is the same parent
-                 return [ var, var0]
-             else:
-                return [NULL_VAR, NULL_VAR]
-         q = p.copy()
-         var0 = var
-     return [NULL_VAR, NULL_VAR]
+            # this wires together the vars 
+        self.tree = self.buildSelfTree(baseID)
+
+        self.modvars = modvars
+        self.mtree = {}
+        for id in dict:
+            self.mtree[id] = self.getMODTree(id)
     
-def getOneOfGroup(tree, segment):
-     revseg = segment[::-1] # reverse the list
-     p = NULL_VAR
-     numvars = 0
-     for var in revseg:
-         numvars += 1
-         if numvars>MAXCONTEXTMEM:
-            continue
 
-         # find a parent that is "ALTERNATIVE"
-         p = getParent(tree,var)
-         if not p.contextType == GROUP_CONTEXT:
-            continue
-         # returns first groupable var
-         return [var]
-     return [NULL_VAR]
+    def getVar(self, id):
+        return self.context[id].var
+     
+    def getMODTree( self, id ):
+        c = self.context[id]
+        return c.getMODTree(self.modvars)
 
-def getManyOfGroup(tree, segment):
-    revseg = segment[::-1] # reverse the list
-    p = NULL_VAR
-    h = []
-    numvars = 0
-    for var in revseg:
-        numvars += 1
-        if numvars>MAXCONTEXTMEM:
-            continue
+    def detectActiveContexts( self ):
+        idvect = []
+        for id in self.context:
+            v = self.getVar(id)
+            if v.found:
+                idvect.append(id)
+        return idvect
 
-        # find a parent that is "ALTERNATIVE"
-        p = getParent(tree,var)
-        if not p.contextType == GROUP_CONTEXT:
-            continue
-        # returns first groupable var
-        h.append(var)
-    return h
+    def hasActiveMODS( self, id, tokens, rawtokens):
+         mtree = self.mtree[id]
+         segM = PrepareSegment( mtree, tokens, rawtokens)
+         if mtree.foundInChildren:
+             return True
+         else:
+             return False
 
-    # look for two ints in context and get their associated last const
-def get2Ints(tree, segment):
-    revseg = segment[::-1] # reverse the list
-    p = NULL_VAR
-    h = []
-    numints = 0
-    for var in revseg:
-        if var.isA("int"):
-            numints += 1
-            if numints<=2:
-                h.append( var )
-    h = h[::-1]
-    return h
-
-def getAll(tree, segment ):
-    revseg = segment[::-1] # reverse the list
-    p = NULL_VAR
-    h = []
-    for var in revseg:
-        if var != NULL_VAR:
-            h.append( var )
-    h = h[::-1]
-    return h
-
-def getN(segment, N):
-    revseg = segment[::-1] # reverse the list
-    p = NULL_VAR
-    h = []
-    n = 0
-    for var in revseg:
-        if var != NULL_VAR:
-            if n<N:
-                h.append( var )
-                n += 1
-            if n==N:
-                break
-    h = h[::-1]
-
-    if len(h)<N :
-        h = []
-
-    return h
-
-def get2( segment ):
-    return getN(segment,2)
-
-def get1( segment ):
-    return getN(segment,1) 
+         # TODO? This gets duplicate copies of self IDs, if parts have parts
+    def detectSubActiveMods( self, id, tokens, rawtokens ):
+        idvect = []
+            # append active mods of 'self'
+        if self.hasActiveMODS( id, tokens, rawtokens ):
+            idvect.append(id)
+             # append active mods of parts
+        for part in self.context[id].PARTS:
+            idvect.extend( self.detectSubActiveMods(part, tokens, rawtokens) )
+        return idvect
 
 
+    def read( self, text ):
+        """ match text tokens to VARs in the context"""
+        rawtokens = []
+        tokens = prepareTokens(text, rawtokens) 
+           
+            # fill the self.tree with 'found' vars
+        segment = PrepareSegment(self.tree, tokens, rawtokens)   
+            
+            # Active contexts
+        idvect = self.detectActiveContexts()
+            
+            # Active modifiers
+        mvect = []
+        for id in idvect:
+            mvect.extend(self.detectSubActiveMods(id, tokens, rawtokens) )
 
-######################################################
-######################################################
+            # merge the trees
+        T = KList("temp","").var()
+        T.sub( self.tree)
 
- 
+        for id in mvect:
+            T.sub( self.mtree[id] )
 
+        segM = PrepareSegment(T, tokens, rawtokens)
 
-kDIFF = "difference, compare "
-
-#DIFF = KList("diff", kDIFF).var(get2Alternatives)
-DIFF = KList("diff", kDIFF).var(get2)
-
-
-
-kBOTH = "both, the pair , the two"
-#BOTH = KList("both", kBOTH).var(get2Ints)
-BOTH = KList("both", kBOTH).var(get2)
-
-IT = KList("it"," it , that").var(get1)
+        print( T.PrintSimple() + "\n")
+        print( "SEG: " + printSEG( segM ) )

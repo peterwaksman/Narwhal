@@ -3,7 +3,6 @@ from narwhal.nwutils import *
 from narwhal.nwcontrol import *
 from narwhal.nwvault import *
 from narwhal.nwnreader import *
-from narwhal.nwcontext import *
 from narwhal.nwsegment import *
 from narwhal.nwlog import NWLog
 
@@ -218,7 +217,7 @@ class NWTopic():
 
                     if var.contextFn:
                         ext = var.contextFn( a2 )
-                        # moved to nwcontext addSegment()
+                        # moved to addSegment()
                         #for var1 in ext:
                         #    var1.ifound = []                    
                          

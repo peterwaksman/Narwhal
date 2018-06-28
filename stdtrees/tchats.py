@@ -8,7 +8,7 @@ that gets confirmation from the client.
 from narwhal.nwutils import *
 from narwhal.nwchat import *
 from narwhal.nwtypes import *  
-from narwhal.nwcontext import *
+from narwhal.nwsegment import *
 
 from stdtrees.ask import *
 
