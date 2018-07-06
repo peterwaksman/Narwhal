@@ -433,6 +433,8 @@ class VAR:
 
     # connect with your children as in "addChild()"
     def sub(self, other):
+        if not other:
+            x = 2
         other.parent = self
         self.children.append(other)
 

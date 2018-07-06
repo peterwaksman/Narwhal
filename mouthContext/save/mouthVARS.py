@@ -126,8 +126,6 @@ TOOTHTYPE.subs([PREPPED, MISSING, POINTIC, REGULAR] )
 SITE_TOOTHTYPEv = TOOTHTYPE.copy()
 
 # SITE_TOOTHNUM -----------------------------------
-#(tolerate duplicate of "tooth" here and in 'site'; or else rely on 'site' being in context when "tooth 3"
-# processed as desired because all MODs are explored and...)
 TOOTH = KList("tooth", " tooth , _hash_ ").var()
 SITE_TOOTHNUMv = TOOTH.copy()
 SITE_TOOTHNUMv.sub(INTx)
