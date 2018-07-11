@@ -10,9 +10,13 @@
      * a 'scene editor' using more-or-less structured commands 
      * an 'about chatbot' for greetings and answering questions
      * a 'confirm chatbot' for getting and confirming a string from the client.
+     * a 'command chatbot' that expects structured language - with flexibility
+     * an 'faq' chatbot that gets nowhere. It was in the midst of that, when I realized
+something more was needed for conversational context.
 
-And now a CommandChatbot that uses Chat infrastructure to implement an old fashioned commmand interpreter.
-You ask: Why bother? It is so command interpreters and chatbots use the same client architecture 
+Chatbot development is undergoing major changes as the nwcontext.py begins to
+take shape. I moved all old chatbots to the 'examplesOldChatbots' folder. The dental 
+vocabulary lives on in the mouthContext example.
 
 Narwhal is a library of objects that can read text. It uses keywords based on client-provided synonym lists and also client-provided formulas in the keywords. So the client can focus on the details of the topic vocabularies and how people express themselves, rather than on how language works. While relying on Narwhal to understand the incoming language the client must still write code that transfers information from the Narwhal objects into more convenient data structures. 
 
