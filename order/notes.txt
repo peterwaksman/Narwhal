@@ -1,7 +1,0 @@
-Notes
-
-Conversation ID is now a CTOR argument for a OrderAppChat
-
-You can choose "location" where to load/save an OrderAppChat but not the filename which is "ConversationID.txt".
-
-If you go to load a non-existant OrderAppChat, you get a default one, and create an empty file.
