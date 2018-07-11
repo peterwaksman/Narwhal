@@ -102,14 +102,16 @@ SHAPE.sub(RECT)
 SHAPE.sub(CIRC)
 SHAPE.sub(OVAL)
 #------------------------
+
 RELATION= KList("relation", "relation, relative to").var()
 #AMOUNT= KList("amount", "amount, quantity").var()
 AT = KList("at"," at, flush, even with, match, noimpingment, level, even , keep ").var()
 CLOSEST= KList("just", "just, close, close to, closest, slightly , as close as possible").var()
 BETWEEN= KList( "between", "between, mid ").var()
-HI= KList("above",  " positive, pos , hi , high,  raise, above, over, sup, supra, supra-, supra_, \
+
+HI= KList("above",  " positive, pos , hi , high,  raise, move * up, above, over, sup, supra, supra-, supra_, \
           super, super-, super_, positive, up, hi as possible, high as possible, up ").var()
-LO= KList("below",  " negative, neg , lo , low, deep, lower, drop, below, sub, sub-, sub_, under, \
+LO= KList("below",  " negative, neg , lo , low, deep, lower, drop, move * down, below, sub, sub-, sub_, under, \
           depth , down , lo as possible, low as possible, down ").var()
 NEAR= KList("near",  "near, near to").var()
 FAR= KList( "far", "far, far from, away, out, away from, out from").var()

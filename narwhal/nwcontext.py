@@ -37,13 +37,13 @@ The RELS is tbd but it looks like it is a dictionary of handler functions.
 
 class ContextFrame:
     def __init__(self, id, env, modifiers, parts, relations, var=NULL_VAR):
-        self.ID = id # should be unique
-        self.ENV = env # None or another ID, could be dynamically assigned
+        self.ID = id         # should be a unique string
+        self.ENV = env       # None or another ID 
+        self.PARTS = parts   # list of other IDs
         self.MODS = modifiers # list of enum vals
-        self.PARTS = parts # list of IDs
-        self.RELS = relations # tbd
-            # language related
-        self.var = var
+        self.RELS = relations # list of procedures, on per modifier
+
+        self.var = var        # keywords that detect this frame
         
 
     def getMODTree(self, modVARs):
@@ -60,20 +60,36 @@ Where the ID is for the context being recorded and where val is
 None or a string filled by a handler, one for each of the MODS
 """
 class ContextRecord:
-    def __init__(self, context, parent = None ):
+    def __init__(self, context, iparent = [] ):
         self.id = context.ID
+
         self.mods = []
         for mod in context.MODS: 
             self.mods.append('')
-        self.parent = parent
+
+        self.iparent = iparent # list of indeces of records in parent that are
+                               # understood to share this record 'child'
+        self.done = False
 
     def str(self):
+                        # id
         out = self.id + ": "
+                        # mods
         for mod in self.mods:
             if mod:
                 out += mod + ","
             else:
                 out += '*' + ","
+
+                       # parent record indices
+        out += " ["
+        if self.iparent:
+            for i in self.iparent:
+                out += str(i)
+                if i< len(self.iparent)-1:
+                    out += ","
+        out += "] "
+
         return out
 
     def copy(self, other):
@@ -82,6 +98,7 @@ class ContextRecord:
         for mod in self.mods: 
             other.mods.append('')
         other.parent = self.parent 
+        other.done = self.done
 
     def isBlank(self):
         for v in self.mods:
@@ -90,7 +107,7 @@ class ContextRecord:
         return True
 
     def isCompatible(self, other):
-        if not self.parent==other.parent:
+        if not self.iparent==other.iparent:
             return False
         if not self.id==other.id:
             return False
@@ -125,9 +142,8 @@ class ContextManager :
             tree.sub( self.buildSelfTree( part ) )
         return tree       
 
+                 # need error checking that dict and modvars are already OrderedDict type.
     def  __init__(self, dict, modvars, rootID):
-
-                # need error checking that dict and modvars are already OrderedDict type.
         self.context = collections.OrderedDict()
         self.records = collections.OrderedDict()
         
@@ -139,7 +155,7 @@ class ContextManager :
             x = dict[id]
             context = ContextFrame(id, x[0], x[1], x[2], x[3], x[4] )    
             self.context[id] = context   
-            self.records[id] = [ContextRecord(context, x[0] )]             
+            self.records[id] = []             
 
             # this wires together the vars 
         self.tree = self.buildSelfTree(rootID)
@@ -216,41 +232,47 @@ class ContextManager :
                 id = pid[j]
         return id
 
-            # caution: the returned 'parent' is not valid
-            # this fn is used as a preliminary to setting 'parent'
-            # so it is not yet valid when returned from here
-    def getBlankTail(self, id):
+            
+    def getActiveTail(self, id):
         R = self.records[id]
-        r = R[ len(R)-1 ]
-        if r.isBlank():
-            return r
-        r = ContextRecord( self.context[id], None )
-        return r
+        if len(R)==0:
+            R.append( ContextRecord(self.context[id], None) )                       
+        tail = []
+        for i in range(0,len(R)):
+            if R[i].done:
+                continue
+            tail.append(i)
+        return tail
 
-    def getTail(self, id):
+
+    def getLast(self, id):
         R = self.records[id]
-        r = R[ len(R)-1 ]
-        return r
+        if R:
+            return R[ len(R)-1 ]
+        else:
+            return None
 
         # indented block of records for this id
-    def str(self, id, ntabs):
+    def strRecord(self, id, ntabs):
         pre = ''
         for i in range(0,ntabs):
             pre += "\t"
 
-        for r in self.records[id]:
-            out = pre + r.str() + "\n"
-
-        return out
-
-        # to print all records for an id and all id's below it
-    def Str( self , id=0):
         out = ''
-        ntabs = 0
-        out += self.str(id, ntabs)
-        for part in self.context[id].PARTS:
-            out += self.str(part, ntabs+1)
+        for r in self.records[id]:
+            out += pre + r.str() + "\n"
+
         return out
+
+    def strSubRecords( self, id, ntabs ):
+        out = self.strRecord( id, ntabs)
+        for part in self.context[id].PARTS:
+           out += " " + self.strSubRecords( part, ntabs+1 )
+        return out
+            
+    def StrRecords(self):
+        return self.strSubRecords( self.rootID, 0 )
+
 
     def read( self, text ):
         """ match text tokens to VARs in the context"""
@@ -263,6 +285,7 @@ class ContextManager :
             # Active contexts
         idvect = self.detectActiveContexts()
             
+                # MOVE THIS
             # Active modifiers
         mvect = []
         for id in idvect:
@@ -280,55 +303,82 @@ class ContextManager :
         print( T.PrintSimple() + "\n")
         print( "SEG: " + printSEG( segM ) )
 
-        # here can play with record creation
-        #for id in idvect:
-        #    self.makeRecord( id ) 
-        #x = 2
-             
+               
+        for id in idvect:
+            for mod in self.context[id].MODS:
+                self.makeRecord( id, mod ) 
+        x = 2
+        
+        s = self.StrRecords()
+
+        self.FinalizeAllRecords()    
 
 
-    def makeRecord( self, id ):    
-           
-        # CREATE A DUPLICATE RECORD ------------------
-        r = self.getTail(id)
-        s= ContextRecord(self.context[id], r.parent)
+    def makeRecord( self, id, mod ):   
+        # EVALUATE MOST RECENT RECORDS ------------        
+        r = self.getLast(id)
+        if not r or r.done:
+            needNewIParents = True
+        else:
+            needNewIParents = False
 
+
+        # CREATE A NEW RECORD -----------------------
+        s = ContextRecord(self.context[id], [])
+ 
         # FILL IT HERE -------------------------------
 
-        # MERGE OR SPAWN -----------------------------
-        """ 
-         Merge info into old record or spawn a new record that contains the info
-         Note: spawning is required if the records are incompatible or if
-         commonID has switched. In which case we should leave r behind and 
-         add the new record s.
-         """
+        # MERGE OR SPAWN -----------------------------     
+        # We are extending records, in the current context....           
+        if not needNewIParents: 
+            if r.isCompatible(s): 
+                r.merge(s) 
+            else:
+                s.iparent = r.iparent
+                self.records[id].append(s)
+            return
+
+        # ... or it is a first time we are here in a new context     
         commonID = self.getCommonParent(id, self.lastActiveID )
  
-        if r.isCompatible(s) and commonID==r.parent:
-            r.merge(s) 
-        else:
-            self.records[id].append(s)
-     
-       # RE-WIRE THE PARENTS -------------------------
+        # CONNECT THE PARENTS -------------------------
         """ If the commonID has changed we need to insert blank records. All
-        the records between id and commonID should be blank and wired together. """ 
+        the records between id and commonID should be blank, singular, and 
+        wired together. 
+        Confusing? parent is a node, iparent is an index of a record for 
+        the node
+        """      
+        mID = id  
+        pID = self.getParentID(mID) 
+        if not pID:
+            self.records[mID].append(s) 
+            self.lastActiveID = id
+            return
 
-        r = self.getTail(id)
+ 
+        while pID != commonID:
+            s.iparent = self.getActiveTail(pID) # allocates a record, len(s.iparent)==1
+            self.records[mID].append(s)
 
-        pid = self.getParentID(id)
-        while pid != commonID:
-            p = self.getBlankTail(pid)
-            r.parent = p
+            if( len(s.iparent)) != 1:
+               print("OOPS!")
 
-            r = p   # iterate
-            pid = self.getParentID(pid)
+            mID = pID
+            pID = self.getParentID(mID)
+                
+        s.iparent = self.getActiveTail(commonID)
+        self.records[mID].append(s) 
         
-        # only the commonID record is treated as non-blank (although it could be)
-        r.parent = self.getTail( commonID ) 
-
         # UPDATE --------------------------------
         self.lastActiveID = id
 
         # Phew! Now THAT is an algorithm
+
+
+
+    def FinalizeAllRecords(self):
+        for id in self.context:
+            for r in self.records[id]:
+                r.Done = True
 
  
