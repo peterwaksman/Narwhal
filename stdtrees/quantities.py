@@ -125,7 +125,7 @@ TOOTH = KList("tooth",kTOOTH).var()
 ############################################
 """ introduces unknowns, in this case: unknown int
 VARs are usually "variable" with range limited to 
-sepecific sub VARs. Here we deal with knowns to be
+specific sub VARs. Here we deal with knowns to be
 read from the input.
 
 I am using 'x' to indicate "unknown"
@@ -143,6 +143,7 @@ FLOATx = KList('float', kFLOAT).var()
 # See the connection to the asFloat() method in nwutils.py
 
 """
+
 I realize that my handling of this is inconsistent. I cannot  
 look for a generic variable string. But I can allow prefix and 
 suffix matching with the remainder generic and variable. Also, sadly, 
@@ -172,6 +173,8 @@ So the entries of the VARs klist are regular expressions. The isUnknown() could
 check for "REGEX_" in the list name and the findInText() could do a regular expression 
 match when it detects __regex__ at the  beginning of a kword. 
 So KList("REGEX_[your listname]","__regex__*").var() will match anything. 
+
+THAT IS A "TODO"
 
 """
 

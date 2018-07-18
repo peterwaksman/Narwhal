@@ -20,9 +20,10 @@ from narwhal.nwcontext import *
 
 
 from mouthVARS import *
+from mouthRELS import *
 
 
-A = ContextManager(MouthDict, MouthMODvars, 'order')
+A = ContextManager(MouthDict, MouthMODvars, MouthHandlers, 'order')
 
 
 while True:

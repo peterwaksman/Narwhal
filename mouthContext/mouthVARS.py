@@ -1,10 +1,10 @@
 
-import collections  
+import collections  # for ordered dictionaryy
 
 
-from narwhal.nwtypes import *
+from narwhal.nwtypes import KList
 from stdtrees.geometry import *
-from stdtrees.quantities import *
+from stdtrees.quantities import INTx
 
 from mouthCONSTS import *
 
@@ -118,10 +118,10 @@ ABUTMENT_TYPEv = ABTTYPE.copy()
 # SITE_TOOTHTYPE ---------------------------------
 PREPPED = KList("prepped", "prep, prepared").var()
 MISSING = KList("missing", "missing").var()
-POINTIC = KList("pontic", "pontic").var()
+PONTIC = KList("pontic", "pontic").var()
 REGULAR = KList("regular", "regular").var()
 TOOTHTYPE = KList("toothtype","").var()
-TOOTHTYPE.subs([PREPPED, MISSING, POINTIC, REGULAR] )
+TOOTHTYPE.subs([PREPPED, MISSING, PONTIC, REGULAR] )
 
 SITE_TOOTHTYPEv = TOOTHTYPE.copy()
 
@@ -360,3 +360,5 @@ MouthDict = {
 for id in MOUTHID_SEQUENCE:
     temp[id] = MouthDict[id]
 MouthDict = temp
+
+        

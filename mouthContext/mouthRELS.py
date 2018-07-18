@@ -1,25 +1,35 @@
 
 from narwhal.nwtypes import *
 from narwhal.nwchat import *
+from narwhal.nwcontext import nullRel
 
 from stdtrees.geometry import *
 
-from mouthCONSTS import *
 from mouthVARS import *
 
-def nullRel():
-    return None
 
+""" 
+MouthHandlers are loaded into the entries of the MouthDict during
+construction of the ContextManager. The reason for delayed load
+is to avoid circular dependencies with mouthVARS while keeping these
+handlers in their own file.
+
+Need a temp tree made from ContextManager.tree and (id,mod) tree in MODvars 
+caution: read() should either work with a copy of self.tree, or should not
+clear the tree in PrepareSegment   
+    
+"""
 
 
 class LaterOrderReader( NWTopicReader ):
-    lateOnar = attribute( ORDERv, ORDER_LATERv )
     def __init__(self, treeroot):
-        NWTopicReader.__init__(self, "lateOreader", treeroot, lateOnar)
+        LOnar = attribute( ORDERv, ORDER_LATERv )
+        NWTopicReader.__init__(self, "lateOreader", treeroot, LOnar)
          
 def LaterOrderRead( segment, tree, tokens ):
     reader = LaterOrderReader( tree )
     reader.readSegment( segment, tokens)
+    x = 2
 
 
 # lookup mod handler from its

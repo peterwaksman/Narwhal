@@ -4,6 +4,11 @@ from narwhal.nwtypes import *
 from narwhal.nwcontrol import *
 from narwhal.nwsegment import *
 
+from narwhal.nwcontextrecord import *
+
+# used as a placeholder for RELS handlers
+def nullRel():
+    return None
 
 """ 
 ----------------------------------------------------------
@@ -53,81 +58,6 @@ class ContextFrame:
         return tree
 
 
-"""
-ContextRecord will be of the form
-        [ID, val, val, val....] 
-Where the ID is for the context being recorded and where val is 
-None or a string filled by a handler, one for each of the MODS
-"""
-class ContextRecord:
-    def __init__(self, context, iparent = [] ):
-        self.id = context.ID
-
-        self.mods = []
-        for mod in context.MODS: 
-            self.mods.append('')
-
-        self.iparent = iparent # list of indeces of records in parent that are
-                               # understood to share this record 'child'
-        self.done = False
-
-    def str(self):
-                        # id
-        out = self.id + ": "
-                        # mods
-        for mod in self.mods:
-            if mod:
-                out += mod + ","
-            else:
-                out += '*' + ","
-
-                       # parent record indices
-        out += " ["
-        if self.iparent:
-            for i in self.iparent:
-                out += str(i)
-                if i< len(self.iparent)-1:
-                    out += ","
-        out += "] "
-
-        return out
-
-    def copy(self, other):
-        other.id = self.id
-        other.mods = []
-        for mod in self.mods: 
-            other.mods.append('')
-        other.parent = self.parent 
-        other.done = self.done
-
-    def isBlank(self):
-        for v in self.mods:
-            if v!='':
-                return False
-        return True
-
-    def isCompatible(self, other):
-        if not self.iparent==other.iparent:
-            return False
-        if not self.id==other.id:
-            return False
-        s = self.mods
-        k = other.mods
-        for i in range(0, min( len(s), len(k))):
-            if s[i]==k[i] or s[i]=='' or k[i]=='':
-                continue
-            else:
-                return False
-        return True
-
-    def merge(self,other):   
-        s = self.mods
-        k = other.mods 
-        for i in range(0, min( len(s), len(k))):
-            if k[i]!='':
-                s[i] = k[i]
- 
-
 """ 
 ContextManager is a collection of ContextFrames linked together by IDs shared through
 the ENV and PARTs of the ContextFrames. Initialized from a dictionaary and based on
@@ -142,20 +72,26 @@ class ContextManager :
             tree.sub( self.buildSelfTree( part ) )
         return tree       
 
-                 # need error checking that dict and modvars are already OrderedDict type.
-    def  __init__(self, dict, modvars, rootID):
-        self.context = collections.OrderedDict()
-        self.records = collections.OrderedDict()
+    def newRecord(self, id):
+        return ContextRecord(id, self.context[id].MODS)
+
+              # need error checking that dict and modvars are already OrderedDict type.
+              # modhandlers does not need to be ordered
+    def  __init__(self, dict, modvars, modhandlers, rootID):
+        self.context = collections.OrderedDict()           
         
         self.rootID = rootID 
-        self.lastActiveID = rootID
-
+ 
             # create frames, making self.context an OrderedDict
         for id in dict:
             x = dict[id]
             context = ContextFrame(id, x[0], x[1], x[2], x[3], x[4] )    
             self.context[id] = context   
-            self.records[id] = []             
+             
+            context.RELS = {}
+            for mod in x[1]:
+                context.RELS[mod] = modhandlers[mod] 
+ 
 
             # this wires together the vars 
         self.tree = self.buildSelfTree(rootID)
@@ -165,7 +101,9 @@ class ContextManager :
         for id in dict:
             self.mtree[id] = self.getMODTree(id)
     
-        x = 2
+        self.ledger = self.newRecord(rootID)
+        self.lastActiveRecord = self.ledger
+        x=2
 
     def getVar(self, id):
         return self.context[id].var
@@ -201,20 +139,21 @@ class ContextManager :
             idvect.extend( self.detectSubActiveMods(part, tokens, rawtokens) )
         return idvect
 
-    def getParentID(self, id):
-        return self.context[id].ENV
 
-        # this does not include the id 
-    def getAllParents(self, id):
+        # this does NOT include the self id 
+        # and list is returned bottom-to-top
+    def getAllParents(self, id, stopID=None):
         context = self.context[id]
 
         idList = [] # [id] for now let us not include id as its own parent
         while context.ENV:
             context = self.context[ context.ENV ] # step back to the parent
             idList.append( context.ID )
+            if context.ID==stopID:
+                break;
         return idList
         
-        # this does inculude the id1 and id2
+        # this *does* include the id1 and id2 as possible results
     def getCommonParent(self, id1, id2 ):
         pid = self.getAllParents(id1)
         pid.reverse()
@@ -232,47 +171,20 @@ class ContextManager :
                 id = pid[j]
         return id
 
-            
-    def getActiveTail(self, id):
-        R = self.records[id]
-        if len(R)==0:
-            R.append( ContextRecord(self.context[id], None) )                       
-        tail = []
-        for i in range(0,len(R)):
-            if R[i].done:
-                continue
-            tail.append(i)
-        return tail
+  
+    def getLastParent(self):
+        p = self.ledger
+        s = p
+        while p != self.lastActiveRecord:
+            s = p
+            if p.children:
+                p = p.children[ len(p.children)-1 ]
+        return s
+    
 
 
-    def getLast(self, id):
-        R = self.records[id]
-        if R:
-            return R[ len(R)-1 ]
-        else:
-            return None
-
-        # indented block of records for this id
-    def strRecord(self, id, ntabs):
-        pre = ''
-        for i in range(0,ntabs):
-            pre += "\t"
-
-        out = ''
-        for r in self.records[id]:
-            out += pre + r.str() + "\n"
-
-        return out
-
-    def strSubRecords( self, id, ntabs ):
-        out = self.strRecord( id, ntabs)
-        for part in self.context[id].PARTS:
-           out += " " + self.strSubRecords( part, ntabs+1 )
-        return out
-            
-    def StrRecords(self):
-        return self.strSubRecords( self.rootID, 0 )
-
+    ##############################################
+    ##############################################
 
     def read( self, text ):
         """ match text tokens to VARs in the context"""
@@ -281,8 +193,22 @@ class ContextManager :
            
             # fill the self.tree with 'found' vars
         segment = PrepareSegment(self.tree, tokens, rawtokens)   
-            
-            # Active contexts
+ 
+        for var in segment:
+            id = var.knames[0]
+            if id!='nullK':
+                mods = self.context[id].MODS
+                for mod in mods:
+                    self.writeDetail(id, mod, self.tree, tokens)
+                x = 2   
+
+        s = self.ledger.str()
+        print("***********\n")
+        print(s)
+
+        #self.ledger.harden()
+
+              # Active contexts
         idvect = self.detectActiveContexts()
             
                 # MOVE THIS
@@ -303,82 +229,73 @@ class ContextManager :
         print( T.PrintSimple() + "\n")
         print( "SEG: " + printSEG( segM ) )
 
-               
-        for id in idvect:
-            for mod in self.context[id].MODS:
-                self.makeRecord( id, mod ) 
-        x = 2
-        
-        s = self.StrRecords()
-
-        self.FinalizeAllRecords()    
+ 
 
 
-    def makeRecord( self, id, mod ):   
-        # EVALUATE MOST RECENT RECORDS ------------        
-        r = self.getLast(id)
-        if not r or r.done:
-            needNewIParents = True
+    def writeDetail(self, id, mod, tree, tokens):
+        last = self.lastActiveRecord
+
+        if last.id == id :
+            keepSameFocus = True
         else:
-            needNewIParents = False
-
+            keepSameFocus = False
 
         # CREATE A NEW RECORD -----------------------
-        s = ContextRecord(self.context[id], [])
- 
+        s = self.newRecord( id )
+         
         # FILL IT HERE -------------------------------
+        #h = self.context[id].RELS[mod]
+        #if h != nullRel:
+        #    h( segM, tree, tokens) 
+     
+        # ????? make it the lastActiveRecord
+        #if not s.getDetail(mod):
+        #    return
 
-        # MERGE OR SPAWN -----------------------------     
-        # We are extending records, in the current context....           
-        if not needNewIParents: 
-            if r.isCompatible(s): 
-                r.merge(s) 
-            else:
-                s.iparent = r.iparent
-                self.records[id].append(s)
+
+
+        # WRITE OUT (using last or a copy)------------
+        #  write out record in existing "last" or its copy
+        if keepSameFocus:
+            if last.details[mod][1] != HARDDETAIL:
+                last.merge(s)
+                self.lastActiveRecord = last
+            else: # new record is begun
+                last = last.copy()
+                last.merge(s)
+                self.lastActiveRecord = last
+                p = self.getLastParent()
+                p.children.append(last)
             return
 
-        # ... or it is a first time we are here in a new context     
-        commonID = self.getCommonParent(id, self.lastActiveID )
- 
-        # CONNECT THE PARENTS -------------------------
-        """ If the commonID has changed we need to insert blank records. All
-        the records between id and commonID should be blank, singular, and 
-        wired together. 
-        Confusing? parent is a node, iparent is an index of a record for 
-        the node
-        """      
-        mID = id  
-        pID = self.getParentID(mID) 
-        if not pID:
-            self.records[mID].append(s) 
-            self.lastActiveID = id
-            return
+        # or else we have some parent above 'id'
+        commonID = self.getCommonParent(id, last.id )
+
+        # WRITE OUT TO A NEWLY FOCUSED RECORD --------
+        r = self.ledger
+        while( r.id != commonID ):
+            r = r.children[  len( r.children)-1 ]
+                # r is a record that now stops at commonID
+
+        plist = self.getAllParents(id, commonID )  
+        plist.reverse() # now list goes top-to-bottom
+        for pid in plist:
+            if pid==commonID:
+                continue
+            c = self.newRecord(pid)
+            r.children.append(c)
+            r = c
+   
+        if r.id==s.id:
+            """ for rootID, allow merge but not append"""
+            if not r.id==self.rootID:
+                print("HUN???")
+            r.merge(s)
+            s = r
+        else:
+            r.children.append( s )
+
+        self.lastActiveRecord = s
 
  
-        while pID != commonID:
-            s.iparent = self.getActiveTail(pID) # allocates a record, len(s.iparent)==1
-            self.records[mID].append(s)
 
-            if( len(s.iparent)) != 1:
-               print("OOPS!")
-
-            mID = pID
-            pID = self.getParentID(mID)
-                
-        s.iparent = self.getActiveTail(commonID)
-        self.records[mID].append(s) 
-        
-        # UPDATE --------------------------------
-        self.lastActiveID = id
-
-        # Phew! Now THAT is an algorithm
-
-
-
-    def FinalizeAllRecords(self):
-        for id in self.context:
-            for r in self.records[id]:
-                r.Done = True
-
- 

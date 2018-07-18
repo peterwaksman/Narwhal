@@ -1,15 +1,10 @@
 """ 
 CONSTANTS
-These predefined constants will be used for context IDs and and modifier IDs.
+These predefined constants will be used to name context IDs and modifier IDs.
+(The IDs themselves are strings).
  
-Contexts will come with a VAR for ID vocabulary, which can be elaborated by VARs for
-ID vocabs of its sub contexts. 
-
-Context modifiers will come with a tree of vocabularies incorporated as a VAR tree
-
-In principle, although there are vocabularies and VARs coming from outside of the
-context, every context specific vocab and VAR is either an ID or a modifier and 
-there should be a constant for each one of them.
+In principle, although there are names coming from outside of the
+context, every context specific entity should have a defined constant.
 """
 
 
@@ -17,6 +12,7 @@ there should be a constant for each one of them.
 # note these are set up to have plenty of headroom, for insertion of context specific
 # modifier constants (below) 
 
+# These are the topics (su contexgts) within the dental order conversational context
 ORDER    = 500
 MOUTH    = 1000
 ARCH     = 2000
@@ -30,10 +26,13 @@ BASE     = ABUTMENT + 30
 EPS      = BASE+1 # straight, concave, ...
  
 CROWN = SITE + 200
-
  
  
 ########################### modifier CONSTANTS ################
+# (note convention of underbar "_" use to relate a modifier name to
+# a context ID name: SITE_TOOTHNUM is a 'toothnum' modifier of the 'site'
+# context. The convention is dropped for MDFL and OCCL because they
+# name modifiers related to several different contexts.
 
 #ORDER = 500
 ORDER_LATER = ORDER+10
