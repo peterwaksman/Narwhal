@@ -21,8 +21,8 @@ MULTISITEv = KList("multisite","multisite").var()
 ABUTMENTv  = KList("abutment", "abutment, abut, abutmen").var()
 MARGINv = KList("margin",  "margin, collar, outline, contour").var()  
 COREv = KList("core", "core # file, post").var()  
-BASEv = KList("base",  "base,  between interface and margin").var()  
-EPSv =KList("eps", "eps, esp, ets, profile,emergence,emergense,emmergence,emergance,emergency,profile,profiling").var()      
+BASEv = KList("base",  "base, between interface and margin,support tissue").var()  
+EPSv =KList("eps", "eps, esp, ets,profile,emergence,emergense,emmergence,emergance,emergency,profile,profiling").var()      
 CROWNv = KList("crown", "temporary|temp|janus|cutback|regular|normal|standard $ crown").var()
 
 
@@ -67,8 +67,8 @@ EPS_TYPEv = KList("epstype", "").var()
 EPS_TYPEv.subs([STRAIGHT, CONCAVE, CONVEX, ANKYLOS])
   
 # PRESSURE -------------------------------
-PRESSURE =  KList("pressure", "press, presure, blanch, blaching, push, push on, support, \
-                   expand,tissue pressure,compression, displace,displacement,\
+PRESSURE =  KList("pressure", "press, presure, blanch, blaching, push, push on,\
+                   expand,pressure,compression, displace,displacement,\
                    diplace, impinge, impingement").var()  
 BASE_PRESSUREv = PRESSURE.copy()
 

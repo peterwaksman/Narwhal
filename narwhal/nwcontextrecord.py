@@ -53,21 +53,31 @@ class ContextRecord():
         out += ')\n'
 
         for c in self.children:
-            out += c.str(ntabs+1) + '\n' # use record.str()
-
+            out += c.str(ntabs+1) #+ '\n' # use record.str()
+            if False and c != self.children[ len(self.children)-1 ]:
+                out += '\n'
         return out 
  
 
     def merge(self, other):
         if self.id!=other.id:
             print("OOPS!")
-        for d in self.details:
-            self.details[d] = other.details[d] # copy
-            if self.details[d][0]:
-                self.details[d][1] = HARDDETAIL #harden content
+        for mod in self.details:
+            val = self.details[mod][0]
+            status = self.details[mod][1]
+            oval = other.details[mod][0]
+            ostatus = other.details[mod][1]
+
+            if status==HARDDETAIL or ostatus==EMPTYDETAIL:
+                continue      
+            self.details[mod][0] = oval
+            self.details[mod][1] = ostatus
+            if self.details[mod][0]:
+                self.details[mod][1] = HARDDETAIL #harden content
+            x = 2
 
     def copy(self):
-        other = ContextRecord( self.id, self.mods)
+        other = ContextRecord( self.id, self.details)
         other.details = {}
         for d in self.details:
             detail = self.details[ d ][:]  # copy the list
@@ -121,5 +131,11 @@ class ContextRecord():
             return ''
 
 
+# used as a placeholder for RELS handlers
+def nullRel():
+    return None
 
+
+
+                     
                 

@@ -6,9 +6,6 @@ from narwhal.nwsegment import *
 
 from narwhal.nwcontextrecord import *
 
-# used as a placeholder for RELS handlers
-def nullRel():
-    return None
 
 """ 
 ----------------------------------------------------------
@@ -198,8 +195,13 @@ class ContextManager :
             id = var.knames[0]
             if id!='nullK':
                 mods = self.context[id].MODS
+
                 for mod in mods:
-                    self.writeDetail(id, mod, self.tree, tokens)
+                    r = self.fillRecord(id, mod, tokens, rawtokens)
+                    s = self.ledger.str()
+                    self.writeDetail(id, mod, r, self.tree, tokens, rawtokens)
+                    s = self.ledger.str()
+                    x = 2
                 x = 2   
 
         s = self.ledger.str()
@@ -208,31 +210,31 @@ class ContextManager :
 
         #self.ledger.harden()
 
-              # Active contexts
-        idvect = self.detectActiveContexts()
+        #      # Active contexts
+        #idvect = self.detectActiveContexts()
             
-                # MOVE THIS
-            # Active modifiers
-        mvect = []
-        for id in idvect:
-            mvect.extend(self.detectSubActiveMods(id, tokens, rawtokens) )
+        #        # MOVE THIS
+        #    # Active modifiers
+        #mvect = []
+        #for id in idvect:
+        #    mvect.extend(self.detectSubActiveMods(id, tokens, rawtokens) )
 
-            # merge the trees
-        T = KList("temp","").var()
-        T.sub( self.tree)
+        #    # merge the trees
+        #T = KList("temp","").var()
+        #T.sub( self.tree)
 
-        for id in mvect:
-            T.sub( self.mtree[id] )
+        #for id in mvect:
+        #    T.sub( self.mtree[id] )
 
-        segM = PrepareSegment(T, tokens, rawtokens)
+        #segM = PrepareSegment(T, tokens, rawtokens)
 
-        print( T.PrintSimple() + "\n")
-        print( "SEG: " + printSEG( segM ) )
+        #print( T.PrintSimple() + "\n")
+        #print( "SEG: " + printSEG( segM ) )
 
  
 
 
-    def writeDetail(self, id, mod, tree, tokens):
+    def writeDetail(self, id, mod, s, tree, tokens, rawtokens):
         last = self.lastActiveRecord
 
         if last.id == id :
@@ -240,27 +242,18 @@ class ContextManager :
         else:
             keepSameFocus = False
 
-        # CREATE A NEW RECORD -----------------------
-        s = self.newRecord( id )
-         
-        # FILL IT HERE -------------------------------
-        #h = self.context[id].RELS[mod]
-        #if h != nullRel:
-        #    h( segM, tree, tokens) 
      
-        # ????? make it the lastActiveRecord
-        #if not s.getDetail(mod):
-        #    return
-
-
-
         # WRITE OUT (using last or a copy)------------
         #  write out record in existing "last" or its copy
         if keepSameFocus:
             if last.details[mod][1] != HARDDETAIL:
                 last.merge(s)
                 self.lastActiveRecord = last
-            else: # new record is begun
+            elif s.details[mod][1]==HARDDETAIL:
+                p = self.getLastParent()
+                p.children.append(s)
+                self.lastActiveRecord = s
+            else: # ????
                 last = last.copy()
                 last.merge(s)
                 self.lastActiveRecord = last
@@ -271,31 +264,57 @@ class ContextManager :
         # or else we have some parent above 'id'
         commonID = self.getCommonParent(id, last.id )
 
-        # WRITE OUT TO A NEWLY FOCUSED RECORD --------
+        """ for rootID, allow merge but not append"""
+        # OK here? was moved from below
+        if id==commonID and commonID==self.rootID:
+            self.ledger.merge(s)
+            self.lastActiveRecord = self.ledger
+            return
+
+
+        # WRITE OUT TO A NEWLY FOCUSED RECORD 'r' -----
+        # the "head" of r is re-used
         r = self.ledger
         while( r.id != commonID ):
             r = r.children[  len( r.children)-1 ]
                 # r is a record that now stops at commonID
 
+        # then new records are created between r and s
         plist = self.getAllParents(id, commonID )  
-        plist.reverse() # now list goes top-to-bottom
+        plist.reverse()  
         for pid in plist:
             if pid==commonID:
                 continue
             c = self.newRecord(pid)
             r.children.append(c)
             r = c
-   
-        if r.id==s.id:
-            """ for rootID, allow merge but not append"""
-            if not r.id==self.rootID:
-                print("HUN???")
-            r.merge(s)
-            s = r
-        else:
-            r.children.append( s )
+
+        # now r is nested to the correct depth (I hope!)
+        r.children.append( s )
 
         self.lastActiveRecord = s
 
- 
 
+    def fillRecord(self, id, mod, tokens, rawtokens):
+        s = self.newRecord( id )
+
+        proc = self.context[id].RELS[mod]
+        if proc == nullRel:
+            return s
+
+                # get temp tree+modtree
+        tree = self.tree.copy()
+        mtree = self.modvars[mod]
+        tree.sub( mtree )
+
+        print( tree.PrintSimple() )
+
+        segM = PrepareSegment(tree, tokens, rawtokens)
+        
+        print( printSEG(segM) )
+
+ 
+        proc( segM, tree, tokens, s, mod) 
+        return s
+  
+                    
