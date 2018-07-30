@@ -343,7 +343,7 @@ def prepareTokens(text, rawtokens):
     # insert 0 before decimal
     text = cleanDecimals(text)
 
-    # make lower case tokens
+     # make lower case tokens
     tokens = text.split(' ')
     newtokens = []
     for tok in tokens:

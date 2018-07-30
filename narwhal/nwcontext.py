@@ -85,11 +85,13 @@ class ContextManager :
             context = ContextFrame(id, x[0], x[1], x[2], x[3], x[4] )    
             self.context[id] = context   
              
+            # because of this initialization, there must 
+            # either be null, generic, or mod-specific handlers. 
+            # See MARGIN_DEPTH
             context.RELS = {}
             for mod in x[1]:
                 context.RELS[mod] = modhandlers[mod] 
  
-
             # this wires together the vars 
         self.tree = self.buildSelfTree(rootID)
 
@@ -99,23 +101,25 @@ class ContextManager :
             self.mtree[id] = self.getMODTree(id)
     
         self.ledger = self.newRecord(rootID)
-        self.lastActiveRecord = self.ledger
-        x=2
+        self.activeRecordIDs = [rootID]
+      
 
+        # when 'id' is in a segment, it may not be an id of this tree
+    def isID(self, id):
+        if self.context.get(id):
+            return True
+        else:
+            return False
     def getVar(self, id):
-        return self.context[id].var
+        if self.isID(id):
+            return self.context[id].var
+        else:
+            return None
      
+
     def getMODTree( self, id ):
         c = self.context[id]
         return c.getMODTree(self.modvars)
-
-    def detectActiveContexts( self ):
-        idvect = []
-        for id in self.context:
-            v = self.getVar(id)
-            if v.found:
-                idvect.append(id)
-        return idvect
 
     def hasActiveMODS( self, id, tokens, rawtokens):
          mtree = self.mtree[id]
@@ -137,47 +141,51 @@ class ContextManager :
         return idvect
 
 
-        # this does NOT include the self id 
-        # and list is returned bottom-to-top
-    def getAllParents(self, id, stopID=None):
-        context = self.context[id]
+    def isActive(self, id):
+        for jd in self.activeRecordIDs:
+            if jd==id:
+                return True
+        return False
 
-        idList = [] # [id] for now let us not include id as its own parent
-        while context.ENV:
-            context = self.context[ context.ENV ] # step back to the parent
-            idList.append( context.ID )
-            if context.ID==stopID:
-                break;
-        return idList
-        
-        # this *does* include the id1 and id2 as possible results
-    def getCommonParent(self, id1, id2 ):
-        pid = self.getAllParents(id1)
-        pid.reverse()
-        pid.append(id1)
-       
-        qid = self.getAllParents(id2)
-        qid.reverse()
-        qid.append(id2)
+    def getParent(self, id):
+        return self.context[id].ENV
+             
+        # returns None if id is not active
+    def getRecentRecord(self, id):
+        if id==self.rootID:
+            return self.ledger
 
-        id = ''
-        for j in range( 0, min(len(pid), len(qid)) ):
-            if pid[j]!=qid[j]:
-                break
+        c = self.ledger
+        while c.children:
+            c = c.children[ len(c.children)-1 ]
+            if c.id==id:
+                return c
+
+    def resetActiveIDs(self):
+        self.activeRecordIDs = []
+        c = self.ledger      
+        while c:
+            self.activeRecordIDs.append( c.id )
+            if c.children:
+                c = c.children[ len(c.children)-1 ]
             else:
-                id = pid[j]
-        return id
+                break
+ 
+            # when id is not active, need different chain of ids
+    def appendChain(self, id, rec):
+        arec = rec
+        pid = self.getParent(id)
+        while not self.isActive( pid ):
+            k = self.newRecord(pid)
+            k.children.append( arec )
+            arec = k
+            pid = self.getParent( pid )
 
-  
-    def getLastParent(self):
-        p = self.ledger
-        s = p
-        while p != self.lastActiveRecord:
-            s = p
-            if p.children:
-                p = p.children[ len(p.children)-1 ]
-        return s
-    
+        # now pid is "common ancestor" above id but also "active"
+        k = self.getRecentRecord(pid)
+        k.children.append( arec )
+
+
 
 
     ##############################################
@@ -193,27 +201,26 @@ class ContextManager :
  
         for var in segment:
             id = var.knames[0]
-            if id!='nullK':
+            if self.isID(id):
                 mods = self.context[id].MODS
 
                 for mod in mods:
-                    r = self.fillRecord(id, mod, tokens, rawtokens)
-                    s = self.ledger.str()
-                    self.writeDetail(id, mod, r, self.tree, tokens, rawtokens)
-                    s = self.ledger.str()
+                    R = self.fillRecord(id, mod, tokens, rawtokens)
+                    if not R:
+                        continue
+                    for rec in R:
+                        self.writeDetail(id, mod, rec)
+                     
                     x = 2
-                x = 2   
-
+                
         s = self.ledger.str()
         print("***********\n")
         print(s)
 
         #self.ledger.harden()
 
-        #      # Active contexts
-        #idvect = self.detectActiveContexts()
-            
-        #        # MOVE THIS
+                  
+        #        # MOVE THIS, SHOWS CONTEXT DETECTION sans ID
         #    # Active modifiers
         #mvect = []
         #for id in idvect:
@@ -232,80 +239,52 @@ class ContextManager :
         #print( "SEG: " + printSEG( segM ) )
 
  
+        # 'mod' is an un-used argument.  But it can be changing
+        # behind the scenes, modfying different parts of the record
+        # so leave it here.
+    def writeDetail(self, id, mod, rec):
+        if self.isActive(id):
+            parent = self.getParent(id)
 
+            # special case of id==rootID
+            if not parent:               
+                self.ledger.merge(rec)  # (ignore return value)
+                self.activeRecordIDs = [self.rootID]
+                return
 
-    def writeDetail(self, id, mod, s, tree, tokens, rawtokens):
-        last = self.lastActiveRecord
+            # ---- MERGE OR SPLIT ----
+            # In these cases there is no change to "activeRecordsIDs"
+            else:
+                parentRec = self.getRecentRecord( parent )
+                myRec     = self.getRecentRecord( id )
 
-        if last.id == id :
-            keepSameFocus = True
+                if myRec.merge(rec):   # MERGE or...
+                    return
+                else:                   # SPLIT or...
+                    splitRec = myRec.copyAll(True) # make soft copy, including children
+                    splitRec.copyDetails(rec)      # overwrite the details
+                    parentRec.children.append( splitRec )
+                    return
+
+            # ---- APPEND NEW (and change activeRecrodIDs) ----
         else:
-            keepSameFocus = False
+            self.appendChain(id, rec )
 
-     
-        # WRITE OUT (using last or a copy)------------
-        #  write out record in existing "last" or its copy
-        if keepSameFocus:
-            if last.details[mod][1] != HARDDETAIL:
-                last.merge(s)
-                self.lastActiveRecord = last
-            elif s.details[mod][1]==HARDDETAIL:
-                p = self.getLastParent()
-                p.children.append(s)
-                self.lastActiveRecord = s
-            else: # ????
-                last = last.copy()
-                last.merge(s)
-                self.lastActiveRecord = last
-                p = self.getLastParent()
-                p.children.append(last)
-            return
-
-        # or else we have some parent above 'id'
-        commonID = self.getCommonParent(id, last.id )
-
-        """ for rootID, allow merge but not append"""
-        # OK here? was moved from below
-        if id==commonID and commonID==self.rootID:
-            self.ledger.merge(s)
-            self.lastActiveRecord = self.ledger
-            return
+        self.resetActiveIDs()
 
 
-        # WRITE OUT TO A NEWLY FOCUSED RECORD 'r' -----
-        # the "head" of r is re-used
-        r = self.ledger
-        while( r.id != commonID ):
-            r = r.children[  len( r.children)-1 ]
-                # r is a record that now stops at commonID
-
-        # then new records are created between r and s
-        plist = self.getAllParents(id, commonID )  
-        plist.reverse()  
-        for pid in plist:
-            if pid==commonID:
-                continue
-            c = self.newRecord(pid)
-            r.children.append(c)
-            r = c
-
-        # now r is nested to the correct depth (I hope!)
-        r.children.append( s )
-
-        self.lastActiveRecord = s
-
-
-    def fillRecord(self, id, mod, tokens, rawtokens):
-        s = self.newRecord( id )
-
+    def fillRecord(self, id, mod, tokens, rawtokens):    
         proc = self.context[id].RELS[mod]
         if proc == nullRel:
-            return s
+#            rec = self.newRecord( id )
+ #           return [rec]
+            return []
 
                 # get temp tree+modtree
         tree = self.tree.copy()
-        mtree = self.modvars[mod]
-        tree.sub( mtree )
+        for mod2 in self.context[id].MODS:
+            mtree = self.modvars[mod2]
+            tree.sub( mtree )
 
         print( tree.PrintSimple() )
 
@@ -313,8 +292,7 @@ class ContextManager :
         
         print( printSEG(segM) )
 
- 
-        proc( segM, tree, tokens, s, mod) 
-        return s
+        
+        R = proc(segM, tree, tokens, id, mod, self.context[id].MODS ) 
+        return R
   
-                    

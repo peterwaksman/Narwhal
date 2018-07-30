@@ -245,6 +245,7 @@ def cleanDecimals(text):
     newtext += text[len(text)-1]
     return newtext    
 
+
 def isInteger(tok):
     if len(tok)==0:
         return False

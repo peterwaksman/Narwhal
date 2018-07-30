@@ -10,7 +10,7 @@ HARDDETAIL=2  # when written to, because of the incoming text
 
 def strStatus(status):
     if status==EMPTYDETAIL:
-        return '0'
+        return 'E'
     elif status==SOFTDETAIL:
         return 'S'
     else:
@@ -28,14 +28,18 @@ class ContextRecord():
 
         self.children = []
 
+    def MODS( self ):
+        M = []
+        for d in self.details:
+            M.append(d)
+        return M
+
     def str(self, ntabs=0):
         pre = ''
         for i in range(0,ntabs):
             pre += "\t"
 
         out = pre
-
-  
                         # id
         out += self.id + ":"
 
@@ -58,42 +62,61 @@ class ContextRecord():
                 out += '\n'
         return out 
  
+    def copyAll(self, makesoft=False):
+        other = ContextRecord( self.id)
+        other.details = {}
+        for d in self.details:
+            detail = self.details[ d ][:]    # copy the list
+
+            if makesoft and detail[1]==HARDDETAIL:
+                detail[1] = SOFTDETAIL      # soften
+            other.details[d] = detail[:]     # store here
+
+        other.children = []
+        for child in self.children:
+            q = child.copyAll(makesoft)
+            other.children.append( q )
+        return other  
+
 
     def merge(self, other):
         if self.id!=other.id:
             print("OOPS!")
-        for mod in self.details:
-            val = self.details[mod][0]
-            status = self.details[mod][1]
-            oval = other.details[mod][0]
-            ostatus = other.details[mod][1]
+            return
 
-            if status==HARDDETAIL or ostatus==EMPTYDETAIL:
-                continue      
-            self.details[mod][0] = oval
-            self.details[mod][1] = ostatus
-            if self.details[mod][0]:
-                self.details[mod][1] = HARDDETAIL #harden content
+        temp = ContextRecord(self.id )
+          
+        for mod in other.details:
+            temp.details[mod] = self.details[mod][:]
+
+            val    = temp.details[mod][0]
+            status = temp.details[mod][1]
+            oval   = other.details[mod][0]
+            ostatus= other.details[mod][1]        
+
+            if status==HARDDETAIL: 
+                if val != oval: # cannot change a hard detail
+                    return False
+                else:
+                    continue
+            # now status is SOFT or EMPTY
+            elif ostatus==SOFTDETAIL or ostatus==HARDDETAIL:
+                temp.details[mod][0] = oval  # can overwrite  
+                temp.details[mod][1] = ostatus
+       
+        for d in temp.details:
+            self.details[d] = temp.details[d][:] # children and id are unchanged.
+            #self.details[d][1] = temp.details[d][1] # children and id are unchanged.
             x = 2
+        return True
 
-    def copy(self):
-        other = ContextRecord( self.id, self.details)
-        other.details = {}
-        for d in self.details:
-            detail = self.details[ d ][:]  # copy the list
-            other.details[d] = detail      # store here
-
-            if detail[0]: # the mod has a value
-                detail[1] = SOFTDETAIL
-
-        other.children = []
-        return other
-
-        for child in self.children:
-            q = child.copy()
-            other.children.append( q )
-
-        return other  
+    def copyDetails( self, other):
+        if self.id!=other.id:
+            print("OOPS!")
+            return
+        for d in other.details:
+            self.details[d] = other.details[d][:]
+            x = 2
     
     def harden( self ):
         for d in self.details:
@@ -130,6 +153,22 @@ class ContextRecord():
         except:
             return ''
 
+    def mergeOLD(self, other):
+        if self.id!=other.id:
+            print("OOPS!")
+        for mod in self.details:
+            val = self.details[mod][0]
+            status = self.details[mod][1]
+            oval = other.details[mod][0]
+            ostatus = other.details[mod][1]
+
+            if status==HARDDETAIL or ostatus==EMPTYDETAIL:
+                continue      
+            self.details[mod][0] = oval
+            self.details[mod][1] = ostatus
+            if self.details[mod][0]:
+                self.details[mod][1] = HARDDETAIL #harden content
+            x = 2
 
 # used as a placeholder for RELS handlers
 def nullRel():
