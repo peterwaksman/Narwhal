@@ -243,34 +243,33 @@ class ContextManager :
         # behind the scenes, modfying different parts of the record
         # so leave it here.
     def writeDetail(self, id, mod, rec):
-        if self.isActive(id):
-            parent = self.getParent(id)
 
-            # special case of id==rootID
-            if not parent:               
+        if self.isActive(id):
+            parentID = self.getParent(id)
+
+               # ---- MERGE ----                   
+            if not parentID:  # special case of id==rootID             
                 self.ledger.merge(rec)  # (ignore return value)
                 self.activeRecordIDs = [self.rootID]
                 return
-
-            # ---- MERGE OR SPLIT ----
-            # In these cases there is no change to "activeRecordsIDs"
-            else:
-                parentRec = self.getRecentRecord( parent )
+                        
+            else:             # In these cases, no change to "activeRecordsIDs"     
                 myRec     = self.getRecentRecord( id )
-
-                if myRec.merge(rec):   # MERGE or...
+                if myRec.merge(rec):   
                     return
-                else:                   # SPLIT or...
+
+                # ---- SPLIT ----
+                else:                   
                     splitRec = myRec.copyAll(True) # make soft copy, including children
                     splitRec.copyDetails(rec)      # overwrite the details
+                    parentRec = self.getRecentRecord( parentID )
                     parentRec.children.append( splitRec )
                     return
 
-            # ---- APPEND NEW (and change activeRecrodIDs) ----
+            # ---- APPEND ----
         else:
             self.appendChain(id, rec )
-
-        self.resetActiveIDs()
+            self.resetActiveIDs()
 
 
     def fillRecord(self, id, mod, tokens, rawtokens):    
