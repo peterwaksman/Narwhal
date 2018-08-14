@@ -68,6 +68,10 @@ kUNREQUEST += kUNDO # ignore distinction for now
 
 REQUEST = KList( "request", kREQUEST ).var() | KList("remove", kUNREQUEST ).var()
 
+################ 
+CONTACTASKv = KList("contact","contact,talk to").var()
+DESIREv = KList("desire","desire,i desire,i want,i want to,i need,\
+i need to, how do i,how can i,where do i,where can i,when do i,when can i").var()
 
 #########################################
 # not really quantities but what the heck

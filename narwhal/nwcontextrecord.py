@@ -28,12 +28,7 @@ class ContextRecord():
 
         self.children = []
 
-    def MODS( self ):
-        M = []
-        for d in self.details:
-            M.append(d)
-        return M
-
+ 
     def str(self, ntabs=0):
         pre = ''
         for i in range(0,ntabs):
@@ -139,37 +134,14 @@ class ContextRecord():
         return nesting
 
 
-    def append(self, id, mod, val):
-        nesting = self.currentDetails()
-        for detail in nesting:
-            if id != detail.id:
-                continue
-            else:
-                x = 2
-
+ 
     def getDetail(self, mod):
         try:
             return self.details[mod][0]
         except:
             return ''
 
-    def mergeOLD(self, other):
-        if self.id!=other.id:
-            print("OOPS!")
-        for mod in self.details:
-            val = self.details[mod][0]
-            status = self.details[mod][1]
-            oval = other.details[mod][0]
-            ostatus = other.details[mod][1]
-
-            if status==HARDDETAIL or ostatus==EMPTYDETAIL:
-                continue      
-            self.details[mod][0] = oval
-            self.details[mod][1] = ostatus
-            if self.details[mod][0]:
-                self.details[mod][1] = HARDDETAIL #harden content
-            x = 2
-
+ 
 # used as a placeholder for RELS handlers
 def nullRel():
     return None

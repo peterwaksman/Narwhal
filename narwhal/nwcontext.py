@@ -110,13 +110,13 @@ class ContextManager :
             return True
         else:
             return False
+
     def getVar(self, id):
         if self.isID(id):
             return self.context[id].var
         else:
             return None
-     
-
+ 
     def getMODTree( self, id ):
         c = self.context[id]
         return c.getMODTree(self.modvars)
@@ -202,14 +202,14 @@ class ContextManager :
         for var in segment:
             id = var.knames[0]
             if self.isID(id):
-                mods = self.context[id].MODS
+                MODS = self.context[id].MODS
 
-                for mod in mods:
+                for mod in MODS :
                     R = self.fillRecord(id, mod, tokens, rawtokens)
                     if not R:
                         continue
                     for rec in R:
-                        self.writeDetail(id, mod, rec)
+                        self.writeDetail(id, rec)
                      
                     x = 2
                 
@@ -233,16 +233,14 @@ class ContextManager :
         #for id in mvect:
         #    T.sub( self.mtree[id] )
 
-        #segM = PrepareSegment(T, tokens, rawtokens)
-
-        #print( T.PrintSimple() + "\n")
-        #print( "SEG: " + printSEG( segM ) )
+ 
 
  
-        # 'mod' is an un-used argument.  But it can be changing
-        # behind the scenes, modfying different parts of the record
-        # so leave it here.
-    def writeDetail(self, id, mod, rec):
+        """  
+          The MERGE, SPLIT, or APPEND algorithm
+         'mod' is an un-seen argument.  It can be changing
+          behind the scenes, modifying different parts of the record  """
+    def writeDetail(self, id, rec):
 
         if self.isActive(id):
             parentID = self.getParent(id)
@@ -254,29 +252,28 @@ class ContextManager :
                 return
                         
             else:             # In these cases, no change to "activeRecordsIDs"     
-                myRec     = self.getRecentRecord( id )
-                if myRec.merge(rec):   
+                prevRec     = self.getRecentRecord( id )
+                if prevRec.merge(rec):   
                     return
 
                 # ---- SPLIT ----
                 else:                   
-                    splitRec = myRec.copyAll(True) # make soft copy, including children
+                    splitRec = prevRec.copyAll(True) # make soft copy, including children
                     splitRec.copyDetails(rec)      # overwrite the details
+
                     parentRec = self.getRecentRecord( parentID )
                     parentRec.children.append( splitRec )
                     return
 
             # ---- APPEND ----
-        else:
+        else: # this id is not in the current active chain
             self.appendChain(id, rec )
             self.resetActiveIDs()
-
+            return
 
     def fillRecord(self, id, mod, tokens, rawtokens):    
         proc = self.context[id].RELS[mod]
         if proc == nullRel:
-#            rec = self.newRecord( id )
- #           return [rec]
             return []
 
                 # get temp tree+modtree
