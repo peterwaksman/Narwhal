@@ -57,21 +57,21 @@ class ContextRecord():
                 out += '\n'
         return out 
  
-    def copyAll(self, makesoft=False):
-        other = ContextRecord( self.id)
-        other.details = {}
-        for d in self.details:
-            detail = self.details[ d ][:]    # copy the list
+    #def copyAll(self, makesoft=False):
+    #    other = ContextRecord( self.id)
+    #    other.details = {}
+    #    for d in self.details:
+    #        detail = self.details[ d ][:]    # copy the list
 
-            if makesoft and detail[1]==HARDDETAIL:
-                detail[1] = SOFTDETAIL      # soften
-            other.details[d] = detail[:]     # store here
+    #        if makesoft and detail[1]==HARDDETAIL:
+    #            detail[1] = SOFTDETAIL      # soften
+    #        other.details[d] = detail[:]     # store here
 
-        other.children = []
-        for child in self.children:
-            q = child.copyAll(makesoft)
-            other.children.append( q )
-        return other  
+    #    other.children = []
+    #    for child in self.children:
+    #        q = child.copyAll(makesoft)
+    #        other.children.append( q )
+    #    return other  
 
 
     def merge(self, other):
@@ -90,7 +90,8 @@ class ContextRecord():
             ostatus= other.details[mod][1]        
 
             if status==HARDDETAIL: 
-                if val != oval: # cannot change a hard detail
+                if val != oval and oval:
+                #if val != oval: # cannot change a hard detail
                     return False
                 else:
                     continue
@@ -112,7 +113,17 @@ class ContextRecord():
         for d in other.details:
             self.details[d] = other.details[d][:]
             x = 2
-    
+
+    def copy(self, makesoft=False):
+        other = ContextRecord( self.id)
+        other.details = {}
+        for d in self.details:
+            detail = self.details[ d ][:]    # copy the list
+            if makesoft and detail[1]==HARDDETAIL:
+                detail[1] = SOFTDETAIL      # soften
+            other.details[d] = detail[:]     # store here
+        return other
+
     def harden( self ):
         for d in self.details:
             if self.details[d][0]: # the mod has a value
@@ -121,25 +132,25 @@ class ContextRecord():
         for child in self.children:
             child.harden() 
 
-    def currentDetails(self):
-        nesting = [self]
-        if self.children:
-            child = self.children[ len(self.children)-1 ] 
-        else:
-            child = None 
+    #def currentDetails(self):
+    #    nesting = [self]
+    #    if self.children:
+    #        child = self.children[ len(self.children)-1 ] 
+    #    else:
+    #        child = None 
              
-        if child:
-            nesting.extend( child.currentDetails() )
+    #    if child:
+    #        nesting.extend( child.currentDetails() )
 
-        return nesting
+    #    return nesting
 
 
  
-    def getDetail(self, mod):
-        try:
-            return self.details[mod][0]
-        except:
-            return ''
+    #def getDetail(self, mod):
+    #    try:
+    #        return self.details[mod][0]
+    #    except:
+    #        return ''
 
  
 # used as a placeholder for RELS handlers

@@ -149,6 +149,10 @@ class ContextManager :
 
     def getParent(self, id):
         return self.context[id].ENV
+
+    def getLastChild(self, id):
+        if self.children:
+            return self.children[ len(c.children)-1 ]
              
         # returns None if id is not active
     def getRecentRecord(self, id):
@@ -160,6 +164,25 @@ class ContextManager :
             c = c.children[ len(c.children)-1 ]
             if c.id==id:
                 return c
+
+    def copyLastAll(self ):
+        L = {}
+        #L[self.rootID] = self.ledger
+
+        for id in self.activeRecordIDs:
+            if id==self.rootID:
+                continue
+            rec = self.getRecentRecord(id)
+            newrec = rec.copy(True) # make a "soft" copy
+            L[id] = newrec
+
+        prevrec = self.ledger
+        for id in self.activeRecordIDs:
+            if id==self.rootID:
+                continue
+            prevrec.children.append( L[id] )
+            prevrec = L[id]
+        x = 2
 
     def resetActiveIDs(self):
         self.activeRecordIDs = []
@@ -199,8 +222,16 @@ class ContextManager :
             # fill the self.tree with 'found' vars
         segment = PrepareSegment(self.tree, tokens, rawtokens)   
  
-        for var in segment:
-            id = var.knames[0]
+            # sadly, this is needed to coordinate the internal Narhwal 'and'
+            # with this external stepping through of IDs
+        idcount = {}
+        for var in segment:       
+            id = var.knames[0] 
+            idcount[id] = 0         
+
+        for var in segment:       
+            id = var.knames[0]          
+
             if self.isID(id):
                 MODS = self.context[id].MODS
 
@@ -208,17 +239,24 @@ class ContextManager :
                     R = self.fillRecord(id, mod, tokens, rawtokens)
                     if not R:
                         continue
+
+                    j = 0
                     for rec in R:
-                        self.writeDetail(id, rec)
-                     
-                    x = 2
-                
+                        if j==idcount[id]:
+                            self.writeDetail(id, rec)
+                        j = j+1
+
+                        x = 2
+
+            idcount[id] = idcount[id]+1
+                 
         s = self.ledger.str()
         print("***********\n")
         print(s)
 
         #self.ledger.harden()
-
+        self.activeRecordIDs = [self.rootID]
+ 
                   
         #        # MOVE THIS, SHOWS CONTEXT DETECTION sans ID
         #    # Active modifiers
@@ -245,6 +283,8 @@ class ContextManager :
         if self.isActive(id):
             parentID = self.getParent(id)
 
+            s = self.ledger.str()
+
                # ---- MERGE ----                   
             if not parentID:  # special case of id==rootID             
                 self.ledger.merge(rec)  # (ignore return value)
@@ -257,13 +297,14 @@ class ContextManager :
                     return
 
                 # ---- SPLIT ----
-                else:                   
-                    splitRec = prevRec.copyAll(True) # make soft copy, including children
-                    splitRec.copyDetails(rec)      # overwrite the details
-
-                    parentRec = self.getRecentRecord( parentID )
-                    parentRec.children.append( splitRec )
+                else:         
+                    self.copyLastAll() # makes soft copy of recent sequence of records
+                    prevRec = self.getRecentRecord( id ) # which becomes "previous"
+                    ok = prevRec.merge(rec)
+                    if not ok: # the soft copy should be writable
+                        print("OOPS in SPLIT!")
                     return
+              
 
             # ---- APPEND ----
         else: # this id is not in the current active chain

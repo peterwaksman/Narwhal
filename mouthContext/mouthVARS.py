@@ -16,10 +16,10 @@ from mouthCONSTS import *
 ORDERv = KList("order", " my order , my * order , order , the order  , an order , case , a case , the case ").var()
 MOUTHv = KList("mouth","mouth, casts").var()
 ARCHv = KList("arch", "arch, upper, lower").var()
-SITEv = KList("site", "site, unit, tooth").var()
+SITEv = KList("site", "site, unit, tooth, _hash_ ").var()
 MULTISITEv = KList("multisite","multisite").var()
 ABUTMENTv  = KList("abutment", "abutment, abut, abutmen").var()
-MARGINv = KList("margin",  "margin, collar, outline, contour").var()  
+MARGINv = KList("margin",  "shoulder $ margin, collar, outline, contour").var()  
 COREv = KList("core", "core # file, post").var()  
 BASEv = KList("base",  "base, between interface and margin,support tissue").var()  
 EPSv =KList("eps", "eps, esp, ets,profile,emergence,emergense,emmergence,emergance,emergency,profile,profiling").var()      
@@ -206,7 +206,7 @@ ORDER_LATERv = KList("laterorder", "later order").var()
 # THIS IS THE MASTER LIST FOR ITEM SEQUENCE
 MOUTHID_SEQUENCE = [ 
                 'order' ,
-                'mouth',
+#                'mouth',
                 'arch',
                 'site' ,
                 'multisite', 
@@ -223,7 +223,7 @@ MOUTHID_SEQUENCE = [
 
 MouthIDvar = {
         'order' : ORDERv ,
-        'mouth' : MOUTHv , 
+ #       'mouth' : MOUTHv , 
         'arch' : ARCHv ,
         'site'  : SITEv ,
         'multisite' : MULTISITEv ,
@@ -257,10 +257,11 @@ MouthMODvars = {
     ORDER_LATER         : ORDER_LATERv  ,
     MDFL                : MDFLv , 
     OCCL                : OCCLv,
-    REF_FEATURE         : REF_FEATUREv ,
     REF_RELATION        : RELATION , # defined in GEOMETRY
     REF_AMOUNT          : RELAMOUNT, 
- 
+    MARGIN_DEPTH        : RELAMOUNT, 
+    REF_FEATURE         : REF_FEATUREv ,
+
     SITE_TOOTHNUM       : SITE_TOOTHNUMv , 
     SITE_TOOTHTYPE      : SITE_TOOTHTYPEv  ,
     SITE_TOOTHGROUP     : SITE_TOOTHGROUPv  ,
@@ -288,8 +289,8 @@ MouthMODvars = {
  #########################################################
  #########################################################
 """ Mouth Contexts (not all implemented)
-
-    'mouth' 
+ 'order'
+    #'mouth' 
         'arch' 
         'site'   
             'abutment'  
@@ -303,7 +304,7 @@ MouthMODvars = {
         'multisite'  
             'superstructure',
             'guide',
-            'kit',
+            'kit', # NAH this is an mod of 'order'
 
 Dental products are defined within the (sub)context of mouth where they apply. 
 For now, a context will have different vocabulary lists associated to its identity 
@@ -318,17 +319,17 @@ I am going to initialize this with a dictionary of entries
 
 MouthDict = {   
               #  id     : [ENV,   MODS ,  PARTS ,  RELS, var ]
-                'order' : [ '', [ORDER_LATER], ['mouth'], None, ORDERv],
+                'order' : [ '', [ORDER_LATER], ['multisite','arch','site'], None, ORDERv],
                                 
-                'mouth' : [ 'order', 
-                           [], 
-                           ['site', 'multisite', 'arch'], 
-                           None, MOUTHv]  ,
+                #'mouth' : [ 'order', 
+                #           [], 
+                #           ['site', 'multisite', 'arch'], 
+                #           None, MOUTHv]  ,
 
-                'multisite' : ['mouth', [], [], None, MULTISITEv ], # 'superstructure','guide','kit'
-                'arch' : ['mouth', [], [], None, ARCHv ],      #'upper','lower','cast','scan'
+                'multisite' : ['order', [], [], None, MULTISITEv ], # 'superstructure','guide','kit'
+                'arch' : ['order', [], [], None, ARCHv ],      #'upper','lower','cast','scan'
 
-                'site'  : [ 'mouth', 
+                'site'  : [ 'order', 
                            [ SITE_TOOTHNUM, SITE_TOOTHTYPE, SITE_TOOTHGROUP], 
                            ['abutment', 'crown'] ,  #'neighbor'], 
                            None, SITEv] ,
@@ -337,9 +338,11 @@ MouthDict = {
                               [ABUTMENT_MATERIAL, ABUTMENT_TYPE, ABUTMENT_RETENTION],
                               [ 'margin', 'core', 'base' ],
                               None, ABUTMENTv] ,
-
+                                            
+                                        # only MARGIN_DEPTH (REF_AMOUNT+1)
+                                        # has a handler
                 'margin' : [ 'abutment',
-                            [ MDFL, REF_FEATURE, REF_RELATION, REF_AMOUNT ],
+                            [ MDFL, REF_FEATURE, REF_RELATION, MARGIN_DEPTH ],
                             [],
                             None, MARGINv],
                 'core' : [ 'abutment',

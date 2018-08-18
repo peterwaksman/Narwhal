@@ -41,9 +41,16 @@ ORDER_LATER = ORDER+10
 MDFL = MOUTH+10 #direction: mesial, distal, facial, lingual
 OCCL = MOUTH+11
 
-REF_FEATURE = MOUTH+20 #reference feature: gum, neighbor, opposing
-REF_RELATION = MOUTH+30 #above, below, closest, ...
+REF_FEATURE = MOUTH+30 #reference feature: gum, neighbor, opposing
+REF_RELATION = MOUTH+20 #above, below, closest, ...
 REF_AMOUNT = MOUTH+40  #"2 mm" or "as much as possible"
+
+# NOTE these general concepts are used in margin setting, so 
+# at least one of them needs a version unique to margins, because
+# the handler function needs to be unique to margins.
+MARGIN_DEPTH = REF_AMOUNT+1
+
+
 
 
 #SITE = 2000

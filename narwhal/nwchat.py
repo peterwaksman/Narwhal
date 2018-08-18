@@ -133,7 +133,8 @@ class NWTopicReader():
         out = ID +  "g=" + str(g).ljust(5) + " " + "    e=" + str(e).ljust(5) + "    events= " + L
         return out
 
-
+    def getVault(self):
+        return self.reader.vault._vault
 #######################
 
 class NWTopic():

@@ -189,6 +189,17 @@ def isNullSegment(seg):
             return False
     return True
             
+def getIDCount(segment):
+    idcount = {}
+    for var in segment:       
+        id = var.knames[0]
+        idcount[id] = 0
+    for var in segment:   
+        id = var.knames[0]                
+        idcount[id]= idcount[id]+1
+    return idcount
+
+
 ################################################
 ################### inner read loop ############
 def ReadSegment(nar, seg):
