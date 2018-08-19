@@ -23,7 +23,7 @@ MARGINv = KList("margin",  "shoulder $ margin, collar, outline, contour").var()
 COREv = KList("core", "core # file, post").var()  
 BASEv = KList("base",  "base, between interface and margin,support tissue").var()  
 EPSv =KList("eps", "eps, esp, ets,profile,emergence,emergense,emmergence,emergance,emergency,profile,profiling").var()      
-CROWNv = KList("crown", "temporary|temp|janus|cutback|regular|normal|standard $ crown").var()
+CROWNv = KList("crown", "crown").var()
 
 
 #########################################################################

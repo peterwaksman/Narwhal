@@ -255,7 +255,7 @@ class ContextManager :
         print(s)
 
         #self.ledger.harden()
-        self.activeRecordIDs = [self.rootID]
+        #self.activeRecordIDs = [self.rootID]
  
                   
         #        # MOVE THIS, SHOWS CONTEXT DETECTION sans ID
