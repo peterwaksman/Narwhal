@@ -256,23 +256,7 @@ class ContextManager :
 
         #self.ledger.harden()
         #self.activeRecordIDs = [self.rootID]
- 
-                  
-        #        # MOVE THIS, SHOWS CONTEXT DETECTION sans ID
-        #    # Active modifiers
-        #mvect = []
-        #for id in idvect:
-        #    mvect.extend(self.detectSubActiveMods(id, tokens, rawtokens) )
-
-        #    # merge the trees
-        #T = KList("temp","").var()
-        #T.sub( self.tree)
-
-        #for id in mvect:
-        #    T.sub( self.mtree[id] )
-
- 
-
+                
  
         """  
           The MERGE, SPLIT, or APPEND algorithm
@@ -300,7 +284,7 @@ class ContextManager :
                 else:         
                     self.copyLastAll() # makes soft copy of recent sequence of records
                     prevRec = self.getRecentRecord( id ) # which becomes "previous"
-                    ok = prevRec.merge(rec)
+                    ok = prevRec.merge(rec, rec.block)
                     if not ok: # the soft copy should be writable
                         print("OOPS in SPLIT!")
                     return

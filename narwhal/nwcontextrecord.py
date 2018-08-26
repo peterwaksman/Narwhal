@@ -21,6 +21,8 @@ class ContextRecord():
     def __init__(self, id = '', contextMods = []):
         self.id = id
 
+        self.block = False # could call this anything
+
         # details are indexed by mods of the context
         self.details = {}
         for m in contextMods:
@@ -35,11 +37,15 @@ class ContextRecord():
             pre += "\t"
 
         out = pre
+
+        if self.block:        
+            out += "~" 
                         # id
         out += self.id + ":"
 
                         # details (mod values)
         M = self.details
+        
         out += '('
         for mod in M:
             out += '['
@@ -57,29 +63,17 @@ class ContextRecord():
                 out += '\n'
         return out 
  
-    #def copyAll(self, makesoft=False):
-    #    other = ContextRecord( self.id)
-    #    other.details = {}
-    #    for d in self.details:
-    #        detail = self.details[ d ][:]    # copy the list
 
-    #        if makesoft and detail[1]==HARDDETAIL:
-    #            detail[1] = SOFTDETAIL      # soften
-    #        other.details[d] = detail[:]     # store here
-
-    #    other.children = []
-    #    for child in self.children:
-    #        q = child.copyAll(makesoft)
-    #        other.children.append( q )
-    #    return other  
-
-
-    def merge(self, other):
+    def merge(self, other, applyBlock=False):
         if self.id!=other.id:
             print("OOPS!")
             return
 
         temp = ContextRecord(self.id )
+
+        # unless applying the block to self, test compatibility
+        if (not applyBlock) and (other.block != self.block):
+            return False
           
         for mod in other.details:
             temp.details[mod] = self.details[mod][:]
@@ -104,6 +98,9 @@ class ContextRecord():
             self.details[d] = temp.details[d][:] # children and id are unchanged.
             #self.details[d][1] = temp.details[d][1] # children and id are unchanged.
             x = 2
+
+        if applyBlock:
+            self.block = other.block
         return True
 
     def copyDetails( self, other):
@@ -116,6 +113,7 @@ class ContextRecord():
 
     def copy(self, makesoft=False):
         other = ContextRecord( self.id)
+        #other.block = self.block
         other.details = {}
         for d in self.details:
             detail = self.details[ d ][:]    # copy the list
@@ -131,26 +129,6 @@ class ContextRecord():
 
         for child in self.children:
             child.harden() 
-
-    #def currentDetails(self):
-    #    nesting = [self]
-    #    if self.children:
-    #        child = self.children[ len(self.children)-1 ] 
-    #    else:
-    #        child = None 
-             
-    #    if child:
-    #        nesting.extend( child.currentDetails() )
-
-    #    return nesting
-
-
- 
-    #def getDetail(self, mod):
-    #    try:
-    #        return self.details[mod][0]
-    #    except:
-    #        return ''
 
  
 # used as a placeholder for RELS handlers
