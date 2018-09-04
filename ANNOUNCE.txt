@@ -1,3 +1,9 @@
+Sept 4 2018
+Conversational Context and Context Ledger now supported, including use of polarity. See nwcontext, nwcontextrecord, and *Context modules.
+
+
+
+
 June 28
 First checkin for ContextFrame
 
